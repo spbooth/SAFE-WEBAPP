@@ -2,7 +2,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
-public class TimeStampSelector implements Selector<TimeStampInput> {
+public class DateSelector implements Selector<DateInput> {
 
 	@Override
 	public int hashCode() {
@@ -20,23 +20,23 @@ public class TimeStampSelector implements Selector<TimeStampInput> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		TimeStampSelector other = (TimeStampSelector) obj;
+		DateSelector other = (DateSelector) obj;
 		if (res != other.res)
 			return false;
 		return true;
 	}
 	private final long res;
 	
-	public TimeStampSelector(long res) {
+	public DateSelector(long res) {
 		this.res=res;
 	}
 
-	public TimeStampSelector() {
+	public DateSelector() {
 		this(1000L);
 	}
 	@Override
-	public TimeStampInput getInput() {
-		TimeStampInput input = new TimeStampInput(res);
+	public DateInput getInput() {
+		DateInput input = new DateInput(res);
 		return input;
 	}
 

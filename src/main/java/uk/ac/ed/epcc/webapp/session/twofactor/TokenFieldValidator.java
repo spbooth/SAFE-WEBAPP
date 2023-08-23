@@ -18,7 +18,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
-/**
+/** A {@link FieldValidator} for MFA tokens
  * @author Stephen Booth
  *
  */

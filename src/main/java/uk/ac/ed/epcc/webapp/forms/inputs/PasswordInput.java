@@ -18,7 +18,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 
 /**
  * Input for a password field. Works the same as a TextInput but is displayed
@@ -40,7 +40,7 @@ public class PasswordInput extends TextInput implements AutoCompleteHint {
 	public PasswordInput() {
 		super();
 		setBoxWidth(32);
-		addValidator(new FieldValidator<String>() {
+		addValidator(new SingleLineFieldValidator() {
 			
 			@Override
 			public void validate(String data) throws FieldException {

@@ -6,8 +6,9 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 
-public class EmailFieldValidator implements FieldValidator<String> , HTML5Input, FormatHintInput{
+public class EmailFieldValidator implements SingleLineFieldValidator , HTML5Input, FormatHintInput{
 	/**
 	 * 
 	 */

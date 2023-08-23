@@ -1072,6 +1072,26 @@ public final class Repository extends AbstractContexed implements AppContextClea
 			return get(name);
 		}
 
+		/** Get a property using a {@link TypeProducer} registered with or discovered
+		 * by the {@link Repository}.
+		 * If the {@link TypeProducer} is already in-scope use {@link #getProperty(TypeProducer)} as it will
+		 * have better type safety. However this method can be used instead of explicitly constructing 
+		 * a {@link TypeProducer} as the producer will be cached within the {@link Repository}.
+		 * 
+		 * @param name
+		 * @return
+		 */
+		public final Object getProducedProperty(String name) {
+			FieldInfo info = getInfo(name);
+			if( info == null ) {
+				return null; // optional field?
+			}
+			TypeProducer prod = info.getTypeProducer();
+			if( prod == null ) {
+				throw new ConsistencyError("Expecting TypeProducer for "+getTag()+"."+name);
+			}
+			return getProperty(prod);
+		}
 		/**
 		 * Returns the value associated with this database column name Unlike
 		 * getProperty the returned value should never be null to additional error

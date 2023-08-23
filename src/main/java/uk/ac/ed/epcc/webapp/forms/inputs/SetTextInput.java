@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 /** A {@link TextInput} that takes a comma separated list of values that must come
  * from a defined set
  * 
@@ -24,7 +24,7 @@ public class SetTextInput extends TextInput implements PatternInput, ItemInput<S
 		for(String a : list.split(SPLIT)) {
 			allowed.add(a);
 		}
-		addValidator(new FieldValidator<String>() {
+		addValidator(new SingleLineFieldValidator() {
 			
 			@Override
 			public void validate(String data) throws FieldException {

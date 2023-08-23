@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 
 /** A class that build password update forms
  * @author spb
@@ -107,7 +108,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
      * @author spb
      *
      */
-    private class MatchValidator implements FieldValidator<String>{
+    private class MatchValidator implements SingleLineFieldValidator{
 
     	/**
 		 * @param user

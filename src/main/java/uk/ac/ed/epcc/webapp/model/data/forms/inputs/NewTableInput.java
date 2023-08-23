@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 /** Input to generate a name for a new database table.
  * 
  * @author spb
@@ -35,7 +36,7 @@ public class NewTableInput extends TextInput {
 	 * @author Stephen Booth
 	 *
 	 */
-	public final class NewTableNameValidator implements FieldValidator<String> {
+	public final class NewTableNameValidator implements SingleLineFieldValidator {
 		/**
 		 * 
 		 */

@@ -22,7 +22,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
-import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
 
@@ -38,7 +38,7 @@ public class SshPublicKeyInput extends ParseAbstractInput<String> implements Ite
 		setBoxWidth(48);
 		setSingle(true);
 		addValidator(new MaxLengthValidator(4096));
-		addValidator(new FieldValidator<String>() {
+		addValidator(new SingleLineFieldValidator() {
 			
 			@Override
 			public void validate(String value) throws FieldException {

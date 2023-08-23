@@ -306,6 +306,9 @@ public class Dummy1 extends DataObject implements Removable {
 		public FilterUpdate<Dummy1> getUpdate(){
 			return new FilterUpdate<>(res);
 		}
+		public Map<String,String> getConfigTags(){
+			return getFinalTableSpecification(getContext(), getTag()).getConfigTags();
+		}
 		
     }
 

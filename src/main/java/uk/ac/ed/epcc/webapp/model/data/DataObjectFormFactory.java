@@ -29,12 +29,16 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormBuilder;
 import uk.ac.ed.epcc.webapp.forms.factory.FormFactory;
 import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.registry.IndexedFormEntry;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
@@ -60,7 +64,7 @@ import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 public  abstract class DataObjectFormFactory<BDO extends DataObject> extends DataObjectLabeller<BDO> implements FormFactory, FormBuilder, IndexedProducer<BDO>{
    public static final Feature DEFAULT_FORBID_HTML = new Feature("form_factory.default_forbid_html_text",true,"Forbid HTML in auto generated text inputs for database fields");
    public static final Feature DEFER_CONTENT = new Feature("form_factory.defer_content",true,"Defer form label generation till needed.");
-
+   public static final Feature WARN_REDUNDANT = new Feature("form_factory.warn_redundant",false,"Generate errors if an explicit Seelctor matches the auto-generated value");
 protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 super(fac);
    }
@@ -385,49 +389,77 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 		return null;
 	}
 	
-	/** Add a set of selectors based on the tables referenced by field keys
-	 * @param conn 
+	/** Add a set of selectors based on the REpository/TableSpecification
+	 * 
+	 * To avoid lots of builder-plate and duplication of specification we
+	 * would rather pick up Selectors here than explicitly from the Factory/Composites
+	 * we therefore have a debugging uption to try and locate redundant definitions
+	 * however this won't help with similar but not identical definitions.
+	 * 
+	 * 
+	 * 
 	 * @param sel 
-	 * @param res
 	 * @return modified map
 	 */
-	public static Map<String,Selector> addSelectors(AppContext conn,Map<String,Selector> sel,Repository res){
+	public Map<String,Selector> addSelectors(Map<String,Selector> sel){
 		if( sel == null ){
 			sel = new HashMap<>();
 		}
+		AppContext conn = getContext();
+		Repository res = factory.res;
+		TableSpecification ts = getSpecification(); // may be null.
+		boolean warn_redundant = WARN_REDUNDANT.isEnabled(conn);
+		Logger logger = conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class);
 		for(String field : res.getFields()){
 			Repository.FieldInfo info = res.getInfo(field);
-			if( ! sel.containsKey(field)){		
-				if( info.getTypeProducer() != null ){
-					// Some TypeProducers also implement selector.
-					// check these before referenced table as 
+			if( warn_redundant || ! sel.containsKey(field)){
+				Selector auto=null;
+				// Check for  a TypeProducer in the Repository
+				TypeProducer prod = info.getTypeProducer();
+				if( prod != null ){
+					auto=prod;
+					// TypeProducers also implement selector.
+					// check for IndexedProducer in preference
 					// 
-					TypeProducer prod = info.getTypeProducer();
-					if( prod instanceof Selector){
-						sel.put(field, (Selector) prod);
+					if( prod instanceof IndexedTypeProducer) { // This should handle reference fields
+						IndexedTypeProducer itp = (IndexedTypeProducer)prod;
+						IndexedProducer ip = itp.getProducer();
+						if( ip instanceof Selector) {
+							auto = (Selector) ip;
+						}	
 					}
-				}else{
-					String ref_table = info.getReferencedTable();
-					if( ref_table != null ){
-						Selector o = null;
-						Class<? extends Selector> c = conn.getPropertyClass(Selector.class, null,ref_table);
-						if( c != null ){
-							try {
-								o = conn.makeParamObject(c,conn,ref_table );
-							} catch (Exception e) {
-								try {
-									o = conn.makeObject(c);
-								} catch (Exception e1) {
-									conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("Unable to construct "+c.getCanonicalName()+" for table "+ref_table);
-								}
+
+				}
+				if( auto == null && ts != null ) {
+					// Can we get anything from the TableSpecification
+					FieldType t = ts.getField(field);
+					if ( t != null ) {
+						MakeSelectorVisitor vis = new MakeSelectorVisitor(res);
+						t.accept(vis);
+						auto = vis.getSelector();
+					}
+					
+				}
+				
+				if( auto != null ) {
+					if( ! warn_redundant ) {
+						sel.put(field, auto);
+					}else {
+						Selector prev = sel.get(field);
+						if( prev == null ) {
+							sel.put(field, auto);
+						}else {
+							// override or redundant
+							if( auto.equals(prev)) {
+								// redundent set
+
+								logger.error("Redundant selector for "+res.getTable()+"."+field);
+							}else {
+								logger.info("Overidden selector for "+res.getTable()+"."+field);
 							}
-						}
-						if( o != null ){
-							sel.put(field, o);
 						}
 					}
 				}
-				
 			}
 		}
 		return sel;
@@ -481,7 +513,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 		for(TableStructureContributer c : factory.getTableStructureContributers()){
 			sel = c.addSelectors(sel);
 		}
-		return addSelectors(getContext(), sel, factory.res);
+		return addSelectors( sel);
 	}
 	
 	/**

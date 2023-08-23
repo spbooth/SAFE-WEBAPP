@@ -6,12 +6,13 @@ import java.net.URL;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 
 /**
  * @author Stephen Booth
  *
  */
-public final class URLValidator implements FieldValidator<String> , HTML5Input{
+public final class URLValidator implements SingleLineFieldValidator , HTML5Input{
 	@Override
 	public void validate(String value) throws FieldException {
 		try {

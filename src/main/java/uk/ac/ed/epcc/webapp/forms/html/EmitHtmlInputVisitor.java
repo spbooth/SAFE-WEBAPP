@@ -28,8 +28,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
-import uk.ac.ed.epcc.webapp.validation.FieldValidator;
-import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
+import uk.ac.ed.epcc.webapp.validation.*;
 
 public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisitor<Object>{
 	/**
@@ -420,7 +419,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		
 		emitTextParam(hb, input,input.getKey(), id,input.getBoxWidth(), 
 				MaxLengthValidator.getMaxLength(input.getValidators()),
-				input.getSingle(), false,def);
+				useSingle(input), false,def);
 		if( input instanceof UnitInput){
 			String unit = ((UnitInput) input).getUnit();
 			if (unit  != null) {
@@ -428,6 +427,26 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.clean(unit);
 			}
 		}
+	}
+	/** Check if the input should be presented a single line
+	 * 
+	 * @param <X>
+	 * @param input
+	 * @return
+	 */
+	private <X> boolean useSingle(LengthInput<X> input) {
+		if( input.getSingle()) {
+			return true;
+		}
+		FieldValidationSet<X> set = input.getValidators();
+		if( set != null) {
+			for(FieldValidator v : set) {
+				if( v instanceof SingleLineFieldValidator) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private String getParam(Input i){

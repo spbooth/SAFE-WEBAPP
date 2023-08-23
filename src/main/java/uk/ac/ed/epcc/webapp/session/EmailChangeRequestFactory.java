@@ -39,6 +39,7 @@ import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
 
 
 
@@ -170,10 +171,8 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 	    	// use email field so we can use the normal field input
 		    // the factory class may have a special version
 	    	AppUserFactory factory = getAppUserFactory();
-			Input input = (Input) factory.getSelectors().get(EmailNameFinder.EMAIL);
-	    	if( input == null ){
-	    		input = new EmailInput();
-	    	}
+	    	EmailInput input = new EmailInput();
+	    	
 			f.addInput(EmailNameFinder.EMAIL, "New Email Address", input);
 			// Must not change to existing email unless already taken by same user.
 			Field field = f.getField(EmailNameFinder.EMAIL);

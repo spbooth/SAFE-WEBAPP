@@ -2375,11 +2375,5 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return new SQLOrFilter<>(getTag(), filters);
 	}
 
-	public final Map<String,String> getConfigTags() throws Exception {
-		TableSpecification spec = getFinalTableSpecification(getContext(), getTag());
-		if( spec != null) {
-			return spec.getConfigTags();
-		}
-		return null;
-	}
+	
 }

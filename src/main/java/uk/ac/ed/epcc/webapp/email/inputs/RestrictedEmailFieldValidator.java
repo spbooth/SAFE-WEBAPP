@@ -19,12 +19,13 @@ import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 
 /** A {@link FieldValidator} that checks for forbidden email patterns
  * @author spb
  *
  */
-public class RestrictedEmailFieldValidator implements FieldValidator<String> {
+public class RestrictedEmailFieldValidator implements SingleLineFieldValidator {
 
     private String bad_pattern_text[]=null;
 	private Pattern bad_patterns[]=null;

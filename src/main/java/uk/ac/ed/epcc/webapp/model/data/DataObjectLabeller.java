@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.AbstractFormTextGenerator;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.forms.FieldHelpProvider;
 import uk.ac.ed.epcc.webapp.model.data.forms.FormLabelProvider;
 
@@ -173,6 +174,13 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 		factory=fac;  
 	}
 
+	private TableSpecification spec=null;
+	protected TableSpecification getSpecification() {
+		if( spec == null ) {
+			spec = factory.getFinalTableSpecification(getContext(), factory.getTag());
+		}
+		return spec;
+	}
 	/** Get a map of field names to secondary config tags.
 	 * 
 	 * @return
@@ -180,8 +188,13 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 	protected Map<String,String> getConfigTags() {
 		if( config_tags == null) {
 			try {
-				config_tags = factory.getConfigTags();
-				config_tags = Collections.unmodifiableMap(config_tags);
+				TableSpecification s = getSpecification();
+				if( s != null ) {
+					config_tags = s.getConfigTags();
+					if( config_tags != null ) {
+						config_tags = Collections.unmodifiableMap(config_tags);
+					}
+				}
 			}catch(Exception e) {
 				getLogger().error("Error making config tags",e);
 			}

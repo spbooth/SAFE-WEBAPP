@@ -276,21 +276,6 @@ Targetted<AU>
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getSelectors()
-	 */
-	@Override
-	protected Map<String,Selector> getSelectors() {
-		// expose to EmailCahngeRequest 
-		// final to see if any overiddes.
-		Map<String,Selector> selectors = super.getSelectors();
-		
-		
-		return selectors;
-	}
-   
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObject.Factory#getSupress()
 	 */
 	@Override

@@ -17,7 +17,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 
 
 /** An input that checks for existing records of the same name.
@@ -42,7 +42,7 @@ public class UnusedNameInput<F extends DataObject> extends NoHtmlInput{
     	super();
     	this.fac=fac;
     	setSingle(true);
-    	addValidator(new FieldValidator<String>() {
+    	addValidator(new SingleLineFieldValidator() {
 			
 			@Override
 			public void validate(String name) throws FieldException {

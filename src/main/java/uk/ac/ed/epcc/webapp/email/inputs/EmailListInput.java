@@ -24,6 +24,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.MultipleInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 /** Input for a list of email addresses.
  * 
  * @author spb
@@ -42,7 +43,7 @@ public class EmailListInput extends TextInput implements MultipleInput, FormatHi
 	}
 
 
-	public class EmailListValidator implements FieldValidator<String> {
+	public class EmailListValidator implements SingleLineFieldValidator {
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.FieldValidator#validate(java.lang.Object)
