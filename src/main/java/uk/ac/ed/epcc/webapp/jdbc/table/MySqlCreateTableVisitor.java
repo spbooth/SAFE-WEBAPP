@@ -39,7 +39,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	public static final Feature FOREIGN_KEY_DELETE_CASCASE_FEATURE = new Feature("foreign-key.delete_cascase",true,"Default to DELETE CASCASE on foreign keys for references that do not allow null");
     public static final Feature FORCE_MYISAM_ON_FULLTEXT_FEATURE=new Feature("mysql.force_myisam_on_fulltext",false,"Always use MyISAM if table contains fulltext index");
     public static final Feature USE_TIMESTAMP=new Feature("mysql.use_timestamp",false,"use timestamp fields by default");
-    public static final Feature USE_DATE=new Feature("mysql.use_date",false,"use date fields by default");
+    public static final Feature USE_DATE=new Feature("mysql.use_date",true,"use date fields by default");
 
     private final MysqlSQLContext ctx;
 	private final StringBuilder sb;
@@ -47,11 +47,18 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	private boolean use_memory=false;
 	private boolean use_myisam=false; // older versions of mysql need this for fulltext
 	private final List<Object> args;
-	public MySqlCreateTableVisitor(MysqlSQLContext ctx,StringBuilder sb, List<Object> args){
+	boolean use_date;
+	boolean use_timestamp;
+	public MySqlCreateTableVisitor(MysqlSQLContext ctx,String config_tag,StringBuilder sb, List<Object> args){
 		this.ctx=ctx;
 		this.sb=sb;
 		this.args=args;
-		this.use_memory = ctx.getContext().getBooleanParameter("create_table.use_memory", use_memory);
+		AppContext conn = ctx.getContext();
+		// Note don't have these start create_table.table-name as this will
+		// conflict with dynamic table fields
+		this.use_memory = conn.getBooleanParameter("create_table.use_memory", use_memory);
+		use_date =  conn.getBooleanParameter("create_table.use_date."+config_tag, USE_DATE.isEnabled(ctx.getContext()));
+		use_timestamp = conn.getBooleanParameter("create_table.use_timestamp."+config_tag, USE_TIMESTAMP.isEnabled(ctx.getContext()));
 	}
 	 
 	public void visitDateFieldType(DateFieldType dateFieldType) {
@@ -63,7 +70,8 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 		
 		//sb.append("TIMESTAMP");
 		if( dateFieldType.isTruncate()) {
-			if( USE_DATE.isEnabled(ctx.getContext())) {
+		
+			if( use_date) {
 				sb.append("DATE");
 				doNull(dateFieldType);
 				Date d = dateFieldType.getDefault();
@@ -80,7 +88,8 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 				doNumericDate(dateFieldType);
 			}
 		}else {
-			if( USE_TIMESTAMP.isEnabled(ctx.getContext())) {
+			
+			if( use_timestamp) {
 				sb.append("TIMESTAMP");
 				doNull(dateFieldType);
 				Date d = dateFieldType.getDefault();

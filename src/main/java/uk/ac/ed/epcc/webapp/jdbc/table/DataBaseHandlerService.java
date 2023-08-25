@@ -197,7 +197,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 	public String createTableText(boolean check_exists,String name, TableSpecification s,
 			SQLContext c, List<Object> args) {
 		StringBuilder sb = new StringBuilder();
-		FieldTypeVisitor vis = c.getCreateVisitor(sb,args);
+		FieldTypeVisitor vis = c.getCreateVisitor(name,sb,args);
 		sb.append("CREATE TABLE ");
 		if( check_exists){
 			sb.append(" IF NOT EXISTS ");
@@ -288,7 +288,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 	public String alterTableText(Repository res, TableSpecification s,
 			SQLContext c, List<Object> args) {
 		StringBuilder sb = new StringBuilder();
-		FieldTypeVisitor vis = c.getCreateVisitor(sb,args);
+		FieldTypeVisitor vis = c.getCreateVisitor(res.getParamTag(),sb,args);
 		sb.append("ALTER TABLE ");
 		res.addTable(sb, true);
 		boolean seen=false;
@@ -312,7 +312,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 
 	public String addFieldText(Repository res, String name, FieldType f,SQLContext c, List<Object> args) {
 		StringBuilder query = new StringBuilder();
-		FieldTypeVisitor vis = c.getCreateVisitor(query,args);
+		FieldTypeVisitor vis = c.getCreateVisitor(res.getParamTag(),query,args);
 		query.append("ALTER TABLE ");
 		res.addTable(query, true);
 		query.append(" ADD ");

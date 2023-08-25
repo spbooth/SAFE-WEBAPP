@@ -18,14 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.expr.BinaryExpression;
-import uk.ac.ed.epcc.webapp.jdbc.expr.BinarySQLValue;
-import uk.ac.ed.epcc.webapp.jdbc.expr.ConstExpression;
-import uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression;
-import uk.ac.ed.epcc.webapp.jdbc.expr.DerefSQLExpression;
-import uk.ac.ed.epcc.webapp.jdbc.expr.Operator;
-import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
+import uk.ac.ed.epcc.webapp.jdbc.expr.*;
 import uk.ac.ed.epcc.webapp.jdbc.filter.CannotUseSQLException;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor;
 import uk.ac.ed.epcc.webapp.model.data.expr.DurationSQLExpression;
@@ -141,11 +134,12 @@ public interface SQLContext extends Contexed{
 	public SQLExpression<String> hashFunction(Hash h, SQLExpression<String> arg) throws CannotUseSQLException;
 	/** Get a {@link FieldTypeVisitor} used to generate table specifications.
 	 * 
+	 * @param config_tag  String (usually the table being modified) qualifies config parameters
 	 * @param sb StringBuilder  to add SQL fragments to
 	 * @param args List query parameters
 	 * @return {@link FieldTypeVisitor}
 	 */
-	public FieldTypeVisitor getCreateVisitor(StringBuilder sb, List<Object> args);
+	public FieldTypeVisitor getCreateVisitor(String config_tag,StringBuilder sb, List<Object> args);
 	
 	/** Get an identifying string for the database host we are connected to.
 	 * 

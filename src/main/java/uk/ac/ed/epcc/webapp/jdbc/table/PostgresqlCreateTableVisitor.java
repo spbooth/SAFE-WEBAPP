@@ -33,7 +33,7 @@ public class PostgresqlCreateTableVisitor implements FieldTypeVisitor {
 	private final PostgresqlSQLContext ctx;
 	private final StringBuilder sb;
 	private final List<Object> args;
-	public PostgresqlCreateTableVisitor(PostgresqlSQLContext ctx,StringBuilder sb, List<Object> args){
+	public PostgresqlCreateTableVisitor(PostgresqlSQLContext ctx,String config_tag,StringBuilder sb, List<Object> args){
 		this.ctx=ctx;
 		this.sb=sb;
 		this.args=args;
