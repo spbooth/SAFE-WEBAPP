@@ -515,6 +515,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 		for(TableStructureContributer c : factory.getTableStructureContributers()){
 			sel = c.addSelectors(sel);
 		}
+		sel = addSelectors(sel);
 		return addSelectors( sel);
 	}
 	

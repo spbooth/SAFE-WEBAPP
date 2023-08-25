@@ -173,7 +173,7 @@ public abstract class MessageDataObject extends DataObject implements
 				if(auto_save){
 					m.saveChanges();
 				}
-				m.writeTo(sd.getOutputStream());
+				m.writeTo(sd.getOutputStream(),ignoreList());
 				//getLogger().debug("update value to "+sd);
 				record.setProperty(MESSAGE, sd);
 				m=null; // force re-read 
@@ -181,6 +181,14 @@ public abstract class MessageDataObject extends DataObject implements
 		} catch (Exception e) {
 			getLogger().error("Error writing mail message", e);
 		}
+	}
+	
+	/** HEaders to be ignored when saving message
+	 * 
+	 * @return
+	 */
+	protected String[] ignoreList() {
+		return null;
 	}
 
 	/* (non-Javadoc)

@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** Target object for {@link EmailTransitionProvider}

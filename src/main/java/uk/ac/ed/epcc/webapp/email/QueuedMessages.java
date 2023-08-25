@@ -1,0 +1,204 @@
+package uk.ac.ed.epcc.webapp.email;
+
+import java.io.*;
+import java.util.*;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
+import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
+import uk.ac.ed.epcc.webapp.model.cron.LockFactory;
+import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
+import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
+import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
+import uk.ac.ed.epcc.webapp.model.mail.MessageDataObject;
+/** Table to hold queued email messages. These are usually messages that failed to send originally
+ * and need to be retried. It is also possible to configure all messages to be queued to the database first
+ * to be extracted and sent by a separate process. This might be needed if the normal servers don't have direct access to a mail
+ * relay.
+ * 
+ * @param <Q>
+ */
+public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends DataObjectFactory<Q> implements AnonymisingFactory{
+	private static final String QUEUED_EMAILS_RETRY_LOCK = "queued_emails.retry_lock";
+	public static final String RETRY = "Retry";
+	public static final String LAST_RETRY = "LastRetry";
+	
+	@Override
+	protected TableSpecification getDefaultTableSpecification(AppContext c, String table) {
+		TableSpecification spec = MessageDataObject.getTableSpecification();
+		spec.setField(RETRY, new IntegerFieldType());
+		spec.setField(LAST_RETRY, new DateFieldType(true, null));
+		return spec;
+	}
+
+	public static final String DEFAULT_TABLE="QueuedMessages";
+	
+	public static QueuedMessages getFactory(AppContext conn) {
+		return conn.makeObject(QueuedMessages.class, DEFAULT_TABLE);
+	}
+	
+	public QueuedMessages(AppContext conn,String table) {
+		setContext(conn, table);
+	}
+	
+	public static class QueuedMessage extends MessageDataObject{
+
+		protected QueuedMessage(Record r) {
+			super(r);
+		}
+		
+		public Date getSentDate() {
+			try {
+				return getMessage().getSentDate();
+			} catch (Exception e) {
+				getLogger().error("Error getting Sent date", e);
+			}
+			return null;
+		}
+		public int getRetry() {
+			return record.getIntProperty(RETRY,0);
+		}
+		public Date getLastRetry() {
+			return record.getDateProperty(LAST_RETRY);
+		}
+		
+		public void recordRetry() throws DataFault {
+			record.setProperty(RETRY, getRetry()+1);
+			record.setProperty(LAST_RETRY, getContext().getService(CurrentTimeService.class).getCurrentTime());
+			commit();
+		}
+
+		@Override
+		protected String[] ignoreList() {
+			// Don't save message id as it will be re-written on attempted send
+			return new String[] {"Message-ID"};
+		}
+	}
+
+	@Override
+	protected Q makeBDO(Record res) throws DataFault {
+		return (Q) new QueuedMessage(res);
+	}
+
+	/** Add a {@link MimeMessage} to the queue.
+	 * 
+	 * @param m
+	 * @return
+	 * @throws DataFault
+	 */
+	public Q queueMessage(MimeMessage m) throws DataFault {
+	
+		Q qm = makeBDO();
+		qm.setMessage(m);
+		qm.commit();
+		return qm;
+	}
+
+	@Override
+	public void anonymise() throws DataFault {
+		// Just delete all records.
+		FilterDelete del = new FilterDelete<>(res);
+		del.delete(null);
+	}
+	public Table getMessageQueue() throws DataFault {
+		Table t = new Table();
+		for(QueuedMessage m : all()) {
+			t.put("Subject", m, m.getSubject());
+			t.put("Recipients", m, m.getRecipients());
+			t.put("Sent", m, m.getSentDate());
+		}
+		return t;
+	}
+	
+	public void retry() {
+		if( Emailer.EMAIL_FORCE_QUEUE_FEATURE.isEnabled(getContext())) {
+			return;
+		}
+		try {
+			// Shortcut check. Don't take the lock unless there seem to be some
+			// records to process.
+			if( ! exists(null)) {
+				return;
+			}
+		} catch (DataException e) {
+			getLogger().error("Error checking for any queued emails",e);
+			return;
+		}
+		Emailer em = Emailer.getFactory(getContext());
+		LockFactory locks = LockFactory.getFactory(getContext());
+		try(Lock lock = locks.makeFromString(QUEUED_EMAILS_RETRY_LOCK)){
+			if( lock.takeLock()) {
+				// Get list of ids as we will be doing deletes
+				LinkedHashSet<Integer> ids = new LinkedHashSet<>();
+				for(Q m : all()) {
+					ids.add(m.getID());
+				}
+				for(Integer id : ids) {
+					Q m = find(id);
+					em.retry(m);
+				}
+			}
+		} catch (Exception e) {
+			getLogger().error("Error retrying queued emails", e);
+		}
+	}
+	/** Copy all pending emails to a {@link StreamData} and remove from queue
+	 * 
+	 * @return
+	 * @throws DataFault
+	 * @throws ParseException
+	 * @throws Exception
+	 */
+	public StreamData exportMessages() throws DataFault, ParseException, Exception {
+		ByteArrayStreamData data = new ByteArrayStreamData();
+		LockFactory locks = LockFactory.getFactory(getContext());
+		Base64.Encoder enc = Base64.getEncoder();
+		try(Lock lock = locks.makeFromString(QUEUED_EMAILS_RETRY_LOCK)){
+			OutputStream stream = data.getOutputStream();
+			Writer w = new OutputStreamWriter(stream);
+			Set<Integer> deletes = new HashSet<>();
+			if( lock.takeLock()) {
+				for(Q m : all()) {
+					ByteArrayOutputStream tmp = new ByteArrayOutputStream();
+					m.getMessage().writeTo(tmp);
+					w.write(enc.encodeToString(tmp.toByteArray()));
+					w.write('\n');
+					deletes.add(m.getID());
+				}
+				w.close();
+				// only delete when all processed sucessfully
+				for(Integer id : deletes) {
+					Q m = find(id);
+					m.delete();
+				}
+			}
+		}
+		return data;
+	}
+	
+	public void importMessages(StreamData data) throws IOException, MessagingException, DataFault {
+		InputStream is = data.getInputStream();
+		BufferedReader r = new BufferedReader(new InputStreamReader(is));
+		Session session = Session.getInstance(getContext().getProperties(),
+				null);
+		Base64.Decoder dec = Base64.getDecoder();
+		for(String line=r.readLine(); line !=null ; line=r.readLine()) {
+			ByteArrayInputStream ms = new ByteArrayInputStream(dec.decode(line));
+			MimeMessage m = new MimeMessage(session, ms);
+			queueMessage(m);
+		}	
+	}
+}

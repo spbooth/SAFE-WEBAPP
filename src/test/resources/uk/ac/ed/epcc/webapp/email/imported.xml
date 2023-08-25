@@ -1,0 +1,12 @@
+<Diff><TableSpecification name='QueuedMessages'>
+<Message type='Blob' nullable='true'/>
+<Retry type='Integer' nullable='true'/>
+<LastRetry type='Long' nullable='true'/>
+</TableSpecification>
+<QueuedMessages id='3'>
+<Message>RGF0ZTogRnJpLCAyNSBBdWcgMjAyMyAxNTozMDowMCArMDEwMCAoQlNUKQ0KRnJvbTogbm9yZXBseUBlcGNjLmVkLmFjLnVrDQpUbzogdXNlckBleGFtcGxlLmNvbQ0KU3ViamVjdDogIEEgdGVzdCBFbWFpbA0KTUlNRS1WZXJzaW9uOiAxLjANCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD11cy1hc2NpaQ0KQ29udGVudC1UcmFuc2Zlci1FbmNvZGluZzogN2JpdA0KWC1IZWxwZGVzazogU2FmDQpYLVNhZi1zZXJ2aWNlOiB0ZXN0DQoNCgoKVGhpcyBpcyBhIHRlc3QgZW1haWwKCgkJCVRoYW5rcw==</Message>
+</QueuedMessages>
+<QueuedMessages id='4'>
+<Message>RGF0ZTogRnJpLCAyNSBBdWcgMjAyMyAxNTozMDowMCArMDEwMCAoQlNUKQ0KRnJvbTogbm9yZXBseUBlcGNjLmVkLmFjLnVrDQpUbzogdXNlcjJAZXhhbXBsZS5jb20NClN1YmplY3Q6ICBBIHRlc3QgRW1haWwNCk1JTUUtVmVyc2lvbjogMS4wDQpDb250ZW50LVR5cGU6IHRleHQvcGxhaW47IGNoYXJzZXQ9dXMtYXNjaWkNCkNvbnRlbnQtVHJhbnNmZXItRW5jb2Rpbmc6IDdiaXQNClgtSGVscGRlc2s6IFNhZg0KWC1TYWYtc2VydmljZTogdGVzdA0KDQoKClRoaXMgaXMgYSB0ZXN0IGVtYWlsCgoJCQlUaGFua3M=</Message>
+</QueuedMessages>
+</Diff>

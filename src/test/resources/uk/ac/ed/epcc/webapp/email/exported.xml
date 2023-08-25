@@ -1,0 +1,12 @@
+<Diff><QueuedMessages id='1' deleted='true'/><QueuedMessages id='2' deleted='true'/><TableSpecification name='Locks'>
+<Name type='String' nullable='false' max='128'/>
+<Description type='String' nullable='true' max='255'/>
+<Lock type='Long' nullable='true'/>
+<LastLock type='Long' nullable='true'/>
+<name_key type='Index' unique='true'><Column name='Name'/></name_key>
+</TableSpecification>
+<Locks id='1'>
+<Name>queued_emails.retry_lock</Name>
+<LastLock>1692974100</LastLock>
+</Locks>
+</Diff>
