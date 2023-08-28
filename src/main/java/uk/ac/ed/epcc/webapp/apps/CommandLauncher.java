@@ -48,7 +48,7 @@ public class CommandLauncher extends AbstractContexed{
 	  private static final Option OPT_HELP = new Option(options, 'h', "help",
 		"Print usage information and exit");
 	  private static final Option OPT_PROP = new Option(options, 'P', true,
-		"Specifiy a property value.  e.g. -Pprop=val").setMultipleArgs();
+		"Specifiy a property value.  e.g. -Pprop=val").noValueSeparator().setMultipleArgs();  // disable value separator to allow comma in properties
 
 	  private static final Option OPT_PROPS_FILE = new Option(options, 'p',
 		"properties", true, "Specify a properties file to load").setMultipleArgs();
