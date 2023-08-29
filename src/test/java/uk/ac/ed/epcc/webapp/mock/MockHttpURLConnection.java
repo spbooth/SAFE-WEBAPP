@@ -106,7 +106,7 @@ public class MockHttpURLConnection extends HttpURLConnection {
 		return out.toString();
 	}
 	
-	public void setReponse(byte[] response) {
+	public void setResponse(byte[] response) {
 		this.response = response;
 	}
 	public void setStatus(String status) {
@@ -115,8 +115,11 @@ public class MockHttpURLConnection extends HttpURLConnection {
 	public void setOK() {
 		this.status="HTTP/1.1 200 OK";
 	}
-	public void addResponseHeader(String fiels,String value  ) {
-		headers.put(fiels,value);
+	public void setContentType(String type) {
+		addResponseHeader("content-type", type);
+	}
+	public void addResponseHeader(String field,String value  ) {
+		headers.put(field,value);
 	}
 	public void addStatusLine(String line) {
 		status=line;
