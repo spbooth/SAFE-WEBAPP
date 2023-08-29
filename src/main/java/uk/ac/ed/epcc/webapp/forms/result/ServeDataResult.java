@@ -29,6 +29,16 @@ public final class ServeDataResult implements FormResult {
 	private final ServeDataProducer producer;
 	private List<String> args;
 	
+	public ServeDataResult(ServeDataProducer producer, String ...strings ) {
+		this(producer,getArgs(strings));
+	}
+	public static LinkedList<String> getArgs(String ...strings){
+		LinkedList<String> args = new LinkedList<>();
+		for(String s :  strings) {
+			args.add(s);
+		}
+		return args;
+	}
 
 	public ServeDataResult(ServeDataProducer producer, List<String> args){
 		this.producer=producer;

@@ -8,8 +8,9 @@ import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
-import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.content.*;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
@@ -21,9 +22,10 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
-import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
-import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
+import uk.ac.ed.epcc.webapp.model.data.stream.*;
 import uk.ac.ed.epcc.webapp.model.mail.MessageDataObject;
+import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 /** Table to hold queued email messages. These are usually messages that failed to send originally
  * and need to be retried. It is also possible to configure all messages to be queued to the database first
  * to be extracted and sent by a separate process. This might be needed if the normal servers don't have direct access to a mail
@@ -31,7 +33,7 @@ import uk.ac.ed.epcc.webapp.model.mail.MessageDataObject;
  * 
  * @param <Q>
  */
-public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends DataObjectFactory<Q> implements AnonymisingFactory{
+public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends DataObjectFactory<Q> implements AnonymisingFactory, ServeDataProducer{
 	private static final String QUEUED_EMAILS_RETRY_LOCK = "queued_emails.retry_lock";
 	public static final String RETRY = "Retry";
 	public static final String LAST_RETRY = "LastRetry";
@@ -54,7 +56,7 @@ public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends Data
 		setContext(conn, table);
 	}
 	
-	public static class QueuedMessage extends MessageDataObject{
+	public class QueuedMessage extends MessageDataObject implements UIGenerator {
 
 		protected QueuedMessage(Record r) {
 			super(r);
@@ -85,6 +87,25 @@ public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends Data
 		protected String[] ignoreList() {
 			// Don't save message id as it will be re-written on attempted send
 			return new String[] {"Message-ID"};
+		}
+		public MimeStreamData getData() throws DataFault, IOException, MessagingException {
+			ByteArrayMimeStreamData result = new ByteArrayMimeStreamData();
+			getMessage().writeTo(result.getOutputStream());
+			result.setName(getDownloadName());
+			result.setMimeType("message/rfc822");
+			return result;
+		}
+
+		private String getDownloadName() {
+			return Integer.toString(getID())+".msg";
+		}
+
+		@Override
+		public ContentBuilder addContent(ContentBuilder builder) {
+			LinkedList<String> args = new LinkedList<>();
+			args.add(Integer.toString(getID()));
+			builder.addLink(getContext(), getIdentifier(), new ServeDataResult(QueuedMessages.this, args));
+			return builder;
 		}
 	}
 
@@ -119,6 +140,7 @@ public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends Data
 			t.put("Subject", m, m.getSubject());
 			t.put("Recipients", m, m.getRecipients());
 			t.put("Sent", m, m.getSentDate());
+			t.put("Download", m, new Button(getContext(), "download", new ServeDataResult(this, Integer.toString(m.getID()))));
 		}
 		return t;
 	}
@@ -200,5 +222,20 @@ public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends Data
 			MimeMessage m = new MimeMessage(session, ms);
 			queueMessage(m);
 		}	
+	}
+
+	@Override
+	public MimeStreamData getData(SessionService user, List<String> path) throws Exception {
+		QueuedMessage m = find(Integer.parseInt(path.get(0)));
+		if( user != null && user.hasRelationship(this, m, "download")) {
+			return m.getData();
+		}
+		return null;
+	}
+
+	@Override
+	public String getDownloadName(SessionService user, List<String> path) throws Exception {
+		QueuedMessage m = find(Integer.parseInt(path.get(0)));
+		return m.getDownloadName();
 	}
 }
