@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
+import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.stream.*;
 import uk.ac.ed.epcc.webapp.model.mail.MessageDataObject;
 import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
@@ -107,6 +108,16 @@ public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends Data
 			builder.addLink(getContext(), getIdentifier(), new ServeDataResult(QueuedMessages.this, args));
 			return builder;
 		}
+		
+		public String getExportString() throws DataFault, IOException, MessagingException {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			getMessage().writeTo(out, ignoreList());
+			Base64.Encoder enc = Base64.getEncoder();
+			return enc.encodeToString(out.toByteArray());
+		}
+		
+		
+		
 	}
 
 	@Override
@@ -143,6 +154,10 @@ public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends Data
 			t.put("Download", m, new Button(getContext(), "download", new ServeDataResult(this, Integer.toString(m.getID()))));
 		}
 		return t;
+	}
+	public void delete(int id) throws DataFault {
+		FilterDelete<Q> del = new FilterDelete<>(res);
+		del.delete(new SQLIdFilter<>(res, id));
 	}
 	
 	public void retry() {
@@ -187,18 +202,20 @@ public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends Data
 	public StreamData exportMessages() throws DataFault, ParseException, Exception {
 		ByteArrayStreamData data = new ByteArrayStreamData();
 		LockFactory locks = LockFactory.getFactory(getContext());
-		Base64.Encoder enc = Base64.getEncoder();
+		
 		try(Lock lock = locks.makeFromString(QUEUED_EMAILS_RETRY_LOCK)){
 			OutputStream stream = data.getOutputStream();
 			Writer w = new OutputStreamWriter(stream);
 			Set<Integer> deletes = new HashSet<>();
 			if( lock.takeLock()) {
 				for(Q m : all()) {
-					ByteArrayOutputStream tmp = new ByteArrayOutputStream();
-					m.getMessage().writeTo(tmp);
-					w.write(enc.encodeToString(tmp.toByteArray()));
-					w.write('\n');
-					deletes.add(m.getID());
+					try {
+						w.write(m.getExportString());
+						w.write('\n');
+						deletes.add(m.getID());
+					}catch(Exception e) {
+						getLogger().error("Error exporting queued message", e);
+					}
 				}
 				w.close();
 				// only delete when all processed sucessfully
