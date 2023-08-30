@@ -604,10 +604,12 @@ public class Emailer implements Contexed{
 		qm.recordRetry();
 		
 	}
-	/**
-	 * @param m
+	/** Actually send the {@link MimeMessage}
+	 * @param m {@link MimeMessage}
+	 * 
+	 * Note this will return null if message sending is disabled.
 
-	 * @return
+	 * @return sent {@link MimeMessage}
 	 * @throws MessagingException
 	 * @throws AddressException
 	 * @throws DataFault 
@@ -726,6 +728,7 @@ public class Emailer implements Contexed{
 			}catch(Exception e){
 				log.error("Error logging contents",e);
 			}
+			return null; // indicate send supressed
 		}
 		return m;
 	}
