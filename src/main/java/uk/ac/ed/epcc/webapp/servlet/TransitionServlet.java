@@ -316,6 +316,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 						}
 						t = tp.getTransition(target,key); // transition may depend on target e.g confirm transition
 					}
+					String logTag = getLogTag(tp,target); // target may be deleted in transition to make logTag here
 					try{
 
 						aquired=System.currentTimeMillis();
@@ -379,14 +380,15 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 						}
 						try{
 							long now = System.currentTimeMillis();
+							
 							if((now-aquired) > max_wait){
 								long secs = (now-aquired)/1000L;
 								// This transition has taken a long time
-								log.warn("Long transition "+secs+" seconds ("+HourTransform.toHrsMinSec(secs)+") provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
+								log.warn("Long transition "+secs+" seconds ("+HourTransform.toHrsMinSec(secs)+") provider="+tp.getTargetName()+" target="+logTag+" key="+key);
 							}else if( now-start > max_wait){
 								// Long time waiting for lock
 								long secs = (now-start)/1000L;
-								log.warn("Blocked transition "+secs+" seconds ("+HourTransform.toHrsMinSec(secs)+") provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
+								log.warn("Blocked transition "+secs+" seconds ("+HourTransform.toHrsMinSec(secs)+") provider="+tp.getTargetName()+" target="+logTag+" key="+key);
 							}
 						}catch(Exception tr){
 							log.error("Problem reporting transition timimgs",tr);

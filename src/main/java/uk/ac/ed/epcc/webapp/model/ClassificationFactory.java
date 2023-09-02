@@ -267,70 +267,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 
 		
 	}
-	/** An {@link DataObjectItemInput} that uses the {@link ParseFactory#findFromString(String)} method to locate
-	 * 
-	 * Note this is not constrained by the select filter so can be used to locate retired objects.
-	 * @author spb
-	 *
-	 */
-	public class NameItemInput extends ParseAbstractInput<Integer> implements DataObjectItemParseInput<T>{
-
-		/**
-		 * 
-		 */
-		public NameItemInput() {
-			super();
-			setSingle(true);
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
-		 */
-		@Override
-		public void setItem(T item) {
-			if( item == null ){
-				setNull();
-				return;
-			}
-			try {
-				setValue(item.getID());
-			} catch (TypeException e) {
-				// should never happend
-				throw new TypeError(e);
-			}
-			
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseInput#parse(java.lang.String)
-		 */
-		@Override
-		public void parse(String v) throws ParseException {
-			if( v == null || v.trim().length()==0){
-				setNull();
-				return;
-			}
-			setItem(findFromString(v));
-		}
-        @Override
-		public Integer parseValue(String v) throws ParseException {
-        	if( v == null || v.trim().length()==0){
-				return null;
-			}
-			T item = findFromString(v);
-			if( item != null) {
-				return item.getID();
-			}
-			return null;
-        }
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput#getDataObject()
-		 */
-		@Override
-		public T getItembyValue(Integer val) {
-			return find(val);
-		}	
-	}
+	
 	@Override
 	protected Map<String, FieldValidationSet> getValidators() {
 		Map<String, FieldValidationSet> validators = super.getValidators();
@@ -344,28 +281,13 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			super(ClassificationFactory.this);
 		}
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory#getSelectors()
-		 */
+	
 		@Override
-		protected Map<String, Selector> getSelectors() {
-			Map<String,Selector> result = super.getSelectors();
-			
-			
-			result.put(ClassificationFactory.NAME, new Selector() {
-
-				@Override
-				public Input getInput() {
-					// done here as only the create form can check that the name does not exist
-					// the update form has to rely on the sql update generating an error.
-					UnusedNameInput<T> input = new UnusedNameInput<>(ClassificationFactory.this);
-					input.setTrim(true);
-					return input;
-				}
-				
-			});
-			
-			return result;
+		protected Map<String, FieldValidationSet> getValidators() {
+			Map<String, FieldValidationSet> validators = super.getValidators();
+			// Name should not be in use.
+			FieldValidationSet.add(validators, NAME, new UnusedNameValidator<T>(ClassificationFactory.this, null));
+			return validators;
 		}
 		
 	}
@@ -437,8 +359,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			// don't allow edits to the name
 			super.customiseUpdateForm(f, o);
 			if( allow_name_change){
-				UnusedNameInput<C> input = new UnusedNameInput<>(getClassificationFactory(),o);
-				f.getField(ClassificationFactory.NAME).setInput(input);
+				f.getField(ClassificationFactory.NAME).addValidator(new UnusedNameValidator<C>(getClassificationFactory(), o));
 			}else{
 				f.getField(ClassificationFactory.NAME).lock();
 			}
@@ -449,26 +370,19 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		 */
 		@Override
 		public DataObjectItemInput<C> getSelectInput() {
-			try{
-				// for update we want name inputs so we can access old entries.
-				// use auto-complete if sufficiently small
-				ClassificationFactory<C> cf = getClassificationFactory();
-				BaseFilter<C> finalSelectFilter = cf.getFinalSelectFilter();
-				
-				if( cf.getCount(finalSelectFilter) < cf.getMaxDataList()) {
-					return new NameFinderInput<C, ClassificationFactory<C>>(cf, cf, false, null, finalSelectFilter);
-				}
+
+			// for update we want name inputs so we can access old entries.
+			// use auto-complete if sufficiently small
+			ClassificationFactory<C> cf = getClassificationFactory();
+			BaseFilter<C> finalSelectFilter = cf.getFinalSelectFilter();
+			boolean autocomplete = false;
+			try {
+				autocomplete = 		cf.getCount(finalSelectFilter) < cf.getMaxDataList();
 			}catch(Exception e){
-				getLogger().error("Error making input", e);;
+				getLogger().error("Error checking auto-complete count", e);;
 			}
-			// fall back to name lookup without suggestions
-			return getClassificationFactory().new NameItemInput();
+			return new NameFinderInput<C, ClassificationFactory<C>>(cf, cf, false,autocomplete, null, finalSelectFilter);
 		}
-
-		
-
-		
-		
 	}
 	@Override
 	public FormUpdate<T> getFormUpdate(AppContext c) {
@@ -555,11 +469,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		}catch(Exception e) {
 			getLogger().error("Error mutating input",e);
 		}
-		
-		// fall back to a name input with restrictions.
-		NameItemInput input = new NameItemInput();
-		input.addValidator(new DataObjectFieldValidator(restrict));
-		return input;
+		return new NameFinderInput<>(this,this, false,false, restrict, fil);
 	}
 
 	/* (non-Javadoc)

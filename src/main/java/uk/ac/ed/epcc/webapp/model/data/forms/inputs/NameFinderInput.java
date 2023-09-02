@@ -66,7 +66,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	}
 	private boolean create;
 	private final BaseFilter<T> restrict;
-	private boolean use_autocomplete;  // allow autocomplete to be turned off while keeping the filter for restrictions.
+	private boolean use_autocomplete;  // allow autocomplete to be turned off 
 	private final BaseFilter<T> autocomplete;
 	
 	public T parseItem(String v) throws ParseException {
@@ -119,9 +119,16 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	}
 	@Override
 	public Integer parseValue(String v) throws ParseException {
+		if( v == null || v.trim().isEmpty()) {
+			return null;
+		}
 		T item = parseItem(v);
 		if( item == null) {
-			return null;
+			try {
+				return Integer.parseInt(v);
+			}catch(NumberFormatException nf) {
+				return null;
+			}
 		}
 		return item.getID();
 	}
@@ -179,7 +186,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		if( p != null ){
 			return finder.getCanonicalName(p);
 		}
-		return "";
+		return Integer.toString(val);
 	}
 	/**
 	 * @return the create
