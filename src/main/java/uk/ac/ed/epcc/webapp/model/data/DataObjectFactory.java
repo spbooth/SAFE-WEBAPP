@@ -1459,9 +1459,17 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return {@link Selector}
 	 */
 	public final DataObjectSelector<BDO> getSelector(BaseFilter<BDO> fil){
-		return new FilterSelector(null,fil);
+		return getSelector(null, fil);
 	}
-	
+	/** create a {@link Selector} for a filter
+	 * 
+	 * @param sel  A {@link BaseFilter} to narrow suggestions
+	 * @param restrict A {@link BaseFilter} to restrict allowed values (also narrows selections)
+	 * @return
+	 */
+	public final DataObjectSelector<BDO> getSelector(BaseFilter<BDO> sel,BaseFilter<BDO> restrict){
+		return new FilterSelector(sel,restrict);
+	}
 	@Override
 	public final DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> fil){
 		// This should narrow the default selector of this class
