@@ -462,13 +462,12 @@ DataObjectTransitionProvider<AU, AppUserFactory<AU>, AppUserKey<AU>>{
 	    if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 
 	    	ExtendedXMLBuilder text = cb.getText();
 	    	text.open("small");
-	    	text.clean(c.expandText("All information supplied is held and processed in accordance with the ${service.name} Personal Data and Privacy Policy.\n" + 
-	    			"You can find full details "));
+	    	text.clean(c.expandText("All information supplied is held and processed in accordance with the ${service.name} "));
 	    	text.open("a");
 	    		text.attr("href",privacy_policy);
 	    		text.attr("target", "_blank");
 	    		text.attr("rel","noopener noreferrer external");
-	    		text.clean("here");
+	    		text.clean("Personal Data and Privacy Policy");
 	    	text.close();
 	    	text.clean(".");
 	    	text.close();

@@ -502,21 +502,25 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
         	   c.customiseForm(f);
            }
 	}
+	private Map<String,Selector> selector_map=null;
 	/**
 	 * Get a Map of selectors to use for forms of this type.
 	 * 
 	 * @return Map
 	 */
-	protected  Map<String,Selector> getSelectors() {
-		Map<String,Selector>sel = factory.getSelectors();
-		if( sel == null ){
-			sel = new HashMap<>();
+	protected Map<String,Selector> getSelectors() {
+		if( selector_map == null ) {
+			Map<String,Selector>sel = factory.getSelectors();
+			if( sel == null ){
+				sel = new HashMap<>();
+			}
+			for(TableStructureContributer c : factory.getTableStructureContributers()){
+				sel = c.addSelectors(sel);
+			}
+			sel = addSelectors(sel);
+			selector_map = addSelectors( sel);
 		}
-		for(TableStructureContributer c : factory.getTableStructureContributers()){
-			sel = c.addSelectors(sel);
-		}
-		sel = addSelectors(sel);
-		return addSelectors( sel);
+		return selector_map;
 	}
 	
 	/**

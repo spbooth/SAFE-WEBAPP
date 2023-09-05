@@ -190,6 +190,9 @@ form.transition .action_buttons, form .action_buttons{
 	 background-color: var(--form-content-bg-color);
 	 padding: 10px;
 }
+.action_buttons{
+	border: none;
+}
 
 div td.button{
 	background-color: #fff;
