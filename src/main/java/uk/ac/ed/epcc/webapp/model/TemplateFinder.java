@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.ContextCached;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.TextFileOverlay.TextFile;
@@ -45,7 +46,7 @@ import uk.ac.ed.epcc.webapp.resource.ResourceService;
  */
 
 
-public class TemplateFinder implements Contexed{
+public class TemplateFinder implements Contexed, ContextCached{
 	private final AppContext conn;
 	private String group;
 	private final TextFileOverlay ov;

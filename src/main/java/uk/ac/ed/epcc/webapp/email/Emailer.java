@@ -47,6 +47,7 @@ import uk.ac.ed.epcc.webapp.resource.ResourceService;
 import uk.ac.ed.epcc.webapp.session.*;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory.PasswordChangeRequest;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
 /**
  * Emailer Class that sends emails.
@@ -690,7 +691,7 @@ public class Emailer implements Contexed{
 				}
 				
 			}else {
-				try {
+				try(TimeClosable tc = new TimeClosable(getContext(), "Emailer.send")) {
 					if( DEBUG_SEND.isEnabled(getContext())){
 						ByteArrayOutputStream stream = new ByteArrayOutputStream();
 						Session s = getSession();

@@ -52,6 +52,8 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
 public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 	
 	public static final Feature STREAM_BUILDER_FEATURE = new Feature("html.stream_builder",true,"use HtmlWriter where possible");
+	public static final Feature FIELDSET_FEATURE = new Feature("html.fieldset_actions",false,"use fieldset for action buttons even without legend");
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormLabel(uk.ac.ed.epcc.webapp.forms.Field)
 	 */
@@ -346,9 +348,15 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 		boolean can_submit=CanSubmitVisistor.canSubmit(f);
 
 		if( ! actions.isEmpty()){
-			open("fieldset");
+			boolean use_legend = legend != null && ! legend.isEmpty();
+			if( use_legend || FIELDSET_FEATURE.isEnabled(f.getContext())) {  // Accessibility tester says don't use fieldset without legend
+				open("fieldset");
+			}else {
+				open("div");
+			}
 			addClass( "action_buttons");
-			if( legend != null && ! legend.isEmpty()) {
+			
+			if( use_legend) {
 				open("legend");
 				clean(legend);
 				close();

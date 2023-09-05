@@ -16,6 +16,8 @@ package uk.ac.ed.epcc.webapp;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
+
 /** A {@link CleanupService} 
  * implements deferred actions to be performed later (usually when the {@link AppContext}
  * is closed.
@@ -63,7 +65,9 @@ public class CleanupService extends AbstractContexed implements AppContextServic
 	 */
 	@Override
 	public final void cleanup() {
-		action();
+		try(TimeClosable tc = new TimeClosable(getContext(), "CleanupService.cleanup")){
+			action();
+		}
 	}
 	
 	/** action to be performed.

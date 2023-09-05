@@ -40,6 +40,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 /** Handy common base class for DataObjects that hold MailMessages
  * This class would normally be used when the {@link MessageHandler} 
  * needs to link to the message by reference. 
@@ -79,12 +80,13 @@ public abstract class MessageDataObject extends DataObject implements
 	 */
 	public final MimeMessage getMessage() throws DataFault, MessagingException {
 		if (m == null) {
-			Session session = Session.getInstance(getContext().getProperties(),
-					null);
+			
 			StreamData sd = record.getStreamDataProperty(MESSAGE);
 			if (sd == null) {
 				return null;
 			}
+			Session session = Session.getInstance(getContext().getProperties(),
+					null);
 			m = new MimeMessage(session, sd.getInputStream());
 			auto_save=true; // These we can save
 		}
@@ -165,7 +167,7 @@ public abstract class MessageDataObject extends DataObject implements
 		 * 
 		 */
 		hash = -1;
-		try {
+		try(TimeClosable tc = new TimeClosable(getContext(), "MessageDataObject.pre_commit")) {
 			if (m != null) {
 				//StreamData sd = new MessageStreamData(m);
 				StreamData sd = new ByteArrayStreamData();
