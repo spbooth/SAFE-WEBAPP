@@ -257,7 +257,11 @@ public abstract class ServletTest extends WebappTestBase{
 		RedirectResult result = (RedirectResult) LoginServlet.getSavedResult(ctx.getService(SessionService.class));
 		assertNotNull(result);
 		assertEquals(page, result.getURL());
-		checkForward(LoginServlet.getLoginPage(ctx));
+		if( DefaultServletService.REDIRECT_TO_LOGIN_FEATURE.isEnabled(ctx)) {
+			checkRedirect(LoginServlet.getLoginPage(ctx));
+		}else{
+			checkForward(LoginServlet.getLoginPage(ctx));
+		}
 	}
 	/** Assert form error reported with a specific error reported on one of the parameters
 	 * 

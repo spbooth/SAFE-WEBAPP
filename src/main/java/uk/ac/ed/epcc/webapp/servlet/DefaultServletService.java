@@ -108,7 +108,9 @@ public class DefaultServletService implements ServletService{
 	public static final Feature EXTERNAL_AUTH_VIA_LOGIN_FEATURE = new Feature("external_auth.use_login",false,"Mandatory external auth with only login.jsp protected externally");
 
 	public static final Feature ALLOW_INSECURE = new Feature("session.allow_insecure",false,"Allow insecure connections to use tokes");
-	public static final Feature REDIRECT_TO_LOGIN_FEATURE = new Feature("login_page.always_redirect",false,"Always use redirect to go to login page");
+	// This should be true. If we have just created a session and forward to the login page it will
+	// show the session-id in urls. If we redirect it will be set as a cookie (if cookies enabled(
+	public static final Feature REDIRECT_TO_LOGIN_FEATURE = new Feature("login_page.always_redirect",true,"Always use redirect to go to login page");
 	public DefaultServletService(AppContext conn,ServletContext ctx, ServletRequest req,
 			ServletResponse res) {
 		super();
