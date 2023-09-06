@@ -18,6 +18,16 @@
 	
 	--table-width: 100%;
 	--cell-padding: 3px;
+	
+	/* suggested colours from html5 standard. should be close to browser defaults
+	 */
+	--link-color: #0000ee;
+	--visited-color: #551a8b;
+	
+	/* Allow overrides to fix contrast for links in hotice regions. Default is to use normal colours
+	 */
+	--link-notice-color: var(--link-color);
+	--visited-notice-color: var(--visited-color);
 	/* standard special markup 
 	 * different hover color for styles used in form tables
 	 */
@@ -994,4 +1004,19 @@ div.sub_label {
 }
 div.sub_input {
 	display: table-cell;
+}
+
+/* put links into selected pallete */
+a:link {
+	color: var(--link-color);
+}
+.notice a:link, .notice.sorting_1 a:link {
+	color: var(--link-notice-color);
+}
+
+a:visited {
+	color: var(--visited-color);
+}
+.notice a:visited, .notice.sorting_1 a:visited {
+	color: var(--visited-notice-color);
 }

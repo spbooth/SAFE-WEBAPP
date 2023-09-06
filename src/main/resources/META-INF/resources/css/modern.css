@@ -3,7 +3,7 @@
   --heading-bg-color: #ffffff;
   --bar-bg-color: #ffffff;
   --bar-text-color: #000;
-  --notice-color: #0d8040;
+  --notice-color: #043e1f;
   --notice-bg-color: #fadad1;
   
   --warn-bg-color: #ff0000;
@@ -32,6 +32,11 @@
   --menu-hover-bg-color: #ddd;
   --menu-hover-text-color: #ff0000;
   --block-radius: 0px;
+  
+  --link-color: var(--button-bg-color);
+  --visited-color: #983010;
+  --link-notice-color: #6f220b;
+  --visited-notice-color: #983010;
   
    --block-v-padding: 10px;
   --block-h-padding: 10px;
@@ -218,14 +223,6 @@ form.transition table.form, table.form {
 }
 
 
-/* put links into selected pallete */
-a:link {
-	color: var(--button-bg-color);
-}
-
-a:visited {
-	color: #983010;
-}
 
 /* fix image size in top level menu */
 .nav > ul > li > a > img {
