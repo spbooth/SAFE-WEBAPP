@@ -69,9 +69,12 @@ public class QRServlet extends WebappServlet {
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid argument");
 			return;
 		}
-		
-		pos = Integer.parseInt(img);
-		
+		try {
+			pos = Integer.parseInt(img);
+		}catch(Exception e) {
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid argument");
+			return;
+		}
 		SessionService sess = conn.getService(SessionService.class);
 		String text=(String) sess.getAttribute(QRCODE_ATTR_PREFIX+Integer.toString(pos));
 		if( text == null || text.isEmpty()) {
