@@ -627,7 +627,7 @@ public class DefaultServletService implements ServletService{
 			if( req instanceof HttpServletRequest && res instanceof HttpServletResponse){
 	    		((HttpServletResponse)res).sendRedirect(((HttpServletRequest)req).getContextPath()+login_page);
 	    	}else {
-	    		error("Unexpected request/resposne type "+req.getClass().getCanonicalName()+" "+res.getClass().getCanonicalName());
+	    		error("Unexpected request/response type "+req.getClass().getCanonicalName()+" "+res.getClass().getCanonicalName());
 	    	}
 		}else {
 			forward(login_page);
