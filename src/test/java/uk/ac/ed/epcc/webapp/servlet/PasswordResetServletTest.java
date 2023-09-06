@@ -183,7 +183,7 @@ public class PasswordResetServletTest extends ServletTest {
 		addParam("submitted","true");
 		setAction(PasswordUpdateFormBuilder.CANCEL_ACTION);
 		doPost();
-		checkRedirect("/login.jsp");
+		checkRedirect(LoginServlet.getLoginPage(ctx));
 		//checkMessage("password_change_cancel");
 		SessionService sess = ctx.getService(SessionService.class);
 		assertFalse(sess.haveCurrentUser());

@@ -173,7 +173,7 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 		req.path_info=CORRECT_TAG;
 		doPost();
 		checkUnchanged();
-		checkRedirect("/login.jsp");
+		checkRedirect(LoginServlet.getLoginPage(ctx));
 	
 	}
 	@Test
