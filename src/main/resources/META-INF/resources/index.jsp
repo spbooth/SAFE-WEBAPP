@@ -12,4 +12,4 @@
 <%--| See the License for the specific language governing permissions and      |--%>
 <%--| limitations under the License.                                           |--%>
 <%@ page session="false" %>
-<jsp:forward page="/main.jsp" />
+<jsp:forward page="/login.jsp" />
