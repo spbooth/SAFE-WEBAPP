@@ -617,18 +617,13 @@ public class DefaultServletService implements ServletService{
 		// standard login page supports both custom password login and self-register for external-auth
 		// If built_in login is off we might change the login page to an external auth servlet url.
 		String login_page=LoginServlet.getLoginPage(getContext());
-		HttpSession hs = getSession(false);
-		if( hs != null  ) {
-			try {
-				// If we visited a jsp first it might have created a session
-				hs.invalidate();
-			}catch(Exception e) {
-				error(e,"Session already invalidated");
-			}
-		}
 				
 		if( EXTERNAL_AUTH_VIA_LOGIN_FEATURE.isEnabled(getContext()) || REDIRECT_TO_LOGIN_FEATURE.isEnabled(getContext()) || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
 			// A non encoding redirect to make sure there is no session in the url
+			// We may well be creating a session cookie at this point (we need to remember the requested page)
+			// but might still get re-write if no cookie seen in request.
+			// risk is a non cookie browser will lose the destination location but
+			// that is an edge case and tolerable where session leakage is a risk for everyone.
 			if( req instanceof HttpServletRequest && res instanceof HttpServletResponse){
 	    		((HttpServletResponse)res).sendRedirect(((HttpServletRequest)req).getContextPath()+login_page);
 	    	}else {
