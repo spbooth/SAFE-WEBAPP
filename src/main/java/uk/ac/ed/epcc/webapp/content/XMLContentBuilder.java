@@ -381,7 +381,7 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 			return;
 		}
 		Object content = action.getText();
-		
+
 		if( content != null ){
 			open("button");
 		}else{
@@ -398,7 +398,7 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 		}
 		
 		String help = action.getHelp();
-		if( help != null){
+		if( help != null && ! help.equals(content.toString())){
 			attr("title", help);
 		}
 		String shortcut = action.getShortcut();

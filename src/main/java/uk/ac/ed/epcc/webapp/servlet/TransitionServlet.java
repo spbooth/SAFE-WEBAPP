@@ -709,7 +709,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
           hb.addClass("input_button");
           hb.attr("type","submit");
           hb.attr("value", text);
-          if( title != null && title.trim().length() > 0){
+          if( title != null && title.trim().length() > 0 && ! title.equals(text)){
           	hb.attr("title", title);
           }
          hb.close();
