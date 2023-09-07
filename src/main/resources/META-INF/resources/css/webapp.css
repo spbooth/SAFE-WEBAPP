@@ -638,25 +638,39 @@ margin-right: 0;
 }
 
 /* Button like links so we can open new page using right mouse */
-div.block table.navbar{
+div.block .navbar{
 	margin-top: 10px;
 	margin-bottom: 10px;
 	border: none;
-	border-spacing: 0;
 	background-color: inherit;	
+}
+div.block div.navbar{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+ 	align-items: center;
+    justify-content: space-around;
+}
+.nav_entry{
+	padding: var(--cell-padding);
+	flex: 1;
+}
+
+div.block table.navbar{
+	border-spacing: 0;
 }
 div.block table.navbar td {
 	background-color: inherit;	
 }
 /* can put single input forms with class input_button in navbar */
-table.navbar tr td form input{
+.navbar form input{
 	width: 100%;
 	border-style: outset;
 	background-color: var(--button-bg-color);
 	color: var(--button-color);
 }
 /* or can put links that look similar */
-table.navbar tr td a {
+.navbar  a {
     background-color: var(--button-bg-color);
     color: var(--button-color);
     margin: 3px 0px;
