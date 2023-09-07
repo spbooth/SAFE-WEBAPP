@@ -466,16 +466,16 @@ text-align: right;
 white-space: nowrap;
 }
 
-div th {
+div th , div td.header{
         color: var(--th-color);
         background-color: var(--th-bg-color);
         padding: var(--cell-padding);
 }
-div table.column th{
+div table.column th, div table.column td.header{
         color: var(--column-th-color);
         background-color: var(--column-th-bg-color);
 }
-div table.column td th{
+div table.column td th, div table.column td td.header{
         color: var(--th-color);
         background-color: var(--th-bg-color);
 }
@@ -602,11 +602,11 @@ table.form td {
         padding: 2px;
    
 }
-form table.form th{
+form table.form th, form table.form td.header{
         color: var(--form-th-color);
         background-color: var(--form-th-bg-color);
 }
-form table.form tr:hover th{
+form table.form tr:hover th, form table.form tr:hover td.header{
 	background-color: var(--th-hover-bg-color);
 }
 table.form td {
