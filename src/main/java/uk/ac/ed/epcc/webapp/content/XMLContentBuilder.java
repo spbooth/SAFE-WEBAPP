@@ -398,7 +398,7 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 		}
 		
 		String help = action.getHelp();
-		if( help != null && ! help.equals(content.toString())){
+		if( help != null &&  ! help.equals(content != null ? content.toString() : name)){
 			attr("title", help);
 		}
 		String shortcut = action.getShortcut();
