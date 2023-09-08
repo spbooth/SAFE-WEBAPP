@@ -379,7 +379,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			try {
 				autocomplete = 		cf.getCount(finalSelectFilter) < cf.getMaxDataList();
 			}catch(Exception e){
-				getLogger().error("Error checking auto-complete count", e);;
+				getLogger().error("Error checking auto-complete count", e);
 			}
 			return new NameFinderInput<C, ClassificationFactory<C>>(cf, cf, false,autocomplete, null, finalSelectFilter);
 		}
