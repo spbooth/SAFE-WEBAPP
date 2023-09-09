@@ -337,14 +337,10 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 							// however to be safe log again.
 							log.error("FatalTransitionException", e);
 							if (use_transactions){
+								// Note this will also cancel any actions added to the cleanup service
+								// registered with the DatabaseService during this transaction
 								serv.rollbackTransaction();
 								log.warn("Rolling back transaction in TransitionServlet");
-								CleanupService clean = conn.getService(CleanupService.class);
-								if( clean != null ) {
-									// remove queued actions
-									clean.reset();
-								}
-								
 							}
 						}
 						// These are typically user errors

@@ -552,7 +552,13 @@ public class Emailer implements Contexed{
 		if( EMAIL_DEFERRED_SEND.isEnabled(getContext()) && getContext().getService(DatabaseService.class).inTransaction()) {
 		   CleanupService cleanup = getContext().getService(CleanupService.class);
 		   if( cleanup != null) {
-			   cleanup.add(new SendAction(this,m));
+			   SendAction a = new SendAction(this,m);
+			   cleanup.add(a);
+			   DatabaseService db = getContext().getService(DatabaseService.class);
+			   if( db != null) {
+				   // If we are in a transaction cancel this if transaction is rolled back
+				   db.addCleanup(a);
+			   }
 			   return;
 		   }
 		}

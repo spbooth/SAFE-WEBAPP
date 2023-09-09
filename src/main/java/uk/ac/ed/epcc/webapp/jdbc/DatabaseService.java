@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  * @author spb
  *
  */
+
 public interface DatabaseService extends Contexed , AppContextService<DatabaseService>, CloseRegistry{
   public static final Feature LOG_QUERY_FEATURE = new Feature("log_query",false,"log all SQL queries");
 public static final Feature USE_SQL_DISTICT_FEATURE = new Feature("use_sql_distict",false,"add distinct clause when selecting objects from table. Should not need this unless filters are malformed");
@@ -86,6 +87,14 @@ public int transactionStage();
  * Transactions cannot be nested so use {@link #inTransaction()} if possible doubt.
  */
 public void startTransaction();
+
+/** Register a Runnable as belonging to the current transaction.
+ * (If we are currently within a transaction)
+ * If the transaction is rolled back these will be removed from the {@link CleanupService}
+ * 
+ * @param r
+ */
+public void addCleanup(Runnable r);
 
 /** Abort changes since start or last commit
  * 

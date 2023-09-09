@@ -59,7 +59,19 @@ public class CleanupService extends AbstractContexed implements AppContextServic
 			actions.add(r);
 		}
 	}
-	
+	/** remove a previously queued action.
+	 * e.g. on transaction roll-back
+	 * 
+	 * @param r
+	 */
+	public void remove(Runnable r) {
+		if( actions != null) {
+			actions.remove(r);
+		}
+		if( tail != null) {
+			tail.remove(r);
+		}
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.AppContextService#cleanup()
 	 */
