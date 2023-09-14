@@ -125,8 +125,5 @@ public abstract class FormAction{
 	public void setMustValidate(boolean validate){
 		this.must_validate=validate;
 	}
-	public Logger getxLogger(AppContext conn) {
-		return conn.getService(LoggerService.class).getLogger(getClass());
-	}
 
 }

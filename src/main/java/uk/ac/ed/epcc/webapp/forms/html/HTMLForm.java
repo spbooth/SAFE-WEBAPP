@@ -16,10 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.html;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlFormPolicy;
-import uk.ac.ed.epcc.webapp.content.HtmlPrinter;
 import uk.ac.ed.epcc.webapp.content.XMLContentBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
