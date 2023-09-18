@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.validation.MinValueValidator;
  * @author Stephen Booth
  *
  */
-public class CanSubmitVisistor implements InputVisitor<Boolean> {
+public class CanSubmitVisitor implements InputVisitor<Boolean> {
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor#visitBinaryInput(uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput)
@@ -134,7 +134,7 @@ public class CanSubmitVisistor implements InputVisitor<Boolean> {
 	 */
 	public static boolean canSubmit(Form f) {
     	boolean can_submit=true;
-    	CanSubmitVisistor vis = new CanSubmitVisistor();
+    	CanSubmitVisitor vis = new CanSubmitVisitor();
     	for( Iterator<String>it = f.getFieldIterator(); it.hasNext() ;) {
     		Field field = f.getField(it.next());
     		if( ! field.isOptional()) {
@@ -154,7 +154,7 @@ public class CanSubmitVisistor implements InputVisitor<Boolean> {
     					}
     				}
     			} catch (Exception e) {
-    				f.getContext().getService(LoggerService.class).getLogger(CanSubmitVisistor.class).error("Error checking submit",e);
+    				f.getContext().getService(LoggerService.class).getLogger(CanSubmitVisitor.class).error("Error checking submit",e);
     			}
     		}
     	}

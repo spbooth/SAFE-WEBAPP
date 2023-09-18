@@ -31,7 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.StringListInput;
  */
 
 
-public class TableInput<T> extends StringListInput implements ListInput<String, String> {
+public class TableInput<T> extends StringListInput{
 	private final AppContext conn;
 	private final Class<T> target;
 	public TableInput(AppContext c, Class<T> target){

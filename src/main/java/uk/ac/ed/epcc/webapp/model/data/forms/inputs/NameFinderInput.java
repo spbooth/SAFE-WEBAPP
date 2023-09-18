@@ -10,6 +10,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
+import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -26,14 +27,10 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * @author spb
  *
  */
-public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>> extends ParseAbstractInput<Integer> implements AutoComplete<T, Integer>, DataObjectItemInput<T>{
-	/**
-	 * 
-	 */
-	protected final F factory;
-	protected final NameFinder<T> finder; // in most cases this will aslo be the factory but not always
+public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>> extends AbstractAutoCompleteIntegerInput<T>{
+	protected final ParseFactory<T> finder; // in most cases this will aslo be the factory but not always
 	
-	private String match_error = null;
+	
 	/** create input
 	 * 
 	 * @param create   make entry if not found
@@ -41,7 +38,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 * @param autocomplete  suggestions/restrict filter
 	 * @param factory {@link DataObjectFactory} and {@link NameFinder}
 	 */
-	public NameFinderInput(F factory, NameFinder<T> finder,boolean create, BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
+	public NameFinderInput(F factory, ParseFactory<T> finder,boolean create, BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
 		this(factory,finder,create,true,restrict,autocomplete);
 	}
 	/** create input
@@ -52,22 +49,19 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 * @param autocomplete  suggestions filter
 	 * @param factory {@link DataObjectFactory} and {@link NameFinder}
 	 */
-	public NameFinderInput(F factory, NameFinder<T> finder,boolean create, boolean use_autocomplete, BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
+	public NameFinderInput(F factory, ParseFactory<T> finder,boolean create, boolean use_autocomplete, BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
 
-		super();
-		this.factory = factory;
+		super(factory,autocomplete,restrict);
 		this.finder = finder;
-		this.create = create;
-		this.autocomplete = autocomplete;
-		this.restrict=restrict;
+		this.create = create && (finder instanceof NameFinder);
 		this.use_autocomplete = use_autocomplete;
+		
 		setSingle(true);
 		addValidator(factory.new DataObjectFieldValidator(restrict));
 	}
 	private boolean create;
-	private final BaseFilter<T> restrict;
 	private boolean use_autocomplete;  // allow autocomplete to be turned off 
-	private final BaseFilter<T> autocomplete;
+	
 	
 	public T parseItem(String v) throws ParseException {
 		if( v == null || v.trim().isEmpty()) {
@@ -77,8 +71,9 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 			boolean created = false;
 			T target=finder.findFromString(v);
 			if( target == null && create ){
-				finder.validateNameFormat(v);
-				target=finder.makeFromString(v);
+				NameFinder<T> nf = (NameFinder<T>) finder;
+				nf.validateNameFormat(v);
+				target=nf.makeFromString(v);
 				created=true;
 			}
 			if(target == null) {
@@ -94,16 +89,6 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 				}
 				if( target == null ) {
 					throw new ParseException("["+v+"] Not found");
-				}
-			}
-			// validate against the filter unless we created a new object
-			// a newly created object is unlikely to match the filter but
-			// probably will as a result of the operation.
-			// we assume if creating a new object is requested then
-			// any newly created object is a valid result
-			if( restrict != null && ! created) {
-				if( ! factory.matches(restrict, target)) {
-					throw new ParseException("["+v+"] Not valid");
 				}
 			}
 			return target;
@@ -130,12 +115,9 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 				return null;
 			}
 		}
-		return item.getID();
+		return getValueByItem(item);
 	}
-	@Override
-	public T getItembyValue(Integer value) {
-		return factory.find(value);
-	}
+	
 	@Override
 	public void setItem(T item) {
 		if( item == null){
@@ -148,26 +130,9 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 			}
 		}
 	}
-	@Override
-	public Set<T> getSuggestions() {
-		LinkedHashSet<T> result = new LinkedHashSet<>();
-		if( autocomplete != null){
-			try {
-				this.factory.getResult(autocomplete).toCollection(result);
-			} catch (DataFault e) {
-				getLogger().error("Error getting suggestions",e);
-			}
-		}
-		return result;
-		
-	}
 	
-	public AppContext getContext(){
-		return factory.getContext();
-	}
-	protected Logger getLogger(){
-		return getContext().getService(LoggerService.class).getLogger(getClass());
-	}
+	
+	
 	@Override
 	public String getValue(T item) {
 		return finder.getCanonicalName(item);
@@ -182,9 +147,9 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 */
 	@Override
 	public String getString(Integer val) {
-		T p = this.factory.find(val);
+		T p = getItembyValue(val);
 		if( p != null ){
-			return finder.getCanonicalName(p);
+			return getValue(p);
 		}
 		return Integer.toString(val);
 	}
@@ -195,59 +160,16 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		return create;
 	}
 	/**
-	 * @param create the create to set
+	 * @param create enable/disable object creation
 	 */
 	public void setCreate(boolean create) {
+		if( ! (finder instanceof NameFinder)) {
+			return;
+		}
 		this.create = create;
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput#convert(java.lang.Object)
-	 */
-	@Override
-	public Integer convert(Object v) throws TypeException {
-		if( v == null) {
-			return null;
-		}
-		if( v instanceof DataObject){
-			if( factory.isMine(v)){
-				return Integer.valueOf(((T)v).getID());
-			}else{
-				throw new TypeException("DataObject "+v.getClass().getCanonicalName()+" passed to "+getClass().getCanonicalName());
-			}
-		}
-		if( v instanceof IndexedReference ){
-			if( factory.isMyReference((IndexedReference) v)){
-				return Integer.valueOf(((IndexedReference)v).getID());
-			}else{
-				throw new TypeException("IndexedReference "+v.toString()+" passed to "+getClass().getCanonicalName());
-			}
-		}
-		if( v instanceof Number) {
-			int intValue = ((Number)v).intValue();
-			if( intValue <= 0 ) {
-				// This is for legacy references where "null" references are stored
-				// as 0 or -1
-				return null;
-			}
-			return Integer.valueOf(intValue);
-		}
-		if(v instanceof String  ) {
-			String name = (String)v;
-			if( ! name.trim().isEmpty()) {
-				T item = finder.findFromString(name);
-				if( item != null) {
-					return item.getID();
-				}
-			}
-		}
-		return super.convert(v);
-	}
-	public String getMatchError() {
-		return match_error;
-	}
-	public void setMatchError(String match_error) {
-		this.match_error = match_error;
-	}
+	
+	
 	@Override
 	public boolean useAutoComplete() {
 		return use_autocomplete;

@@ -75,7 +75,7 @@ public class ConstructedObjectInput<T> extends AbstractStringInput implements Li
     }
 	@Override
 	public T getItembyValue(String value) {
-		if( value == null ){
+		if( value == null  || value.isEmpty()){
 			return null;
 		}
 		return c.makeObject(clazz, value); 
@@ -132,35 +132,15 @@ public class ConstructedObjectInput<T> extends AbstractStringInput implements Li
 		throw new TypeException(v.getClass());
 	}
 
-	
-
-
-	
-
 
 	@Override
-	public T getItem() {
-		String value = getValue();
-		if( value == null || value.isEmpty()) {
-			return null;
-		}
-		return c.makeObject(clazz, value);
-	}
-
-	@Override
-	public void setItem(T item) {
-		try {
-			setValue(getTagByItem(item));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
-		
+	public final String getValueByItem(T item) {
+		return getTagByItem(item);
 	}
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
 	}
-
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
 	 */

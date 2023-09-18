@@ -38,6 +38,10 @@ public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements
 	public T getItembyValue(V value) {
 		return getInner().getItembyValue(value);
 	}
+	@Override
+	public V getValueByItem(T item) throws TypeException {
+		return getInner().getValueByItem(item);
+	}
 
 	@Override
 	public Iterator<T> getItems() {
@@ -72,10 +76,6 @@ public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements
 		return getInner().convert(v);
 	}
 
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
 
 	@Override
 	public T getItem() {

@@ -67,12 +67,8 @@ public class SetTextInput extends TextInput implements PatternInput, ItemInput<S
 	}
 
 	@Override
-	public void setItem(Set<String> item) {
-		try {
-			setValue(String.join(",", item.toArray(new String[item.size()])));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
+	public String getValueByItem(Set<String> item) {
+		return String.join(",", item.toArray(new String[item.size()]));
 	}
 
 }

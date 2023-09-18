@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
@@ -74,11 +75,11 @@ public class SshPublicKeyArrayInput extends ParseAbstractInput<String> implement
 		}
 	}
 
-	public void setItem(PublicKey item[]) {
+	public String getValueByItem(PublicKey item[]) throws TypeException {
 		try {
-			setValue(format(item));
+			return format(item);
 		} catch (Exception e) {
-			throw new ConsistencyError("setItem not supported",e);
+			throw new TypeException(e);
 		}
 		
 		

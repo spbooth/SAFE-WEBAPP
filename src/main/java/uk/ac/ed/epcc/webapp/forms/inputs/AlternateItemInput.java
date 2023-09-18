@@ -74,5 +74,17 @@ public class AlternateItemInput<T,I> extends AlternateInput<T> implements ItemIn
 		return null;
 	}
 
+	@Override
+	public T getValueByItem(I item) throws TypeException {
+		if( item == null) {
+			return null;
+		}
+		for(Iterator<Input<T>> it = getInputs();it.hasNext();){
+			ItemInput<T,I> i =  (ItemInput<T,I>) it.next();
+			return i.getValueByItem(item);
+		}
+		return null;
+	}
+
 
 }

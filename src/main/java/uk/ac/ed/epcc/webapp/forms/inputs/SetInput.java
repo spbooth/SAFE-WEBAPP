@@ -139,18 +139,10 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 		return labels.get(item);
 	}
 
+	
 	@Override
-	public T getItem() {
-		return getItembyValue(getValue());
-	}
-
-	@Override
-	public void setItem(T item) {
-		try {
-			setValue(getTagByItem(item));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
+	public final String getValueByItem(T item) {
+		return getTagByItem(item);
 	}
 	@Override
 	public String parseValue(String v) throws ParseException {

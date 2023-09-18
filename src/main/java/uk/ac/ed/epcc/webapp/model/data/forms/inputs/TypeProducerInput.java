@@ -129,22 +129,14 @@ public class TypeProducerInput<T> extends AbstractInput<String> implements PreSe
 	}
 
 	@Override
-	public void setItem(T item) {
-		try {
-			setValue(getTagByItem(item));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
+	public final String getValueByItem(T item) {
+		return getTagByItem(item);
 	}
 	@Override
 	public String getPrettyString(String val) {
 		return getText(getItembyValue(val));
 	}
 	
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput#getUnselectedText()
 	 */

@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.DisabledAction;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
-import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisistor;
+import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisitor;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.preferences.Preference;

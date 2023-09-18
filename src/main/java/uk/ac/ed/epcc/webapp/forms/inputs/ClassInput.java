@@ -139,14 +139,8 @@ public class ClassInput<T> extends AbstractStringInput implements ListInput<Stri
 	}
 
 	@Override
-	public void setItem(Class<? extends T> item) {
-		try {
-			setValue(getTagByItem(item));
-		} catch (TypeException e) {
-			// should never happen
-			throw new TypeError(e);
-		}
-		
+	public final String getValueByItem(Class<? extends T> item) {
+		return getTagByItem(item);
 	}
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {

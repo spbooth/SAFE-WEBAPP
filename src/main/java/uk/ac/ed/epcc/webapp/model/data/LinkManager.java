@@ -431,16 +431,8 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		}
 
 		@Override
-		public void setItem(T l) {
-
-		
-			try {
-				setValue(new Integer(l.getID()));
-			} catch (TypeException e) {
-				// should never happen
-				throw new TypeError(e);
-			}
-
+		public Integer getValueByItem(T l) {
+			return l.getID();
 		}
 
 		@Override

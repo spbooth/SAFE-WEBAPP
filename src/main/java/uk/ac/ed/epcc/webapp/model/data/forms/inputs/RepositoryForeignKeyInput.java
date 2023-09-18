@@ -118,6 +118,10 @@ public class RepositoryForeignKeyInput extends BaseInput<String> implements List
 		return getTagByItem(item);
 	}
 
+	@Override
+	public String getValueByItem(FieldInfo item) {
+		return getTagByItem(item);
+	}
 
 	@Override
 	public String setValue(String v)  {
@@ -136,10 +140,7 @@ public class RepositoryForeignKeyInput extends BaseInput<String> implements List
 	public void setItem(FieldInfo item) {
 		this.item=item;
 	}
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
 	 */

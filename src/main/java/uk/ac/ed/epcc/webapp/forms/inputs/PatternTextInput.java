@@ -16,7 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 /** an input that validates text against a pattern
  * 
  * @author spb

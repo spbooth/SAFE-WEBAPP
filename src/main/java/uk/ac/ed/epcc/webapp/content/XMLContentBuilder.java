@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.action.DisabledAction;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.html.AddButtonVisitor;
 import uk.ac.ed.epcc.webapp.forms.html.AddLinkVisitor;
-import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisistor;
+import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisitor;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -345,7 +345,7 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 	 */
 	@Override
 	public default void addActionButtons(Form f,String legend,Set<String> actions) {
-		boolean can_submit=CanSubmitVisistor.canSubmit(f);
+		boolean can_submit=CanSubmitVisitor.canSubmit(f);
 
 		if( ! actions.isEmpty()){
 			boolean use_legend = legend != null && ! legend.isEmpty();
@@ -371,7 +371,7 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 
 
 	public default void addActionButton(Form f, String name) {
-		boolean can_submit=CanSubmitVisistor.canSubmit(f);
+		boolean can_submit=CanSubmitVisitor.canSubmit(f);
 
 		addActionButton(f, can_submit, name);
 	}

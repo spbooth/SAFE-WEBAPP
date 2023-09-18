@@ -203,6 +203,10 @@ public class MapForm extends BaseForm {
 		}
 	}
 
+	/** An {@link InputVisitor} that parses input from a {@link Map} of parameters.
+	 * This allows {@link MultiInput}s to access values targeted at sub-inputs.
+	 * 
+	 */
 	public class ParseVisitor implements InputVisitor<Object>{
 		/**
 		 * @param params

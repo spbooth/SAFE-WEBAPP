@@ -40,25 +40,6 @@ public abstract class StringListInput extends AbstractStringInput implements Lis
 	
 
 	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
-	 */
-	@Override
-	public final void setItem(String item) {
-		try {
-			setValue(item);
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
-	}
-
-	public final String getItem() {
-		return getValue();
-	}
-	
-
-	
-
-	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#getTagByValue(java.lang.Object)
 	 */
 	@Override
@@ -84,7 +65,10 @@ public abstract class StringListInput extends AbstractStringInput implements Lis
 		return value;
 	}
 
-	
+	@Override
+	public final String getValueByItem(String value) {
+		return value;
+	}
    
 	
 	

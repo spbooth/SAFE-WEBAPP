@@ -117,16 +117,8 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 
 	
 	@Override
-	public void setItem(E v) {
-		if( v == null ){
-			setNull();
-			return;
-		}
-		try {
-			setValue(getValue(v));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
+	public final Integer getValueByItem(E v) {
+		return getValue(v);
 	}
 	
 	@Override

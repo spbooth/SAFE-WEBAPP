@@ -83,13 +83,17 @@ public class RepositoryFieldInput extends BaseInput<String> implements ListInput
 	
 
 	
-
+	@Override
 	public String getValue() {
 		return getTagByItem(item);
 	}
 
+	@Override
+	public final String getValueByItem(FieldInfo item) {
+		return getTagByItem(item);
+	}
 	
-
+	@Override
 	public String setValue(String v){
 		String old = getValue();
 		item=res.getInfo(v);
@@ -97,17 +101,16 @@ public class RepositoryFieldInput extends BaseInput<String> implements ListInput
 	}
 
 	
-
+	@Override
 	public FieldInfo getItem() {
 		return item;
 	}
 
+	@Override
 	public void setItem(FieldInfo item) {
 		this.item=item;
 	}
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
 	 */

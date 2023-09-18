@@ -35,6 +35,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
@@ -92,15 +93,16 @@ public class XMLDocumentInput extends TextInput implements ItemInput<String,Docu
 		}
 	}
 
-	public void setItem(Document item) {
+	public String getValueByItem(Document item) throws TypeException {
 		DOMSource source = new DOMSource(item);
 		StreamResult output = new StreamResult(new StringWriter());
 		try{
 			transformer.transform(source, output);
-			setValue(output.getWriter().toString());
+			return output.getWriter().toString();
 		}catch(Exception e){
-			Logger.getLogger(getClass()).error("error setting Node as item",e);
+			throw new TypeException(e);
 		}
+		
 	}
 
 

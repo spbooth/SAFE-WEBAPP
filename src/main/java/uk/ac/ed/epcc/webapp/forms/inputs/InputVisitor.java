@@ -32,6 +32,9 @@ public interface InputVisitor<R> {
 	<V,I extends Input> R visitMultiInput(MultiInput<V,I> multiInput) throws Exception;
 	<V,T> R visitListInput(ListInput<V,T> listInput) throws Exception;
 	<V,T> R visitRadioButtonInput(ListInput<V,T> listInput) throws Exception;
+	default <V,T> R visitAutoCompleteInput(AutoComplete<V,T> autocompleteInput) throws Exception{
+		return visitLengthInput(autocompleteInput);
+	}
 	R visitLengthInput(LengthInput input) throws Exception;
 	R visitUnmodifyableInput(UnmodifiableInput input) throws Exception;
 	R visitFileInput(FileInput input) throws Exception;

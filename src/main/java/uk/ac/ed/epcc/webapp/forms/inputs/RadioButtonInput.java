@@ -131,12 +131,16 @@ public class RadioButtonInput<V, T> implements ListInput<V, T>, ParseInput<V> {
 	@Override
 	public void setItem(T item) {
 		nested.setItem(item);
-
 	}
 
 	@Override
 	public T getItembyValue(V value) {
 		return nested.getItembyValue(value);
+	}
+	
+	@Override
+	public V getValueByItem(T item) throws TypeException {
+		return nested.getValueByItem(item);
 	}
 
 	@Override

@@ -80,12 +80,8 @@ public class IntegerSetInput extends IntegerInput implements ListInput<Integer,I
 	}
 
 	@Override
-	public void setItem(Integer item) {
-		try {
-			setValue(item);
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
+	public Integer getValueByItem(Integer item) {
+		return item;
 	}
 
 	@Override

@@ -68,11 +68,11 @@ public class SshPublicKeyInput extends ParseAbstractInput<String> implements Ite
 		}
 	}
 
-	public void setItem(PublicKey item) {
+	public String getValueByItem(PublicKey item) throws TypeException {
 		try {
-			setValue(PublicKeyReaderUtil.format(item));
+			return PublicKeyReaderUtil.format(item);
 		} catch (Exception e) {
-			throw new ConsistencyError("setItem not supported",e);
+			throw new TypeException(e);
 		}
 		
 		

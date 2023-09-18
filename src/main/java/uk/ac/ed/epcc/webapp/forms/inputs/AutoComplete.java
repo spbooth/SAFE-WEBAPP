@@ -18,18 +18,13 @@ import java.util.Set;
 
 /** Interface for inputs that provide auto-complete text.
  * @author spb
- *
- * @param <T> item type
+ * 
  * @param <V> input type
+ * @param <T> item type
+ * 
  */
-public interface AutoComplete<T,V> extends SuggestedItemInput<V,T>, ParseInput<V> {
+public interface AutoComplete<V,T> extends SuggestedItemInput<V,T>, LengthInput<V> {
 
-	/** Get the set of Items corresponding to a suggested values
-	 * 
-	 * @return
-	 */
-	// subclasses should override to return a list of possible completions
-	Set<T> getSuggestions();
 
 	/** Map an item to the corresponding value (compatible with the parse method).
 	 * 
@@ -45,25 +40,24 @@ public interface AutoComplete<T,V> extends SuggestedItemInput<V,T>, ParseInput<V
 	 */
 	String getSuggestionText(T item);
 
-	@Override
-	default Iterator<T> getItems() {
-		return getSuggestions().iterator();
-	}
-
-	@Override
-	default int getCount() {
-		return getSuggestions().size();
-	}
 	
 	/** should the auto-complete option be used?
 	 * If this method returns false the input should fall back to a text
 	 * input without generating the suggestion list. This is for cases where
 	 * the enumerating the suggestions may be very costly.
 	 * 
+	 * 
+	 * 
 	 * @return
 	 */
 	default boolean useAutoComplete() {
 		return true;
 	}
-
+	public default  <R> R accept(InputVisitor<R> vis) throws Exception{
+		if( useAutoComplete()) {
+			return vis.visitAutoCompleteInput(this);
+		}else {
+			return vis.visitLengthInput(this);
+		}
+	}
 }

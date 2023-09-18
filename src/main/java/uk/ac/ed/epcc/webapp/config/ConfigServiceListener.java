@@ -16,6 +16,9 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.config;
 /** Class wishing to receive config change notifications.
+ * It is up to the implementing class to register itself with the {@link ConfigService}.
+ * Normally this is only needed if the class caches configuration dependent information across
+ * http requests.
  * 
  * @author spb
  *

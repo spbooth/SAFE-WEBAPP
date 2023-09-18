@@ -16,9 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.Collections;
-import java.util.Set;
-
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;

@@ -428,6 +428,33 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			}
 		}
 	}
+	
+	private void emitTextHTMLWithAutoComplete(ExtendedXMLBuilder hb,boolean use_post, AutoComplete input,
+			String param) {
+		String def = null;
+		if (use_post) {
+			def = param;
+		} else {
+			def = input.getString();
+		}
+		String id=null;
+		try {
+			id = makeID(input);
+		} catch (Exception e) {
+			getLogger().error("Error getting id",e);
+		}
+		
+		emitTextParam(hb, input,input.getKey(), id,input.getBoxWidth(), 
+				MaxLengthValidator.getMaxLength(input.getValidators()),
+				useSingle(input), false,def,input);
+		if( input instanceof UnitInput){
+			String unit = ((UnitInput) input).getUnit();
+			if (unit  != null) {
+				hb.clean(" ");
+				hb.clean(unit);
+			}
+		}
+	}
 	/** Check if the input should be presented a single line
 	 * 
 	 * @param <X>
@@ -580,6 +607,13 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		return null;
 	}
 
+	@Override
+	public <V, T> Object visitAutoCompleteInput(AutoComplete<V, T> input) throws Exception {
+		emitTextHTMLWithAutoComplete(hb, use_post, input, getParam(input));
+		return null;
+	}
+
+
 	public Object visitUnmodifyableInput(UnmodifiableInput input)
 			throws Exception {
 		constantHTML(hb,input);
@@ -678,6 +712,10 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	 */
 	private void emitTextParam(ExtendedXMLBuilder result,Input input,String name, String id, int boxwid, int max_result_length,
 			boolean force_single, boolean force_password,String default_value) {
+		emitTextParam(result, input, name, id, boxwid, max_result_length, force_single, force_password, default_value, null);
+	}
+	private void emitTextParam(ExtendedXMLBuilder result,Input input,String name, String id, int boxwid, int max_result_length,
+			boolean force_single, boolean force_password,String default_value,AutoComplete suggestions) {
 	
 		String format_hint=getFormatHint(input);
 		
@@ -687,7 +725,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		if( boxwid <=0 ) {
 			force_single=true; // unspecified width defaults to single
 		}
-		boolean autocomplete = input instanceof AutoComplete && ((AutoComplete)input).useAutoComplete();
+		boolean autocomplete = suggestions != null  && suggestions.useAutoComplete();
 		boolean use_datalist = autocomplete && use_html5 && USE_DATALIST.isEnabled(conn);
 		if(autocomplete) {
 			force_single=true; // autocomplete (via list) is single
@@ -797,7 +835,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			
 			if (autocomplete) {
 				if (use_html5) {
-					emitDataList(result, use_datalist,(AutoComplete) input, name,false);
+					emitDataList(result, use_datalist,suggestions, name,false);
 				}
 			}
 		} else {
@@ -848,10 +886,10 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	 * @param input
 	 * @param name
 	 */
-	private <T,V> void emitDataList(SimpleXMLBuilder result, boolean use_datalist, AutoComplete<T,V> input, String name,boolean wrap) {
+	private <T,V> void emitDataList(SimpleXMLBuilder result, boolean use_datalist, AutoComplete<V,T> input, String name,boolean wrap) {
 		// add actual list of completions
 		
-		// can't put in noscritp as some browsers show all noscript contents as text.
+		// can't put in noscript as some browsers show all noscript contents as text.
 		
 		if( use_datalist){
 			result.open("datalist");
@@ -870,9 +908,10 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			result.clean("Not selected");
 			result.close();
 		}
-		Set<T> suggestions = input.getSuggestions();
+		Iterator<T> suggestions = input.getItems();
 		if(suggestions!=null){
-			for(T item : suggestions){
+			while( suggestions.hasNext()) {
+				T item = suggestions.next();
 				String value = input.getValue(item);
 				if( value != null && ! value.isEmpty()) {
 					String text = input.getSuggestionText(item).trim();

@@ -183,12 +183,8 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Str
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
 	 */
 	@Override
-	public void setItem(LdapName item) {
-		try {
-			setValue(makeGlobusName(item));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
+	public String getValueByItem(LdapName item) {
+		return makeGlobusName(item);
 	}
 
 	@Override

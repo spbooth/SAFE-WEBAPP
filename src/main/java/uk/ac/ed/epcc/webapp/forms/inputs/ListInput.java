@@ -92,4 +92,8 @@ public abstract interface ListInput<V,T> extends  SuggestedItemInput<V,T> {
 	public default String getTooltip(T item) {
 		return null;
 	}
+	
+	public default  <R> R accept(InputVisitor<R> vis) throws Exception{
+		return vis.visitListInput(this);
+	}
 }

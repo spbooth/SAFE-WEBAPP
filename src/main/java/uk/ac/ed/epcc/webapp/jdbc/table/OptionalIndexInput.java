@@ -47,10 +47,7 @@ public class OptionalIndexInput<I> extends ParseAbstractInput<String> implements
 			}
 		}
 	}
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
+	
 	
 	@Override
 	public I getItem() {
@@ -59,13 +56,8 @@ public class OptionalIndexInput<I> extends ParseAbstractInput<String> implements
 	}
 
 	@Override
-	public void setItem(I item) {
-		try {
-			setValue(getTagByItem(item));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
-		
+	public final String getValueByItem(I item) {
+		return getTagByItem(item);
 	}
 
 	

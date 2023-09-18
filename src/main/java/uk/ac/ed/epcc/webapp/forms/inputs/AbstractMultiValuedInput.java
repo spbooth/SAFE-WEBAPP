@@ -60,6 +60,15 @@ public abstract  class AbstractMultiValuedInput<T> extends MultiInput<String, Bo
 		}
 		return result;
 	}
+	public String getValueByItem(Set<T> item) {
+		LinkedHashSet<String> tags = new LinkedHashSet<>();
+		for(T i : item) {
+			if( allowed.contains(i)) {
+				tags.add(getTagByItem(i));
+			}
+		}
+		return String.join(",", tags);
+	}
 	@Override
 	public void setItem(Set<T> item) {
 		for(T i : allowed) {

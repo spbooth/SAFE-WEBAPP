@@ -111,15 +111,8 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 
 	
 	@Override
-	public void setItem(E v) {
-		if( v == null ){
-			setNull();
-		}
-		try {
-			setValue(getTagByItem(v));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
+	public final String getValueByItem(E v) {
+		return getTagByItem(v);
 	}
 	
 	@Override

@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+
 /** An input that has some Domain Object associated with its values
  * 
  * Our normal convention for automatic forms is to have the input value correspond to the database field value. 
@@ -37,6 +39,13 @@ public interface ItemInput<V,T> extends Input<V>{
 	 * @return Object the domain object or null
 	 */
 	public abstract T getItembyValue(V value);
+	
+	/** get the value associated with the domain object
+	 * 
+	 * @param item
+	 * @return
+	 */
+	public abstract V getValueByItem(T item) throws TypeException;
 	/**
 	 * get the domain Object associated with the current value
 	 * 
@@ -51,7 +60,17 @@ public interface ItemInput<V,T> extends Input<V>{
 	/**
 	 * Set the value of the input using an item
 	 * 
-	 * @param item
+	 * @param item 
 	 */
-	public abstract void setItem(T item);
+	public default void setItem(T item){
+		if(item == null) {
+			setNull();
+		}else {
+			try {
+				setValue(getValueByItem(item));
+			} catch (TypeException e) {
+				setNull();
+			}
+		}
+	}
 }
