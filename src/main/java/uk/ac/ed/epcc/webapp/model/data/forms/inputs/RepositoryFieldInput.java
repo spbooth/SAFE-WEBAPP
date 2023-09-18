@@ -18,14 +18,7 @@ package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
 import java.util.Iterator;
 
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.inputs.BaseInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
-import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.forms.inputs.CodeListInput;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 /** Input to select one of the fields of a Repository
@@ -35,23 +28,26 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  */
 
 
-public class RepositoryFieldInput extends BaseInput<String> implements ListInput<String,Repository.FieldInfo>{
+public class RepositoryFieldInput extends CodeListInput<Repository.FieldInfo>{
     private final Repository res;
-    private FieldInfo item=null;
     public RepositoryFieldInput(Repository res){
     	this.res=res;
     }
-	public FieldInfo getItembyValue(String value) {
+	
+    @Override
+    public FieldInfo getItembyValue(String value) {
 		return res.getInfo(value);
 	}
 
+    @Override
 	public Iterator<FieldInfo> getItems() {
 		return res.getInfo().iterator();
 	}
+    @Override
 	public int getCount(){
 		return res.getInfo().size();
 	}
-
+    @Override
 	public String getTagByItem(FieldInfo item) {
 		if( item == null ){
 			return null;
@@ -59,10 +55,7 @@ public class RepositoryFieldInput extends BaseInput<String> implements ListInput
 		return item.getName(false);
 	}
 
-	public String getTagByValue(String value) {
-		return value;
-	}
-
+    @Override
 	public String getText(FieldInfo item) {
 		if( item == null ){
 			return null;
@@ -70,47 +63,6 @@ public class RepositoryFieldInput extends BaseInput<String> implements ListInput
 		return item.getName(false);
 	}
 
-	public String convert(Object v) throws TypeException {
-		if( v == null ) {
-			return null;
-		}
-		if( v instanceof String){
-			return (String)v;
-		}
-		throw new TypeException(v.getClass());
-	}
-
-	
-
-	
-	@Override
-	public String getValue() {
-		return getTagByItem(item);
-	}
-
-	@Override
-	public final String getValueByItem(FieldInfo item) {
-		return getTagByItem(item);
-	}
-	
-	@Override
-	public String setValue(String v){
-		String old = getValue();
-		item=res.getInfo(v);
-		return old;
-	}
-
-	
-	@Override
-	public FieldInfo getItem() {
-		return item;
-	}
-
-	@Override
-	public void setItem(FieldInfo item) {
-		this.item=item;
-	}
-	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
 	 */
@@ -118,24 +70,6 @@ public class RepositoryFieldInput extends BaseInput<String> implements ListInput
 	public boolean isValid(FieldInfo item) {
 		return res.hasField(item);
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#validate()
-	 */
-	@Override
-	public void setNull() {
-		item=null;
-		
-	}
-	@Override
-	public String parseValue(String v) throws ParseException {
-		if( v == null || v.trim().isEmpty()) {
-			return null;
-		}
-		if( ! res.hasField(v)) {
-			throw new ParseException("Invalid field "+v);
-		}
-		return v;
-	}
 	
-
+	
 }

@@ -13,9 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.Iterator;
-import java.util.Set;
-
 /** Interface for inputs that provide auto-complete text.
  * @author spb
  * 
@@ -25,13 +22,33 @@ import java.util.Set;
  */
 public interface AutoComplete<V,T> extends SuggestedItemInput<V,T>, LengthInput<V> {
 
+	/** Are there any legal values for this input.
+	 * 
+	 * @return 
+	 */
+	default boolean canSubmit() {
+		return true;
+	}
+	/** If there is only one legal item for this input return
+	 * 
+	 * @return
+	 */
+	default T forcedItem() {
+		return null;
+	}
 
 	/** Map an item to the corresponding value (compatible with the parse method).
 	 * 
 	 * @param item
 	 * @return String value
 	 */
-	String getValue(T item);
+	default String getValue(T item){
+		try {
+			return getString(getValueByItem(item));
+		} catch (TypeException e) {
+			return null;
+		}
+	}
 
 	/** get the suggestion text. This can be an expanded form of the value
 	 * 

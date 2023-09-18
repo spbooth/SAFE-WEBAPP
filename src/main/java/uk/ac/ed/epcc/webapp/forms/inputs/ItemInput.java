@@ -52,7 +52,11 @@ public interface ItemInput<V,T> extends Input<V>{
 	 * @return Object
 	 */
 	default public  T getItem() {
-		return getItembyValue(getValue());
+		V value = getValue();
+		if( value == null) {
+			return null;
+		}
+		return getItembyValue(value);
 	}
 	
 	

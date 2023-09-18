@@ -81,4 +81,13 @@ public abstract class AbstractSuggestedInput<BDO extends DataObject> extends Dat
 		}
 		return and;
 	}
+	protected BaseFilter<BDO> getRestrictionFilter() {
+		uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter and = getFactory().getAndFilter();
+		for(FieldValidator<Integer> v : getValidators()) {
+			if(v instanceof DataObjectFactory.DataObjectFieldValidator) {
+				and.addFilter(((DataObjectFactory.DataObjectFieldValidator)v).getFilter());
+			}
+		}
+		return and;
+	}
 }

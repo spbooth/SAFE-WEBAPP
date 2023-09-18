@@ -23,7 +23,6 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
@@ -39,7 +38,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  */
 
 
-public class ClassInput<T> extends AbstractStringInput implements ListInput<String,Class<? extends T>>{
+public class ClassInput<T> extends SimpleListInput<Class<? extends T>>{
     private final AppContext c;
     private final String prefix;
     
@@ -107,29 +106,13 @@ public class ClassInput<T> extends AbstractStringInput implements ListInput<Stri
 		return null;
 	}
 
-	@Override
-	public String getTagByValue(String value) {
-		return value;
-	}
+	
 
 	@Override
 	public String getText(Class<? extends T> item) {
 		String tag = getTagByItem(item);
 		return c.getInitParameter("classinput.text."+prefix+tag, tag);
 	}
-
-	@Override
-	public String convert(Object v)  {
-		if( v instanceof String ){
-			return (String) v;
-		}
-		return null;
-	}
-
-	
-
-	
-
 
 	
 
@@ -138,14 +121,6 @@ public class ClassInput<T> extends AbstractStringInput implements ListInput<Stri
 		return reg.get(getValue());
 	}
 
-	@Override
-	public final String getValueByItem(Class<? extends T> item) {
-		return getTagByItem(item);
-	}
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
 	 */

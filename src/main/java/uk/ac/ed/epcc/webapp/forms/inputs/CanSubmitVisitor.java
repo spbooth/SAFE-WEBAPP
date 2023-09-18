@@ -160,4 +160,9 @@ public class CanSubmitVisitor implements InputVisitor<Boolean> {
     	}
     	return can_submit;
     }
+
+	@Override
+	public <V, T> Boolean visitAutoCompleteInput(AutoComplete<V, T> autocompleteInput) throws Exception {
+		return autocompleteInput.canSubmit();
+	}
 }

@@ -23,11 +23,7 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.inputs.BaseInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
-import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 /** Input to select one of the foreign keys of a Repository
@@ -37,9 +33,8 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  */
 
 
-public class RepositoryForeignKeyInput extends BaseInput<String> implements ListInput<String,Repository.FieldInfo>{
+public class RepositoryForeignKeyInput extends CodeListInput<Repository.FieldInfo>{
     private final Repository res;
-    private FieldInfo item=null;
     private Map<String,FieldInfo> data=new LinkedHashMap<>();
     public RepositoryForeignKeyInput(Repository res){
     	for(FieldInfo info : res.getInfo()){
@@ -74,10 +69,6 @@ public class RepositoryForeignKeyInput extends BaseInput<String> implements List
 		return item.getForeignKeyName();
 	}
 
-	@Override
-	public String getTagByValue(String value) {
-		return value;
-	}
 
 	@Override
 	public String getText(FieldInfo item) {
@@ -87,60 +78,6 @@ public class RepositoryForeignKeyInput extends BaseInput<String> implements List
 		return item.getForeignKeyName()+" "+item.getName(false);
 	}
 
-	@Override
-	public String convert(Object v) throws TypeException {
-		if( v == null ) {
-			return null;
-		}
-		if( v instanceof String){
-			return (String)v;
-		}
-		throw new TypeException(v.getClass());
-	}
-
-	
-
-	@Override
-	public String getPrettyString(String value) {
-		return value;
-	}
-
-	@Override
-	public String getString(String value) {
-		return value;
-	}
-
-	@Override
-	public String getValue() {
-		if( item == null ) {
-			return null;
-		}
-		return getTagByItem(item);
-	}
-
-	@Override
-	public String getValueByItem(FieldInfo item) {
-		return getTagByItem(item);
-	}
-
-	@Override
-	public String setValue(String v)  {
-		String old = getValue();
-		item=getItembyValue(v);
-		return old;
-	}
-
-
-	@Override
-	public FieldInfo getItem() {
-		return item;
-	}
-
-	@Override
-	public void setItem(FieldInfo item) {
-		this.item=item;
-	}
-	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
 	 */
@@ -148,20 +85,5 @@ public class RepositoryForeignKeyInput extends BaseInput<String> implements List
 	public boolean isValid(FieldInfo item) {
 		return data.containsValue(item);
 	}
-	@Override
-	public void setNull() {
-		item=null;
-		
-	}
-	@Override
-	public String parseValue(String v) throws ParseException {
-		if( v == null || v.trim().isEmpty()) {
-			return null;
-		}
-		if( ! data.containsKey(v)) {
-			throw new ParseException("Invalid foreign key "+v);
-		}
-		return v;
-	}
-
+	
 }

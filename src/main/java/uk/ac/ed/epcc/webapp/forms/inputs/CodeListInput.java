@@ -21,29 +21,36 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 /** Abstract class to implement ListInput where we want
  * the input to generate a String code for each item.
  * 
+ * The values and the list tags are always the same and can be derived from the item so
+ * internally this holds state as an item rather than a value.
+ * 
  * @author spb
  *
  * @param <O> type of item
+ * @see SimpleListInput
  */
 public abstract class CodeListInput<O> extends BaseInput<String> implements ListInput<String,O>, NameInput<O> {
 
 	private O item=null;
 	
-	
-
-	
 	@Override
-	public String getTagByValue(String value) {
+	public final String getTagByValue(String value) {
 		return value;
 	}
-
+	@Override
+	public final String getValueByItem(O item) {
+		return getTagByItem(item);
+	}
 	
 	@Override
-	public String convert(Object v)  {
+	public final String convert(Object v) throws TypeException  {
 		if( v == null ){
 			return null;
 		}
-		return v.toString();
+		if( v instanceof String){
+			return (String)v;
+		}
+		throw new TypeException(v.getClass());
 	}
 
 	
@@ -57,12 +64,12 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 	}
 
 	@Override
-	public String getString(String value) {
+	public final String getString(String value) {
 		return value;
 	}
 
 	@Override
-	public String getValue() {
+	public final String getValue() {
 		if( item == null) {
 			return null;
 		}
@@ -70,7 +77,7 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 	}
 
 	@Override
-	public String setValue(String v) {
+	public final String setValue(String v) {
 		String previous = getTagByItem(item);
 		item = getItembyValue(v);
 		return previous;
@@ -79,18 +86,18 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 
 
 	@Override
-	public O getItem() {
+	public final O getItem() {
 		return item;
 	}
 
 	@Override
-	public void setItem(O item) {
+	public final void setItem(O item) {
 		this.item=item;		
 	}
 
 
 	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
+	public final <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
 	}
 	@Override
@@ -99,7 +106,7 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 	}
 
 
-	public O parseToItem(String v) throws ParseException{
+	public final O parseToItem(String v) throws ParseException{
 		O i = getItembyValue(v);
 		if( i == null ) {
 			throw new ParseException("Invalid code "+v);
@@ -107,14 +114,18 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 		return i;
 	}
 	@Override
-	public String parseValue(String v) throws ParseException {
-		if( v == null) {
+	public final String parseValue(String v) throws ParseException {
+		if( v == null || v.isEmpty()) {
 			return null;
 		}
 		
-		return getTagByItem(parseToItem(v));
+		O i = parseToItem(v);
+		if( ! isValid(i)) {
+			throw new ParseException("Invalid item");
+		}
+		return getTagByItem(i);
 	}
-	public void parse(String v) throws ParseException{
+	public final void parse(String v) throws ParseException{
 		item = parseToItem(v);
 	}
 		

@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  */
 
 
-public class ConstructedObjectInput<T> extends AbstractStringInput implements ListInput<String,T>{
+public class ConstructedObjectInput<T> extends SimpleListInput<T>{
     private final AppContext c;
     private Class<T> clazz;
     private Map<String,Class> reg;
@@ -110,37 +110,6 @@ public class ConstructedObjectInput<T> extends AbstractStringInput implements Li
 		return null;
 	}
 
-	@Override
-	public String getTagByValue(String value) {
-		return value;
-	}
-
-	@Override
-	public String getText(T item) {
-		String tag = getTagByItem(item);
-		return tag;
-	}
-
-	@Override
-	public String convert(Object v) throws TypeException  {
-		if( v == null) {
-			return null;
-		}
-		if( v instanceof String ){
-			return (String) v;
-		}
-		throw new TypeException(v.getClass());
-	}
-
-
-	@Override
-	public final String getValueByItem(T item) {
-		return getTagByItem(item);
-	}
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
 	 */

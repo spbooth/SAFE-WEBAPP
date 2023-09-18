@@ -6,6 +6,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.*;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -177,6 +178,32 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	
 	public void setUseAutoComplete(boolean val) {
 		use_autocomplete = val;
+	}
+	@Override
+	public boolean canSubmit() {
+		if( create ) {
+			return true;
+		}
+		try {
+			return getFactory().exists(getRestrictionFilter());
+		} catch (DataException e) {
+			getLogger().error("Error checking submit", e);
+			return false;
+		}
+	}
+	@Override
+	public T forcedItem() {
+		if( create ) {
+			return null;
+		}
+		try {
+			if( getFactory().getCount(getRestrictionFilter()) == 1L) {
+				return getFactory().find(getRestrictionFilter());
+			}
+		} catch (DataException e) {
+			getLogger().error("Error checking for forced", e);
+		}
+		return null;
 	}
 	
 	

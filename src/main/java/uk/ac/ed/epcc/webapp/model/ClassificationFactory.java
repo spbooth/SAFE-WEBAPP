@@ -223,10 +223,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		public T getItembyValue(String value) {
 			return findFromString(value);
 		}
-		@Override
-		public String getValueByItem(T item) {
-			return item.getName();
-		}
+		
 		@Override
 		public Iterator<T> getItems() {
 			try {
