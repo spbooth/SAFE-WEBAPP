@@ -65,6 +65,10 @@ public class XMLDataUtilsTest extends WebappTestBase {
 		Dummy2 boris = d2_fac.find(d2_fac.new StringFilter("boris"));
 		assertNotNull("Boris not found", boris);
 		assertNotNull(linker.getLink(fred, boris));
+		utils.readFixtures(getClass(), "delete.xml");
+		d2_fac = new Dummy2.Factory(ctx);
+		assertEquals(0, d2_fac.getCount(null));
+		
 	}
 	
 	
@@ -94,7 +98,7 @@ public class XMLDataUtilsTest extends WebappTestBase {
 		 utils.getDiff(diff, new InputSource(reader));
 		 System.out.println(diff.toString());
 		 assertEquals("<Test id='1'>\n<Number>19998.0</Number>\n</Test>\n",diff.toString());
-		
+		 
 	}
 	
 }

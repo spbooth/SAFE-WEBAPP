@@ -48,13 +48,18 @@ public class UnDumper extends DumpParser{
 	 * @throws ConsistencyError
 	 * @throws DataFault
 	 */
-	public int processRecord(int parse_id,Record rec) throws ConsistencyError, DataFault {
-		int new_id=0;
-		if( new_id == 0 || rec.hasID()){
-			rec.commit();
-			new_id = rec.getID();
+	public int processRecord(int parse_id,Record rec,boolean deleted) throws ConsistencyError, DataFault {
+		if( deleted ) {
+			rec.delete();
+			return 0;
+		}else {
+			int new_id=0;
+			if( new_id == 0 || rec.hasID()){
+				rec.commit();
+				new_id = rec.getID();
+			}
+			return new_id;
 		}
-		return new_id;
 	}
 	public void processSpecification(String table_name,TableSpecification spec) throws DataFault{
 		if( serv != null){

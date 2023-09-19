@@ -74,6 +74,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 	private Repository res=null;
 	private FieldInfo field=null;
 	private boolean null_value=false;
+	private boolean deleted=false;
 	private Integer id=null;
 	private StringBuilder sb = new StringBuilder();
 	private String table_name;
@@ -150,7 +151,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 						// end of record
 						Record rec = current;
 
-						int new_id = processRecord(id,rec);
+						int new_id = processRecord(id,rec,deleted);
 						if( new_id != 0 && id_map != null){
 							Map<Integer,Integer> map = id_map.get(res.getTag());
 							if( map == null ){
@@ -194,12 +195,13 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 	/**	 handle a {@link Record} once we have parsed it
 	 * @param parse_id int id parsed from file.
 	 * @param rec uncommitted {@link Record} parsed from the file
+	 * @param deleted Deletion state
 	 * @return int id to record in id_map.
 	 * @throws ConsistencyError
 	 * @throws DataException 
 	 * @throws IOException 
 	 */
-	public abstract int processRecord(int parse_id,Record rec) throws ConsistencyError, DataException, IOException;
+	public abstract int processRecord(int parse_id,Record rec,boolean deleted) throws ConsistencyError, DataException, IOException;
 	/** handle a {@link TableSpecification} once we have parsed it.
 	 * 
 	 * @param table
@@ -255,6 +257,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 		}
 		if( state == State.Top){
 			String id_str  = arg3.getValue(Dumper.ID);
+			String deleted_str = arg3.getValue(Dumper.DELETED_ATTR);
 			if( id_str != null ){
 				depth=1; // start counting
 				if( skipRecord(name,id_str)) {
@@ -283,6 +286,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 							}
 						}
 						field=null;
+						deleted=deleted_str != null && deleted_str.equals("true");
 					}catch(Exception t){
 						id=null;
 						res=null;

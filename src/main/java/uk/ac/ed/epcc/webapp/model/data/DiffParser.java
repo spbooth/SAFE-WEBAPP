@@ -62,7 +62,9 @@ public class DiffParser extends DumpParser {
 	 * @see uk.ac.ed.epcc.webapp.model.data.DumpParser#processRecord(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	public int processRecord(int parse_id,Record rec) throws ConsistencyError, DataException, IOException {
+	public int processRecord(int parse_id,Record rec,boolean deleted) throws ConsistencyError, DataException, IOException {
+		// CAn ignore deleted as this is never generated from a baseline dump
+		
 		
 		// would this even work without assuming parsed-ids are correct.
 		// if the id-s are remapped 
