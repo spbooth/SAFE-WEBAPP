@@ -13,39 +13,24 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.serv;
 
-import java.util.Calendar;
-import java.util.Date;
-
-import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.CurrentTimeService;
-import uk.ac.ed.epcc.webapp.model.cron.CadenceHeartbeatListener;
+import uk.ac.ed.epcc.webapp.model.cron.DailyHeartbeatListener;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
-import uk.ac.ed.epcc.webapp.model.cron.LockFactory;
-import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
 
 /** A {@link HeartbeatListener} that runs {@link DataObjectDataProducer#clean()} once a day.
  * This defaults to cleaning the default producer but this can be customised by putting a comma seperated list of
- * tags in the property cer.clean_tags</b>
+ * tags in the property <b>data_producer.clean_tags</b>
  * @author spb
  *
  */
 
-public class DataProducerHeartbeatListener extends CadenceHeartbeatListener {
+public class DataProducerHeartbeatListener extends DailyHeartbeatListener {
 
 	public DataProducerHeartbeatListener(AppContext conn) {
 		super(conn);
 	}
 	
-	@Override
-	public int getRepeat() {
-		return 1;
-	}
-	@Override
-	public int getCadenceField() {
-		return Calendar.HOUR_OF_DAY;
-	}
+	
 	@Override
 	protected String getLockName() {
 		return "DataProducerHeartbeatListener";
@@ -60,5 +45,11 @@ public class DataProducerHeartbeatListener extends CadenceHeartbeatListener {
 			}
 		}
 		
+	}
+
+
+	@Override
+	public int getRepeatHour() {
+		return 20;
 	}
 }
