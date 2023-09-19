@@ -20,6 +20,7 @@ import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
+import uk.ac.ed.epcc.webapp.model.cron.CadenceHeartbeatListener;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
 import uk.ac.ed.epcc.webapp.model.cron.LockFactory;
 import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
@@ -31,63 +32,33 @@ import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
  *
  */
 
-public class DataProducerHeartbeatListener extends AbstractContexed implements HeartbeatListener {
+public class DataProducerHeartbeatListener extends CadenceHeartbeatListener {
 
 	public DataProducerHeartbeatListener(AppContext conn) {
 		super(conn);
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener#run()
-	 */
+	
 	@Override
-	public Date run() {
-		try {
-			LockFactory lock_f = LockFactory.getFactory(getContext());
-			Lock lock = lock_f.makeFromString("DataProducerHeartbeatListener");
-			Calendar cal = Calendar.getInstance();
-			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-			Date now = time.getCurrentTime();
-
-			if( lock.isLocked()) {
-				Date d = lock.wasLockedAt();
-				cal.setTime(d);
-				cal.add(Calendar.HOUR,1);
-				if(now.after(cal.getTime())) {
-					getLogger().error(lock.getName()+" locked since "+d);
-				}
-				return null;
+	public int getRepeat() {
+		return 1;
+	}
+	@Override
+	public int getCadenceField() {
+		return Calendar.HOUR_OF_DAY;
+	}
+	@Override
+	protected String getLockName() {
+		return "DataProducerHeartbeatListener";
+	}
+	@Override
+	public void process() {
+		String tags = getContext().getInitParameter("data_producer.clean_tags",ServeDataProducer.DEFAULT_SERVE_DATA_TAG);
+		for(String tag : tags.split("\\s*,\\s*")){
+			DataObjectDataProducer prod = new DataObjectDataProducer(getContext(), tag);
+			if( prod != null ){
+				prod.clean();
 			}
-			Date lastLocked = lock.lastLocked();
-			if( lastLocked != null ) {
-				cal.setTime(lastLocked);
-				cal.add(Calendar.DAY_OF_YEAR,1);
-				Date target = cal.getTime();
-				if( target.after(now)) {
-					return target;
-				}
-			}
-		
-			if( lock.takeLock()) {
-				try {
-
-					String tags = getContext().getInitParameter("data_producer.clean_tags",ServeDataProducer.DEFAULT_SERVE_DATA_TAG);
-					for(String tag : tags.split("\\s*,\\s*")){
-						DataObjectDataProducer prod = new DataObjectDataProducer(getContext(), tag);
-						if( prod != null ){
-							prod.clean();
-						}
-					}
-				}finally {
-					lock.releaseLock();
-				}
-				cal.setTime(now);
-				cal.add(Calendar.DAY_OF_YEAR, 1);
-				return cal.getTime();
-			}
-			return null;
-		}catch(Exception e) {
-			getLogger().error("Error in DataProducerHeartbeatistener", e);
-			return null;
 		}
+		
 	}
 }
