@@ -145,7 +145,7 @@ public class JFormDialog extends JDialog implements Contexed{
 	 */
 	public JPanel getActionButtons(Form form,Set<String> actions){
 		JPanel buttons = new JPanel();
-		buttons.setLayout(new WrapLayout(FlowLayout.RIGHT));
+		buttons.setLayout(new WrapLayout(FlowLayout.RIGHT,5,10));
 		//buttons.setLayout(new BoxLayout(buttons, BoxLayout.LINE_AXIS));
 		//buttons.add(Box.createHorizontalGlue());
 		buttons.setBorder(BorderFactory.createLineBorder(Color.BLACK));

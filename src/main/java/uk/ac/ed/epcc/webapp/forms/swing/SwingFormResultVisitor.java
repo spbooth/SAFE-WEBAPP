@@ -276,6 +276,7 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 		}
 		builder.addActionButtons(base);
 		dialog.setTitle(page_title);
+		dialog.pack();
 		if( parent != null ) {
 			parent.validate();
 		}

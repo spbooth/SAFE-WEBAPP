@@ -159,6 +159,7 @@ TargetType t = conn.makeObject(TargetType.class,"tag-name");
 public final class AppContext {
 	
 
+	
 	public static final String CLASSDEF_PROP_PREFIX = "classdef.";
 	public static final Feature CONTEXT_CACHE_FEATURE = new Feature("ContextCache",true,"cache objects that implement ContextCache in the AppContext");
 	public static final Feature DATABASE_FEATURE = new Feature("database",true,"use database");
@@ -168,9 +169,12 @@ public final class AppContext {
 	private Map<Object,Object> attributes = null;
 
     private LinkedHashMap<Class,AppContextService> services = null;
+    
+    private ClassLoader saved_classloader=null;
     // services known not to resolve
     private Set<Class> missing_services =null;
     private boolean disable_service_creation=false;
+    private boolean disable_attribute_creation=false;
  
     
     public AppContext(){
@@ -208,6 +212,9 @@ public final class AppContext {
 		disable_service_creation=true;
 		
 		if (attributes != null) {
+			// Clean-up and remove attributes before services.
+			// Repositories hold open preparedStatements for finding records
+			// and the we have a debug check that looks for unclosed statements.
 			for( Iterator<Entry<Object, Object>> it =attributes.entrySet().iterator();it.hasNext();) {
 				Map.Entry e = it.next();
 				Object o = e.getValue();
@@ -219,6 +226,7 @@ public final class AppContext {
 			attributes.clear();
 			attributes = null;
 		}
+		disable_attribute_creation=true;
 		if( services != null ){
 			Set<Class> keySet = services.keySet();
 			Class keys[] = keySet.toArray(new Class[keySet.size()]);
@@ -1412,6 +1420,9 @@ public final class AppContext {
 	 *            Object to be stored.
 	 */
 	public final void setAttribute(Object key, Object value) {
+		if( disable_attribute_creation) {
+			return;
+		}
 		if (attributes == null) {
 			attributes = new HashMap<>();
 		}
@@ -1431,10 +1442,17 @@ public final class AppContext {
 	}
 	private static final ThreadLocal<AppContext> local_ctx = new ThreadLocal<AppContext>();
 	/** Save a thread-local AppContext
-	 * 
-	 * @param c
+	 * Also set the Thread savedClassloader to the AppContext classloader if different.
+	 * @param c {@link AppContext}
 	 */
 	public static void setContext(AppContext c) {
+		Thread thread = Thread.currentThread();
+		ClassLoader thread_cl = thread.getContextClassLoader();
+		ClassLoader app_cl = c.getClass().getClassLoader();
+		if( thread_cl != app_cl) {
+			thread.setContextClassLoader(app_cl);
+			c.saved_classloader = thread_cl;
+		}
 		local_ctx.set(c);
 	}
 	/** Retrieve a thread-local {@link AppContext} previously set using {@link #setContext(AppContext)}
@@ -1445,9 +1463,17 @@ public final class AppContext {
 		return local_ctx.get();
 	}
 	/** Clear the thread-local reference to the {@link AppContext}
+	 * reverses the opertion of {@link #setContext(AppContext)}
 	 * 
 	 */
 	public static void clearContext() {
+		AppContext c = getContext();
+		if(  c != null ) {
+			if( c.saved_classloader != null ) {
+				Thread.currentThread().setContextClassLoader(c.saved_classloader);
+				c.saved_classloader=null;
+			}
+		}
 		local_ctx.remove();
 	}
 	
