@@ -22,7 +22,7 @@ import java.util.Iterator;
  * @author Stephen Booth
  *
  */
-public interface SuggestedItemInput<V, T> extends ItemInput<V, T> , ParseInput<V>{
+public interface SuggestedItemInput<V, T> extends ItemInput<V, T> {
 	/**
 	 * get a list of domain objects that are being selected
 	 * 

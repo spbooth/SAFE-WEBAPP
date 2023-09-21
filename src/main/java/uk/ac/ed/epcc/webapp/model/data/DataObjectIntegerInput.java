@@ -32,7 +32,7 @@ public class DataObjectIntegerInput<BDO extends DataObject> extends ParseAbstrac
 		factory = dataObjectFactory;
 	}
 
-	protected DataObjectFactory<BDO> getFactory(){
+	protected  final DataObjectFactory<BDO> getFactory(){
 		return factory;
 	}
 	

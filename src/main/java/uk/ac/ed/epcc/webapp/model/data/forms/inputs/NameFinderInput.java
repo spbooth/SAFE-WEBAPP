@@ -4,6 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -12,6 +13,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
+import uk.ac.ed.epcc.webapp.model.data.AbstractDataObjectInput;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -28,7 +30,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * @author spb
  *
  */
-public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>> extends AbstractAutoCompleteIntegerInput<T>{
+public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>> extends AbstractDataObjectInput<T> implements AutoCompleteListInput<Integer, T>, PreSelectInput<Integer, T>, FormatHintInput{
 	protected final ParseFactory<T> finder; // in most cases this will aslo be the factory but not always
 	
 	
@@ -105,6 +107,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	}
 	@Override
 	public Integer parseValue(String v) throws ParseException {
+		kkkk
 		if( v == null || v.trim().isEmpty()) {
 			return null;
 		}
@@ -119,18 +122,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		return getValueByItem(item);
 	}
 	
-	@Override
-	public void setItem(T item) {
-		if( item == null){
-			setNull();
-		}else{
-			try {
-				setValue(item.getID());
-			} catch (TypeException e) {
-				throw new TypeError(e);
-			}
-		}
-	}
+	
 	
 	
 	
@@ -148,6 +140,8 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 */
 	@Override
 	public String getString(Integer val) {
+		
+		MUST mutate ???
 		T p = getItembyValue(val);
 		if( p != null ){
 			return getValue(p);
@@ -206,6 +200,15 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		return null;
 	}
 	
+	
+	private String format_hint=null;
+	public void setFormatHint(String hint) {
+		format_hint=hint;
+	}
+	@Override
+	public String getFormatHint() {
+		return format_hint;
+	}
 	
 	
 }

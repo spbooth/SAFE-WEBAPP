@@ -10,7 +10,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * @param <T>
  */
 public abstract class AbstractAutoCompleteIntegerInput<T extends DataObject> extends AbstractSuggestedInput<T> implements AutoComplete<Integer, T> , FormatHintInput{
-	private String format_hint=null;
+	
 	
 	public AbstractAutoCompleteIntegerInput(DataObjectFactory factory, BaseFilter<T> view_fil,
 			BaseFilter<T> restrict_fil) {
@@ -25,7 +25,7 @@ public abstract class AbstractAutoCompleteIntegerInput<T extends DataObject> ext
 			return vis.visitLengthInput(this);
 		}
 	}
-
+	private String format_hint=null;
 	public void setFormatHint(String hint) {
 		format_hint=hint;
 	}

@@ -20,26 +20,8 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.action.ConfirmMessage;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ConfirmException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
-import uk.ac.ed.epcc.webapp.forms.inputs.LengthInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseMapInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.PasswordInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
-import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
+import uk.ac.ed.epcc.webapp.forms.exceptions.*;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -182,7 +164,7 @@ public class MapForm extends BaseForm {
 	 * parse a Map of parameters.
 	 * @param input
 	 * @param params
-	 *            Map of values. These may be String representation from POST of
+	 *            Map of values. These may be String representation from POST or
 	 *            Objects from default values.
 	 * @param skip_null if true ignore any unset parameter
 	 * @throws FieldException

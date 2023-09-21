@@ -16,8 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-
 /** An input that has some Domain Object associated with its values
  * 
  * Our normal convention for automatic forms is to have the input value correspond to the database field value. 
