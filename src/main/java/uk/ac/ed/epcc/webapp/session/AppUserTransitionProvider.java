@@ -84,7 +84,6 @@ DataObjectTransitionProvider<AU, AppUserFactory<AU>, AppUserKey<AU>>{
 	 * 
 	 */
 	public static final String PERSON_TRANSITION_TAG = "Person";
-	public static final String VIEW_PERSON_RELATIONSHIP = "ViewPerson";
 	public static final AppUserKey SU_KEY = new AppUserKey("SU","Become User","Switch to this user identity") {
 
 		@Override
@@ -411,7 +410,7 @@ DataObjectTransitionProvider<AU, AppUserFactory<AU>, AppUserKey<AU>>{
 	@Override
 	public boolean canView(AU target, SessionService<?> sess) {
 		try(TimeClosable time = new TimeClosable(getContext(), "AppUserTransitionProvider.canView")){
-		return ((SessionService)sess).isCurrentPerson(target) || ((SessionService)sess).hasRelationship((AppUserFactory)sess.getLoginFactory(), target, VIEW_PERSON_RELATIONSHIP,false);
+		return ((SessionService)sess).isCurrentPerson(target) || sess.hasRole(AppUserFactory.VIEW_PERSON_ROLE)|| ((SessionService)sess).hasRelationship((AppUserFactory)sess.getLoginFactory(), target, AppUserFactory.VIEW_PERSON_RELATIONSHIP,false);
 		}
 	}
 

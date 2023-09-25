@@ -82,18 +82,7 @@ public interface InputVisitor<R> {
 	default <V,T> R visitAutoCompleteInput(AutoComplete<V,T> autocompleteInput) throws Exception{
 		return visitLengthInput(autocompleteInput);
 	}
-	/** An {@link ItemInput} that can be presents as either a text box with a suggested list of auto-completions
-	 * or a pull-down list. As with a {@link ListInput} values not in the suggestion list will not be accepted.
-	 * 
-	 * @param <V> type of data
-	 * @param <T> type of item
-	 * @param acl
-	 * @return
-	 * @throws Exception
-	 */
-	default <V,T> R visitAutoCompleteListInput(AutoCompleteListInput<V,T> acl) throws Exception{
-		return visitListInput(acl);
-	}
+	
 	/** A generic text box input 
 	 * 
 	 * @param <V> type of data

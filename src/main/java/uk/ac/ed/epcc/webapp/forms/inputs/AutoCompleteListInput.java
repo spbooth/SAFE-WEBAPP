@@ -1,20 +1,28 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
+
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+
 /** This is an input that can either be presented as a {@link ListInput} or an {@link AutoComplete}.
  * 
- * Like a {@link ListInput} it only allows values from the suggested list (or the current value of the input).
- * so the choice of which presentation to use can be deferred to very late in the form generation
+ * An implementing class needs to select which presentation to use in the #{@link #accept(InputVisitor)} method.
  * (e.g. based on a preference or the number of suggestions).
  * 
- * An implementing class can also force a particular presentation by calling the corresponding {@link InputVisitor} method in the 
- * {@link #accept(InputVisitor)} method.
  * 
  * @param <V>
  * @param <T>
  */
 public interface AutoCompleteListInput<V,T> extends ListInput<V, T>, AutoComplete<V, T> {
 
-	
+	/** Should this input be presented as a list or an auto-complete
+	 * 
+	 * @return
+	 */
+	public boolean useListPresentation();
 	public default  <R> R accept(InputVisitor<R> vis) throws Exception{
-		return vis.visitAutoCompleteListInput(this);
+		if( useListPresentation()) {
+			return vis.visitListInput(this);
+		}else {
+			return vis.visitAutoCompleteInput(this);
+		}
 	}
 }

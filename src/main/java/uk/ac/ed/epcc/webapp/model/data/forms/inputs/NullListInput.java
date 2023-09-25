@@ -78,14 +78,24 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public String getTagByItem(Object item) {
+	public String getTagByItem(Object item){
 		if( item == null ){
 			return null;
 		}
 		if( item == NULLTAG){
-			return ""+NULL_VALUE;
+			return NULLTAG;
 		}
 		return internal.getTagByItem((T)item);
+	}
+	@Override
+	public Object getItemByTag(String tag) {
+		if( tag == null ) {
+			return null;
+		}
+		if( tag.equals(NULLTAG)) {
+			return NULLTAG;
+		}
+		return internal.getItemByTag(tag);
 	}
 
 	@Override
@@ -94,11 +104,21 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 			return null;
 		}
 		if( value == NULL_VALUE ) {
-			return ""+NULL_VALUE;
+			return NULLTAG;
 		}
 		return value.toString();
 	}
-
+	@Override
+	public Integer getValueByTag(String tag) {
+		if( tag == null) {
+			return null;
+		}
+		if( tag.equals(NULLTAG)) {
+			return NULL_VALUE;
+		}
+		return Integer.parseInt(tag);
+	}
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public String getText(Object item) {
@@ -154,7 +174,8 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 			prev = internal.setValue(null);
 		}else if( v.intValue() == NULL_VALUE) {
 			null_value=true;
-			prev = internal.setValue(null);
+			prev = internal.getValue();
+			internal.setNull();
 		}else {	
 			prev = internal.setValue(v);
 		}

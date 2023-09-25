@@ -36,16 +36,6 @@ public class BasicTypeInput<T extends BasicType.Value> extends TypeProducerInput
 	}
 
 	@Override
-	public T getItembyValue(String value) {
-		try {
-			// Try more relaxed conversion
-			return ((BasicType<T>)getProducer()).parse(value);
-		} catch (ParseException e) {
-			return super.getItembyValue(value);
-		}
-	}
-
-	@Override
 	public boolean isEmpty() {
 		String value = getValue();
 		return value == null || value.isEmpty() ||  getItem() == null;

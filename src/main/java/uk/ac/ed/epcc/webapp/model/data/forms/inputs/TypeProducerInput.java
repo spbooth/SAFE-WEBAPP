@@ -21,15 +21,16 @@ import java.util.Iterator;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.*;
+import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.SimpleListInput;
 import uk.ac.ed.epcc.webapp.model.data.convert.EnumeratingTypeConverter;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 
 
-public class TypeProducerInput<T> extends AbstractInput<String> implements PreSelectInput<String,T>, OptionalListInput<String, T> {
+public class TypeProducerInput<T> extends SimpleListInput<T> implements PreSelectInput<String,T>, OptionalListInput<String, T> {
     private final EnumeratingTypeConverter<T,String> t;
     private Set<T> item_set=null;
     private String unselected_text=null;
@@ -72,7 +73,7 @@ public class TypeProducerInput<T> extends AbstractInput<String> implements PreSe
     	return t;
     }
 	@Override
-	public T getItembyValue(String value) {
+	public T getItemByTag(String value) {
 
 		try {
 			return t.find(value);
@@ -107,11 +108,6 @@ public class TypeProducerInput<T> extends AbstractInput<String> implements PreSe
 	}
 
 	@Override
-	public String getTagByValue(String value) {
-		return value;
-	}
-
-	@Override
 	public String getText(T item) {
 		if( item == null) {
 			return null;
@@ -128,10 +124,6 @@ public class TypeProducerInput<T> extends AbstractInput<String> implements PreSe
 		return getItembyValue(value);
 	}
 
-	@Override
-	public final String getValueByItem(T item) {
-		return getTagByItem(item);
-	}
 	@Override
 	public String getPrettyString(String val) {
 		return getText(getItembyValue(val));
@@ -187,15 +179,7 @@ public class TypeProducerInput<T> extends AbstractInput<String> implements PreSe
 		}
 		return false;
 	}
-	@Override
-	public String parseValue(String v) throws ParseException {
-		if( v == null || v.trim().isEmpty()) {
-			return null;
-		}
-		if( t.find(v) == null) {
-			throw new ParseException("Invalid input "+v);
-		}
-		return v;
-	}
+	
+	
 
 }

@@ -35,7 +35,7 @@ public class RepositoryFieldInput extends CodeListInput<Repository.FieldInfo>{
     }
 	
     @Override
-    public FieldInfo getItembyValue(String value) {
+    public FieldInfo getItemByTag(String value) {
 		return res.getInfo(value);
 	}
 

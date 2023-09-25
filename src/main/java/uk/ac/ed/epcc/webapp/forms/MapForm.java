@@ -143,23 +143,7 @@ public class MapForm extends BaseForm {
 		}
 		return ok;
 	}
-	@SuppressWarnings("unchecked")
-	private  void parseMultiInput(MultiInput input, Map<String,Object> params,boolean skip_null)
-			throws FieldException {
-		if(params == null ){
-			return;
-		}
-		// for convenience try a global parse if and only if global data exists
-		// null values cannot be handled for global values.
-		// handy on command line where the multi-input also implements parseInput
-		// or when forms are populated from a script.
-		if( ! defaultParseInput(input, params, true) ){
-			// no global data look at the sub-inputs.
-			for (Iterator<Input> it = input.getInputs(); it.hasNext();) {
-				parseInput( it.next(), params,skip_null);
-			}
-		}
-	}
+	
 	/**
 	 * parse a Map of parameters.
 	 * @param input
@@ -189,7 +173,7 @@ public class MapForm extends BaseForm {
 	 * This allows {@link MultiInput}s to access values targeted at sub-inputs.
 	 * 
 	 */
-	public class ParseVisitor implements InputVisitor<Object>{
+	public static class ParseVisitor implements InputVisitor<Object>{
 		/**
 		 * @param params
 		 * @param skip_null
@@ -201,13 +185,88 @@ public class MapForm extends BaseForm {
 		}
 		private final Map<String,Object> params;
 		private final boolean skip_null;
+		@SuppressWarnings("unchecked")
+		private  void parseMultiInput(MultiInput input, Map<String,Object> params,boolean skip_null)
+				throws FieldException {
+			if(params == null ){
+				return;
+			}
+			// for convenience try a global parse if and only if global data exists
+			// null values cannot be handled for global values.
+			// handy on command line where the multi-input also implements parseInput
+			// or when forms are populated from a script.
+			if( ! defaultParseInput(input, params, true) ){
+				// no global data look at the sub-inputs.
+				for (Iterator<Input> it = input.getInputs(); it.hasNext();) {
+					
+					try {
+						it.next().accept(this);
+					}catch(FieldException fe){
+						throw fe;
+					} catch (Exception e) {
+						throw new ParseException("Invalid input",e);
+					}
+				}
+			}
+		}
+		/** default parse behaviour (use parameter corresponding to input key)
+		 * 
+		 * @param <J>
+		 * @param input  Input
+		 * @param params  form params
+		 * @param skip_null (ignore null values if true).
+		 * @return true if data found
+		 * @throws FieldException
+		 */
+		private <J> boolean defaultParseInput(Input<J> input, Map params,boolean skip_null)
+		throws FieldException {
+			Object data = params.get(input.getKey());
+			if( data == null ) {
+				if(! skip_null) {
+					input.setNull();
+				}
+			}else if (data instanceof String && input instanceof ParseInput) {
+				((ParseInput) input).parse((String) data);
+				return true;
+			} else {
+					//Note the check-boxes need to parse null as a result
+					//so we can't skip null data
+					// also don't want to ignore an input that has been cleared
+					// so html usually does not set skip_null
+					// however in the command line form it is generally better to 
+					// use the default values where they exist
+					try {
+						input.setValue(input.convert(data));
+					} catch (TypeException e) {
+						throw new ParseException("Illegal type conversion", e);
+					}
+					return true;
+			}
+			return false;
+
+		}
+		private void parseMapInput(ParseMapInput input, Map<String, Object> params) throws FieldException{
+			input.parse(params);
+			
+		}
+
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor#visitBinaryInput(uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput)
 		 */
 		@Override
 		public Object visitBinaryInput(BinaryInput checkBoxInput)
 				throws Exception {
-			defaultParseInput(checkBoxInput, params, skip_null);
+			Object o = params.get(checkBoxInput.getKey());
+			if( o == null ) {
+				checkBoxInput.setChecked(false);
+			}else {
+				if( o instanceof String) {
+					checkBoxInput.setChecked(checkBoxInput.getChecked().equals(o));
+				}else {
+					// last ditch fallback
+					checkBoxInput.setValue(checkBoxInput.convert(o));
+				}
+			}
 			return null;
 		}
 		/* (non-Javadoc)
@@ -234,7 +293,18 @@ public class MapForm extends BaseForm {
 		@Override
 		public <V, T> Object visitListInput(ListInput<V, T> listInput)
 				throws Exception {
-			defaultParseInput(listInput, params, skip_null);
+			Object o = params.get(listInput.getKey());
+			if( o == null) {
+				if( ! skip_null) {
+					listInput.setNull();
+				}
+			}else {
+				if( o instanceof String) {
+					listInput.setItem(listInput.getItemByTag((String) o));
+				}else {
+					listInput.setValue(listInput.convert(o));
+				}
+			}
 			return null;
 		}
 		/* (non-Javadoc)
@@ -243,7 +313,7 @@ public class MapForm extends BaseForm {
 		@Override
 		public <V, T> Object visitRadioButtonInput(ListInput<V, T> listInput)
 				throws Exception {
-			defaultParseInput(listInput, params, skip_null);
+			visitListInput(listInput);
 			return null;
 		}
 		/* (non-Javadoc)
@@ -285,47 +355,9 @@ public class MapForm extends BaseForm {
 		
 	}
 	
-	private void parseMapInput(ParseMapInput input, Map<String, Object> params) throws FieldException{
-		input.parse(params);
-		
-	}
-
 	
 	
-	/** default parse behaviour (use parameter corresponding to input key)
-	 * 
-	 * @param <J>
-	 * @param input  Input
-	 * @param params  form params
-	 * @param skip_null (ignore null values if true).
-	 * @return true if data found
-	 * @throws FieldException
-	 */
-	private <J> boolean defaultParseInput(Input<J> input, Map params,boolean skip_null)
-	throws FieldException {
-		Object data = params.get(input.getKey());
-		if (data instanceof String && input instanceof ParseInput) {
-			((ParseInput) input).parse((String) data);
-			return true;
-		} else {
-			if( ! skip_null || data != null ){
-				//Note the check-boxes need to parse null as a result
-				//so we can't skip null data
-				// also don't want to ignore an input that has been cleared
-				// so html usually does not set skip_null
-				// however in the command line form it is generally better to 
-				// use the default values where they exist
-				try {
-					input.setValue(input.convert(data));
-				} catch (TypeException e) {
-					throw new ParseException("Illegal type conversion", e);
-				}
-				return true;
-			}
-			return false;
-		}
-
-	}
+	
 
 	/** Set the name to use for the action parameter
 	 * defaults to action

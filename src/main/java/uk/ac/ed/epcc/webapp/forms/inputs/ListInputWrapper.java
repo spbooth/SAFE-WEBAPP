@@ -15,13 +15,15 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.Iterator;
 
-/**
+/** Abstract superclass for wrappers around {@link ListInput}s
  * @author Stephen Booth
  *
   * @param <V> type of value object
  * @param <T> type of Item object
  */
 public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements ListInput<V,T>{
+
+	
 
 	/**
 	 * @param nested
@@ -54,7 +56,7 @@ public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements
 	}
 
 	@Override
-	public String getTagByItem(T item) {
+	public String getTagByItem(T item){
 		return getInner().getTagByItem(item);
 	}
 
@@ -62,7 +64,18 @@ public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements
 	public String getTagByValue(V value) {
 		return getInner().getTagByValue(value);
 	}
-
+	@Override
+	public T getItemByTag(String tag) {
+		return getInner().getItemByTag(tag);
+	}
+	@Override
+	public String getText(T item) {
+		return getInner().getText(item);
+	}
+	@Override
+	public V getValueByTag(String tag) {
+		return getInner().getValueByTag(tag);
+	}
 	@Override
 	public V convert(Object v) throws TypeException {
 		if( v == null){

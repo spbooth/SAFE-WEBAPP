@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
@@ -28,7 +29,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  */
 
 
-public class IntegerSetInput extends IntegerInput implements ListInput<Integer,Integer> {
+public class IntegerSetInput extends AbstractInput<Integer> implements ListInput<Integer,Integer> {
     /**
 	 * @author Stephen Booth
 	 *
@@ -138,5 +139,20 @@ public class IntegerSetInput extends IntegerInput implements ListInput<Integer,I
 	public boolean isValid(Integer item) {
 		return values.contains(item);
 	}
+	@Override
+	public Integer getItemByTag(String tag) {
+		return Integer.parseInt(tag);
+	}
+	@Override
+	public Integer getValueByTag(String tag) {
+		return Integer.parseInt(tag);
+	}
 
+	public void setInteger(int i) {
+		try {
+			setValue(i);
+		} catch (TypeException e) {
+			throw new ConsistencyError("Impossible type error", e);
+		}
+	}
 }

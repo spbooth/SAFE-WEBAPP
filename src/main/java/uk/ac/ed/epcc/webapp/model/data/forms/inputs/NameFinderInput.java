@@ -1,31 +1,25 @@
 package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.AbstractDataObjectInput;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
-import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
-/** An {@link DataObjectItemInput} for {@link NameFinder} factories.
+/** An {@link DataObjectItemInput} for {@link ParseFactory}/{@link NameFinder} factories.
  * 
- * This is a text {@link AutoComplete} input using the permitted names
- * optionally creating bootstrap entries 
+ * This is an {@link AutoCompleteListInput} that can be presented as either a pull-down list or
+ * an auto-complete text box. Optionally if created with a {@link NameFinder} it can be used to create new bootstrap
+ * entries. Though this requires tet-box presentation. 
  * 
- * Autocompletion can be 
+ * In text-box mode it is also possible to turn off the auto-completion list for selections where the
+ * suggestion list is too long.
  * 
  * @author spb
  *
@@ -33,37 +27,55 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>> extends AbstractDataObjectInput<T> implements AutoCompleteListInput<Integer, T>, PreSelectInput<Integer, T>, FormatHintInput{
 	protected final ParseFactory<T> finder; // in most cases this will aslo be the factory but not always
 	
+	/** Possible operating modes.
+	 * 
+	 * This is the requested operating mode. 
+	 */
+	public static enum Options{
+		CREATE(true,false,true),
+		CREATE_NO_SUGGESTIONS(true,false,false),
+		LIST(false,true,true),
+		AUTO_COMPLETE(false,false,true),
+		TEXT_ONLY(false,false,false);
+		private Options(boolean create, boolean list, boolean suggestions) {
+			this.create = create;
+			this.list = list;
+			this.suggestions = suggestions;
+		}
+		final boolean create; // Create new objects, requires text presentations and a NameFinder
+		final boolean list;   // Force list presentation
+		final boolean suggestions; // generate suggestions in text mode
 	
-	/** create input
-	 * 
-	 * @param create   make entry if not found
-	 * @param restrict  restrict with filter
-	 * @param autocomplete  suggestions/restrict filter
-	 * @param factory {@link DataObjectFactory} and {@link NameFinder}
-	 */
-	public NameFinderInput(F factory, ParseFactory<T> finder,boolean create, BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
-		this(factory,finder,create,true,restrict,autocomplete);
 	}
-	/** create input
+	
+	public NameFinderInput(F factory,ParseFactory<T> finder,BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
+		this(factory,finder,Options.AUTO_COMPLETE,restrict,autocomplete);
+	}
+	public NameFinderInput(F factory,ParseFactory<T> finder,boolean create,BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
+		this(factory,finder,create ? Options.CREATE: Options.AUTO_COMPLETE,restrict,autocomplete);
+	}
+	/**
 	 * 
-	 * @param create   make entry if not found
-	 * @param use_autocomplete   use autocomplete input or a simple text input
-	 * @param restrict  restrict filter
-	 * @param autocomplete  suggestions filter
-	 * @param factory {@link DataObjectFactory} and {@link NameFinder}
+	 * @param factory
+	 * @param finder
+	 * @param options
+	 * @param restrict
+	 * @param autocomplete
 	 */
-	public NameFinderInput(F factory, ParseFactory<T> finder,boolean create, boolean use_autocomplete, BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
+	public NameFinderInput(F factory, ParseFactory<T> finder,Options options, BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
 
 		super(factory,autocomplete,restrict);
 		this.finder = finder;
-		this.create = create && (finder instanceof NameFinder);
-		this.use_autocomplete = use_autocomplete;
+		this.options=options;
 		
-		setSingle(true);
-		addValidator(factory.new DataObjectFieldValidator(restrict));
+
+
 	}
-	private boolean create;
-	private boolean use_autocomplete;  // allow autocomplete to be turned off 
+	private Options options;
+	
+	public void setOptions(Options opt) {
+		options = opt;
+	}
 	
 	
 	public T parseItem(String v) throws ParseException {
@@ -73,7 +85,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		try{
 			boolean created = false;
 			T target=finder.findFromString(v);
-			if( target == null && create ){
+			if( target == null && canCreate() ){
 				NameFinder<T> nf = (NameFinder<T>) finder;
 				nf.validateNameFormat(v);
 				target=nf.makeFromString(v);
@@ -107,7 +119,6 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	}
 	@Override
 	public Integer parseValue(String v) throws ParseException {
-		kkkk
 		if( v == null || v.trim().isEmpty()) {
 			return null;
 		}
@@ -140,8 +151,6 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 */
 	@Override
 	public String getString(Integer val) {
-		
-		MUST mutate ???
 		T p = getItembyValue(val);
 		if( p != null ){
 			return getValue(p);
@@ -151,31 +160,18 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	/**
 	 * @return the create
 	 */
-	public boolean isCreate() {
-		return create;
-	}
-	/**
-	 * @param create enable/disable object creation
-	 */
-	public void setCreate(boolean create) {
-		if( ! (finder instanceof NameFinder)) {
-			return;
-		}
-		this.create = create;
+	public boolean canCreate() {
+		return options.create && (finder instanceof NameFinder);
 	}
 	
 	
-	@Override
-	public boolean useAutoComplete() {
-		return use_autocomplete;
-	}
 	
-	public void setUseAutoComplete(boolean val) {
-		use_autocomplete = val;
-	}
+	
+	
+	
 	@Override
 	public boolean canSubmit() {
-		if( create ) {
+		if( canCreate() ) {
 			return true;
 		}
 		try {
@@ -187,11 +183,11 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	}
 	@Override
 	public T forcedItem() {
-		if( create ) {
+		if( canCreate() ) {
 			return null;
 		}
 		try {
-			if( getFactory().getCount(getRestrictionFilter()) == 1L) {
+			if( getRestrictionCount() == 1L) {
 				return getFactory().find(getRestrictionFilter());
 			}
 		} catch (DataException e) {
@@ -208,6 +204,77 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	@Override
 	public String getFormatHint() {
 		return format_hint;
+	}
+	
+	private int boxwid=32;
+	@Override
+	public int getBoxWidth() {
+		return boxwid;
+	}
+	@Override
+	public void setBoxWidth(int l) {
+		boxwid=l;
+	}
+	@Override
+	public boolean getSingle() {
+		return true;
+	}
+	@Override
+	public boolean useListPresentation() {
+		if( options.list || finder == null) {
+			return true;
+		}
+		if( ! options.suggestions) {
+			return false;  // suggtions explicitly not requested
+		}
+		if( options.create) {
+			return false; // cannot create from list
+		}
+		try {
+			int threshold = getConfigParam("list_threshold", 50);
+			if( threshold > 0 ) {
+				// If the possible suggestions are low enough and
+				// the suggestions contain all the allowed choices then we can use a list
+				long allowed_count = getRestrictionCount();
+				if( allowed_count < threshold) {
+					if( allowed_count ==  getCount()) {
+						return true;
+					}
+
+				}
+			}
+		} catch (DataException e) {
+			getLogger().error("Error in presentation choice", e);
+		}
+		return false;
+	}
+	
+	
+	/** Get a configuration parameter.
+	 * Check FactoryTag.name first then NameFinderInput.name
+	 * 
+	 * @param name
+	 * @param def
+	 * @return
+	 */
+	private int getConfigParam(String name,int def) {
+		AppContext conn = getContext();
+		return conn.getIntegerParameter(getFactory().getConfigTag()+"."+name,
+				conn.getIntegerParameter("NameFinderInput."+name, def)
+				);
+	}
+
+	@Override
+	public boolean useAutoComplete() {
+		if( ! options.suggestions) {
+			return false;  // explicitly disables
+		}
+		int max = getConfigParam("max_datalist", 200);
+		if( max > 0 && getCount() > max) {
+			return false; // too many values to add a datalist
+		}
+		
+		return true;
 	}
 	
 	

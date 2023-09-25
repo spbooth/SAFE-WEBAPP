@@ -51,7 +51,7 @@ public class OptionalIndexInput<I> extends SimpleListInput<I>{
 	}
 	
 	@Override
-	public I getItembyValue(String value) {
+	public I getItemByTag(String value) {
 		return indexes.get(value);
 	}
 

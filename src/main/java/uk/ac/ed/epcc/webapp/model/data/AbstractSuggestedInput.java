@@ -90,4 +90,8 @@ public abstract class AbstractSuggestedInput<BDO extends DataObject> extends Dat
 		}
 		return and;
 	}
+	protected long getRestrictionCount() throws DataException {
+		return getFactory().getCount(getRestrictionFilter());
+	}
+	
 }

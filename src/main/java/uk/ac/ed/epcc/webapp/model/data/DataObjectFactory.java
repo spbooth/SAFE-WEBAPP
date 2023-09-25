@@ -288,7 +288,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		
 	}
 
-	public class SortingDataObjectInput extends DataObjectInput implements DataObjectItemParseInput<BDO>{
+	public class SortingDataObjectInput extends DataObjectInput {
 		 Comparator<? super BDO> comp;
 		public SortingDataObjectInput( BaseFilter<BDO> f,Comparator<? super BDO> comp) {
 			super(f);

@@ -74,7 +74,7 @@ public class ConstructedObjectInput<T> extends SimpleListInput<T>{
     	
     }
 	@Override
-	public T getItembyValue(String value) {
+	public T getItemByTag(String value) {
 		if( value == null  || value.isEmpty()){
 			return null;
 		}

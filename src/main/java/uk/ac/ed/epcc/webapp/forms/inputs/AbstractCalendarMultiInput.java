@@ -13,7 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -37,26 +36,21 @@ public abstract class AbstractCalendarMultiInput extends MultiInput<Date, Input<
 	public AbstractCalendarMultiInput(int max_field) {
 		super();
 		this.max_field=max_field;
-		NumberFormat nf = NumberFormat.getIntegerInstance();
-    	nf.setMinimumIntegerDigits(2);
-    	nf.setMaximumIntegerDigits(2);
+
     	if( max_field >= Calendar.HOUR){
     		hour_input=new IntegerRangeInput(0, 24);
-    		hour_input.setNumberFormat(nf);
     		addInput("hour",hour_input);
     	}else{
     		hour_input=null;
     	}
     	if( max_field >= Calendar.MINUTE){
     		min_input = new IntegerRangeInput(0, 60);
-    		min_input.setNumberFormat(nf);
     		addInput("min",":",min_input);
     	}else{
     		min_input=null;
     	}
     	if( max_field >= Calendar.SECOND){
     		sec_input = new IntegerRangeInput(0, 60);
-    		sec_input.setNumberFormat(nf);
     		addInput("sec",":",sec_input);
     	}else{
     		sec_input=null;

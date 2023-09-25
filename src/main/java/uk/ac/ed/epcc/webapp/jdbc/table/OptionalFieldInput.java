@@ -53,7 +53,7 @@ public class OptionalFieldInput<I> extends SimpleListInput<I>{
 	
 	
 	@Override
-	public I getItembyValue(String value) {
+	public I getItemByTag(String value) {
 		return fields.get(value);
 	}
 

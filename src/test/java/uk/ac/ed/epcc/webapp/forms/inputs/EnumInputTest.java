@@ -16,21 +16,11 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.util.HashSet;
 import java.util.Set;
 
-
-
-
-
-
 import org.junit.Test;
 
-import uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTest;
-import uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTestImpl;
-import uk.ac.ed.epcc.webapp.forms.ParseAbstractInputTestCase;
-import uk.ac.ed.epcc.webapp.forms.TestDataProvider;
-import uk.ac.ed.epcc.webapp.forms.TestEnum;
-import uk.ac.ed.epcc.webapp.forms.inputs.EnumInput;
+import uk.ac.ed.epcc.webapp.forms.*;
 
-public class EnumInputTest extends ParseAbstractInputTestCase<String,EnumInput<TestEnum>> implements TestDataProvider<String,EnumInput<TestEnum>>,
+public class EnumInputTest extends AbstractInputTestCase<String,EnumInput<TestEnum>> implements TestDataProvider<String,EnumInput<TestEnum>>,
 ListInputInterfaceTest<String, TestEnum, EnumInput<TestEnum>, TestDataProvider<String,EnumInput<TestEnum>>>
 {
 
@@ -40,15 +30,7 @@ ListInputInterfaceTest<String, TestEnum, EnumInput<TestEnum>, TestDataProvider<S
 		
 	}
 
-	@Override
-	public Set<String> getGoodParseData() {
-		return getGoodData();
-	}
-
-	@Override
-	public Set<String> getBadParseData() {
-		return getBadData();
-	}
+	
 
 	@Override
 	public Set<String> getGoodData()  {

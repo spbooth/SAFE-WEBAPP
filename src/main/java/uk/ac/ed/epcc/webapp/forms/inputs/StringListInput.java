@@ -42,9 +42,10 @@ public abstract class StringListInput extends SimpleListInput<String> {
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#getItembyValue(java.lang.Object)
 	 */
 	@Override
-	public final String getItembyValue(String value) {
+	public final String getItemByTag(String value) {
 		return value;
 	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#getTagByItem(java.lang.Object)
 	 */

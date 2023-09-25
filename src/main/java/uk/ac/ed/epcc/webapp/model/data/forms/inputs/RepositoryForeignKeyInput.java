@@ -48,7 +48,7 @@ public class RepositoryForeignKeyInput extends CodeListInput<Repository.FieldInf
     	this.res=res;
     }
 	@Override
-	public FieldInfo getItembyValue(String value) {
+	public FieldInfo getItemByTag(String value) {
 		return data.get(value);
 	}
 

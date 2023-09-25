@@ -79,7 +79,7 @@ public class ClassInput<T> extends SimpleListInput<Class<? extends T>>{
     	this(c,target,false,"classdef");
     }
 	@Override
-	public Class<? extends T> getItembyValue(String value) {
+	public Class<? extends T> getItemByTag(String value) {
 		if( value == null ){
 			return null;
 		}

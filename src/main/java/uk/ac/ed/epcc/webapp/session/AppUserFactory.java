@@ -60,11 +60,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.PlaceHolderFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
-import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
-import uk.ac.ed.epcc.webapp.model.IndexTableContributor;
-import uk.ac.ed.epcc.webapp.model.NameFinder;
-import uk.ac.ed.epcc.webapp.model.SummaryContributer;
+import uk.ac.ed.epcc.webapp.model.*;
 import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
@@ -547,6 +543,16 @@ Targetted<AU>
 	}
 	
 	private Map<String,AppUserNameFinder> realms=null;
+	
+	/** This is a role that allows access to all personal details in the application
+	 * this role can be used to short-circuit an expensive access check using {@link #VIEW_PERSON_RELATIONSHIP}
+	 */
+	public static final String VIEW_PERSON_ROLE = "ViewPersonalDetails";
+	/** This is the relationship that allows personal details to be viewed.
+	 * this should always include the {@link #VIEW_PERSON_ROLE} as well as person specific relationships
+	 * 
+	 */
+	public static final String VIEW_PERSON_RELATIONSHIP = "ViewPerson";
 	/** key for a session attibute holding a newly registered user.
 	 * This is to support users being able to link external identities
 	 * in the same session after registration
@@ -619,15 +625,21 @@ Targetted<AU>
 	}
 	public static class  AppUserNameInput<A extends AppUser> extends NameFinderInput<A, AppUserFactory<A>> implements HTML5Input, FormatHintInput{
 
-		/**
-		 * @param factory
-		 * @param create
-		 * @param restrict
-		 * @param autocomplete
-		 */
-		public AppUserNameInput(AppUserFactory<A> factory,NameFinder<A>finder, boolean create, boolean use_autocomplete,BaseFilter<A> restrict,
+		
+
+		public AppUserNameInput(AppUserFactory<A> factory, ParseFactory<A> finder, BaseFilter<A> restrict,
 				BaseFilter<A> autocomplete) {
-			super(factory, finder,create,use_autocomplete, restrict, autocomplete);
+			super(factory, finder, restrict, autocomplete);
+		}
+
+		public AppUserNameInput(AppUserFactory<A> factory, ParseFactory<A> finder, boolean create,
+				BaseFilter<A> restrict, BaseFilter<A> autocomplete) {
+			super(factory, finder, create, restrict, autocomplete);
+		}
+
+		public AppUserNameInput(AppUserFactory<A> factory, ParseFactory<A> finder, Options options,
+				BaseFilter<A> restrict, BaseFilter<A> autocomplete) {
+			super(factory, finder, options, restrict, autocomplete);
 		}
 
 		/* (non-Javadoc)
@@ -678,8 +690,12 @@ Targetted<AU>
 	public DataObjectItemInput<AU> getInput(boolean restrict) {
 		BaseFilter<AU> fil = getFinalSelectFilter();
 		if( useAutoCompleteForSelect()) {
-			//return getNameInput(getFinalSelectFilter(),false, restrictDefaultInput() );
-			return getNameInput(fil,getRealmFinder(getDefaultRealm()),false,true, restrict?fil:null );
+			if( restrict ) {
+				return new NameFinderInput<AU, AppUserFactory<AU>>(this,getRealmFinder(getDefaultRealm()),fil,null );
+			}else {
+				return new NameFinderInput<AU, AppUserFactory<AU>>(this,getRealmFinder(getDefaultRealm()),null, fil );
+			}
+			
 		}
 		return super.getInput(fil,restrict);
 	}
@@ -693,9 +709,7 @@ Targetted<AU>
 		return AUTO_COMPLETE_APPUSER_INPUT.isEnabled(getContext());
 	}
 	
-	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,NameFinder<AU> finder,boolean create,boolean use_autocomplete,BaseFilter<AU> restrict){
-		return new AppUserNameInput<>(this, finder,create, use_autocomplete,restrict, fil);
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.ParseFactory#getCanonicalName(java.lang.Object)
 	 */
@@ -1145,8 +1159,19 @@ Targetted<AU>
 	}
 	@Override
 	public BaseFilter<AU> getSelectFilter() {
+		/* Because input selectors can leak personal information
+		 * we allways narrow selections using the view person relationship.
+		 * In principal an autocomplete input might still allow a person to be
+		 * selected where their id (usually email) is known.
+		 */
+		SessionService sess = getContext().getService(SessionService.class);
+		if( sess.hasRole(AppUserFactory.VIEW_PERSON_ROLE)) {
+			// shortcut the relationship lookup as
+			// the role is sufficient
+			return super.getSelectFilter();
+		}
 		return getAndFilter(super.getSelectFilter(),
-				getContext().getService(SessionService.class).getRelationshipRoleFilter(this, AppUserTransitionProvider.VIEW_PERSON_RELATIONSHIP,new GenericBinaryFilter<>(true)));
+				sess.getRelationshipRoleFilter(this, AppUserFactory.VIEW_PERSON_RELATIONSHIP,new GenericBinaryFilter<>(false)));
 	}
 	@Override
 	public FormUpdate<AU> getFormUpdate(AppContext c) {

@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 /** Abstract class to implement ListInput where we want
@@ -38,10 +39,17 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 		return value;
 	}
 	@Override
-	public final String getValueByItem(O item) {
+	public final String getValueByTag(String value) {
+		return value;
+	}
+	@Override
+	public final String getValueByItem(O item) throws TypeException {
 		return getTagByItem(item);
 	}
-	
+	@Override
+	public final O getItembyValue(String value) {
+		return getItemByTag(value);
+	}
 	@Override
 	public final String convert(Object v) throws TypeException  {
 		if( v == null ){
@@ -78,9 +86,11 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 
 	@Override
 	public final String setValue(String v) {
+
 		String previous = getTagByItem(item);
 		item = getItembyValue(v);
 		return previous;
+
 	}
 
 
@@ -106,27 +116,5 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 	}
 
 
-	public final O parseToItem(String v) throws ParseException{
-		O i = getItembyValue(v);
-		if( i == null ) {
-			throw new ParseException("Invalid code "+v);
-		}
-		return i;
-	}
-	@Override
-	public final String parseValue(String v) throws ParseException {
-		if( v == null || v.isEmpty()) {
-			return null;
-		}
-		
-		O i = parseToItem(v);
-		if( ! isValid(i)) {
-			throw new ParseException("Invalid item");
-		}
-		return getTagByItem(i);
-	}
-	public final void parse(String v) throws ParseException{
-		item = parseToItem(v);
-	}
-		
+	
 }

@@ -16,14 +16,10 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** Input to select values from a Java Enum 
@@ -35,7 +31,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  */
 
 
-public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInput<String,E>,OptionalListInput<String, E>,PreSelectInput<String, E> {
+public class EnumInput<E extends Enum<E>> extends CodeListInput<E> implements OptionalListInput<String, E>,PreSelectInput<String, E> {
     EnumSet<E> set;
     Map<String,E> lookup;
     private String unslected_text=null;
@@ -62,7 +58,7 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
     	this(EnumSet.allOf(clazz));
     }
 	@Override
-	public E getItembyValue(String value) {
+	public E getItemByTag(String value) {
 		if( value == null ){
 			return null;
 		}
@@ -86,12 +82,7 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 		}
 		return item.name();
 	}
-
-	@Override
-	public String getTagByValue(String value) {
-		return getTagByItem(getItembyValue(value));
-	}
-
+	
 	@Override
 	public String getText(E item) {
 		if( item == null ){
@@ -101,43 +92,13 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 	}
 
 	@Override
-	public E getItem() {
-		String val = getValue();
-		if( val == null ){
-			return null;
-		}
-		return getItembyValue(val);
-	}
-
-	
-	@Override
-	public final String getValueByItem(E v) {
-		return getTagByItem(v);
-	}
-	
-	@Override
 	public String getPrettyString(String val) {
 		if( val == null ){
 			return "No Value";
 		}
 		return getText(getItembyValue(val));
 	}
-	@SuppressWarnings("unchecked")
-	@Override
-	public String convert(Object v) throws TypeException {
-		if( v == null ){
-			return null;
-		}
-		if( set.contains(v)){
-			return getTagByItem((E) v);
-		}
-		return super.convert(v);
-	}
 	
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput#allowPreSelect()
 	 */

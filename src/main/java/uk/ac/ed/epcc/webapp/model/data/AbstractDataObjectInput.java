@@ -10,11 +10,14 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 /** A form Input used to select objects produced by the owning factory.
  * 
  * @author spb
+ * @param <BDO> type of DataObject
  *
  */
 public abstract class AbstractDataObjectInput<BDO extends DataObject> extends AbstractSuggestedInput<BDO> implements PreSelectInput<Integer,BDO>{
 	
 	
+	
+
 	public AbstractDataObjectInput(DataObjectFactory<BDO> dataObjectFactory, BaseFilter<BDO> f) {
 		this(dataObjectFactory, null,f);
 	}
@@ -65,12 +68,21 @@ public abstract class AbstractDataObjectInput<BDO extends DataObject> extends Ab
 		return result;
 	}
 	
-	
+	@Override
+	public Integer getValueByTag(String tag) {
+		return Integer.parseInt(tag);
+	}
 	@Override
 	public String getTagByItem(BDO item) {
-		return Integer.toString(getValueByItem(item));
+		return getTagByValue(getValueByItem(item));
 	}
-	
+	@Override
+	public BDO getItemByTag(String tag) {
+		if( tag == null) {
+			return null;
+		}
+		return getItembyValue(getValueByTag(tag));
+	}
 	
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {

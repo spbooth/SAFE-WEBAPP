@@ -23,7 +23,7 @@ import java.util.Set;
  */
 
 
-public class IntegerRangeInput extends IntegerSetInput {
+public class IntegerRangeInput extends IntegerSetInput implements MinMaxInput<Integer> {
   public IntegerRangeInput(int min, int count){
 	  super(makeSet(min, count));
   }

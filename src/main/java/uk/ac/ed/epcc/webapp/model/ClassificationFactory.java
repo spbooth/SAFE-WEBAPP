@@ -33,14 +33,15 @@ import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.model.data.*;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
-import uk.ac.ed.epcc.webapp.model.data.forms.inputs.*;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
@@ -61,14 +62,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	
 
 	static final String CLASSIFICATION_CONFIG_TAG = "Classification";
-	/** Maximum size of pull-down menu for this type
-	 * 
-	 */
-	private static final int CLASSIFICATION_MAX_MENU = 100;
-	/** MAximum size of datalist for this type.
-	 * 
-	 */
-	private static final int CLASSIFICATION_MAX_DATALIST = 200;
+	
 	private static final Pattern WHITESPACE = Pattern.compile("\\s");
 	
 	private HistoryFactory<T,HistoryFactory.HistoryRecord<T>> hist_fac=null;
@@ -220,7 +214,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 
 		private final BaseFilter<T> fil;
 		@Override
-		public T getItembyValue(String value) {
+		public T getItemByTag(String value) {
 			return findFromString(value);
 		}
 		
@@ -375,13 +369,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			// use auto-complete if sufficiently small
 			ClassificationFactory<C> cf = getClassificationFactory();
 			BaseFilter<C> finalSelectFilter = cf.getFinalSelectFilter();
-			boolean autocomplete = false;
-			try {
-				autocomplete = 		cf.getCount(finalSelectFilter) < cf.getMaxDataList();
-			}catch(Exception e){
-				getLogger().error("Error checking auto-complete count", e);
-			}
-			return new NameFinderInput<C, ClassificationFactory<C>>(cf, cf, false,autocomplete, null, finalSelectFilter);
+			return new NameFinderInput<C, ClassificationFactory<C>>(cf, cf, null, finalSelectFilter);
 		}
 	}
 	@Override
@@ -442,34 +430,14 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	}
 	
 	
-	int getMaxDataList() {
-		return getContext().getIntegerParameter(getConfigTag()+".max_datalist", CLASSIFICATION_MAX_DATALIST);
-	}
 	
-	int getMaxPulldown() {
-		return getContext().getIntegerParameter(getConfigTag()+".max_pulldown", CLASSIFICATION_MAX_MENU);
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getInput()
 	 */
 	@Override
 	public DataObjectItemInput<T> getInput(BaseFilter<T> fil, BaseFilter<T> restrict) {
-		// Filter for narrowed suggestions.
-		try {
-			AndFilter<T> total = getAndFilter(fil,restrict);
-			long count = getCount(total);
-			boolean use_list = Feature.checkDynamicFeature(getContext(), getConfigTag()+".use_list_input", false);
-			if( count < getMaxDataList()) {
-				if( use_list || count < getMaxPulldown()) {
-					return super.getInput(fil,restrict);
-				}
-				return new NameFinderInput<>(this,this, false, restrict, fil);
-			}
-
-		}catch(Exception e) {
-			getLogger().error("Error mutating input",e);
-		}
-		return new NameFinderInput<>(this,this, false,false, restrict, fil);
+		
+		return new NameFinderInput<>(this,this, restrict, fil);
 	}
 
 	/* (non-Javadoc)

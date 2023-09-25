@@ -69,10 +69,10 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> {
 					i.validate(); // was this good for this input
 					set = true;
 				}catch(FieldException e){
-					i.setValue(null);
+					i.setNull();
 				}
 			}else{
-				i.setValue(null);
+				i.setNull();;
 			}
 		}
 		return old;
