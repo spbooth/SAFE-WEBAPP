@@ -49,10 +49,7 @@ public class ParseStringVisitor implements InputVisitor<Object> {
 	}
 	@Override
 	public <V, I extends Input> Object visitParseMultiInput(ParseMultiInput<V, I> multiInput) throws Exception {
-		Map<String,Object> map = new HashMap<String, Object>();
-		map.put(multiInput.getKey(), value);
-		multiInput.parse(map);
-		return multiInput.getValue();
+		return defaultParse(multiInput, value, true);
 	}
 	@Override
 	public <V, I extends Input> Object visitMultiInput(MultiInput<V, I> multiInput) throws Exception {

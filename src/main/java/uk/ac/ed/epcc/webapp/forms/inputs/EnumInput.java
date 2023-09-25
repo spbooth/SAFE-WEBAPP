@@ -136,4 +136,14 @@ public class EnumInput<E extends Enum<E>> extends CodeListInput<E> implements Op
 	public boolean isValid(E item) {
 		return set.contains(item);
 	}
+	@Override
+	public String convert(Object v) throws TypeException {
+		if( v == null || v instanceof String) {
+			return (String) v;
+		}
+		if( v instanceof Enum) {
+			return ((Enum)v).name();
+		}
+		throw new TypeException(v.getClass());
+	}
 }

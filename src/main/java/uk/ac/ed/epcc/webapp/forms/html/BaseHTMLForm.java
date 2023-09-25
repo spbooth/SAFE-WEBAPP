@@ -34,10 +34,7 @@ import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseMapInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 /** Common Base class for different types of HTML Form
@@ -243,14 +240,8 @@ public abstract class BaseHTMLForm extends MapForm {
 		}
 	}
 	public static void getHiddenParam(ExtendedXMLBuilder hb,Input i){
-		if(i instanceof ParseMapInput){
-			ParseMapInput c = (ParseMapInput) i;
-			Map<String,Object> map = c.getMap();
-			for (Iterator<String> it = map.keySet().iterator(); it.hasNext();) {
-				String key = it.next();
-				String value = map.get(key).toString();
-				emitHiddenParam(hb,key,value);
-			}
+		if(i instanceof ParseMultiInput){
+			emitHiddenParam(hb, i);
 		}else if (i instanceof MultiInput) {
 			MultiInput c = (MultiInput) i;
 			for (Iterator it = c.getInputs(); it.hasNext();) {

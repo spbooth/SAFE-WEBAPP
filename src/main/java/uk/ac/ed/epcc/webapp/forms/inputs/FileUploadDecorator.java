@@ -106,7 +106,9 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 
 	@Override
 	public void validateInner() throws FieldException {
-		if( parent.isEmpty() && ! file.isEmpty()) {
+		// file uploads override the text.
+		// we need this to do an update with and existing value.
+		if(  ! file.isEmpty()) {
 			try {
 				parent.setValue(convert(file.getValue()));
 			} catch (TypeException e) {
@@ -125,73 +127,10 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	public String parseValue(String v) throws ParseException {
 		return parent.parseValue(v);
 	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseMapInput#getMap()
-	 */
 	@Override
-	public Map<String, Object> getMap() {
-		Map<String,Object> map = new HashMap<>();
-		String parent_string = parent.getString();
-		if( parent_string != null ) {
-			map.put(parent.getKey(),parent_string);
-		}
-		StreamData file_value = file.getValue();
-		if( file_value != null ) {
-			map.put(file.getKey(), file_value);
-		}
-		return map;
+	public String getString(String v) {
+		return parent.getString(v);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseMapInput#parse(java.util.Map)
-	 */
-	@Override
-	public boolean parse(Map<String, Object> v) throws ParseException {
-		
-		boolean is_leaf=true;
-		boolean is_set=false;
-		// First consider a global param-name
-		Object data = v.get(getKey());
-		if( data != null) {
-			try {
-				parent.parse(convert(data));
-			} catch (TypeException e) {
-				throw new ParseException("Failed to convert data to string", e);
-			}
-			file.setNull();
-			is_leaf=false;
-			is_set=true;
-		}else {
-			// Parse parent input (If no global value)
-			Object text = v.get(parent.getKey());
-			if( text != null ) {
-				try {
-					parent.parse(parent.convert(text));
-				} catch (TypeException e) {
-					throw new ParseException("Failed to convert data to string", e);
-				}
-				is_leaf=true;
-				is_set=true;
-			}
-			// finally override with any file-upload
-			Object f = v.get(file.getKey());
-			if( f != null ) {
-				try {
-					parent.parse(convert(f));
-				} catch (TypeException e) {
-					throw new ParseException("Failed to convert file data to string", e);
-				}
-				is_leaf=true;
-				is_set=true;
-			}
-			if( ! is_set ) {
-				// no values have been seen at all
-				parent.parse(null);
-				is_leaf=true;
-			}
-		}
-		return is_leaf;
-	}
-
+	
 }

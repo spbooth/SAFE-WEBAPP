@@ -54,8 +54,8 @@ public class SetParamVisitor implements InputVisitor<Object> {
 	}
 	@Override
 	public <V, I extends Input> Object visitParseMultiInput(ParseMultiInput<V, I> multiInput) throws Exception {
-		params.putAll(multiInput.getMap());
-		return null;
+		// defaults to presenting as a multi-input so form post treats as normal MultiInput
+		return visitMultiInput(multiInput);
 	}
 	@Override
 	public <V, I extends Input> Object visitMultiInput(MultiInput<V, I> multiInput) throws Exception {

@@ -16,11 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
@@ -40,6 +37,10 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> {
 
+	// This is the wrapped parse input to use for parsing
+	private ParseInput<T> parse_input;
+	
+	
 	public AlternateInput() {
 		super();
 	}
@@ -104,11 +105,10 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> {
 	 */
 	@Override
 	public void addInput(String sub_key, String label,Input<T> i) {
-
-
-		
-
 		super.addInput(sub_key, label,i);
+		if( i instanceof ParseInput) {
+			parse_input=(ParseInput<T>) i;
+		}
 	}
 	
 	@Override
@@ -116,67 +116,29 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> {
 		return false;
 	}
 
-
-	
-
 	@Override
-	public Map<String, Object> getMap() {
-		Map<String,Object> m = new HashMap<>();
-		for(Iterator<Input<T>> it = getInputs(); it.hasNext();){
-			Input<T> i = it.next();
-			if( i instanceof ParseMapInput){
-				ParseMapInput pmi = (ParseMapInput)i;
-				m.putAll(pmi.getMap());
-			}else if(i instanceof ParseInput){
-				ParseInput pi = (ParseInput)i;
-				String key = pi.getKey();
-				String text = pi.getString();
-				if( text != null ){
-					m.put(key,text);
-				}
-			}else{
-				throw new ConsistencyError("Input cannot parse");
-			}
+	public T parseValue(String v) throws ParseException {
+		if( parse_input != null ) {
+			return parse_input.parseValue(v);
 		}
-		return m;
+		try {
+			return convert(v);
+		} catch (TypeException e) {
+			throw new ParseException(e);
+		}
 	}
 
 	@Override
-	public boolean parse(Map<String, Object> v) throws ParseException {
-		String default_value = (String) v.get(getKey()); // value corresponding to this input
-		boolean result = false;
-		for(Iterator<Input<T>> it = getInputs(); it.hasNext();){
-			Input<T> i = it.next();
-			if( i instanceof ParseMapInput){
-				result |= ((ParseMapInput)i).parse(v);
-			}else if( i instanceof ParseInput){
-				Object val = v.get(i.getKey());
-				if( val != null  && ! (val instanceof String)){
-					try{
-					// Non string object
-						i.setValue(i.convert(val));
-					}catch(TypeException e){
-						// report the error.
-						throw new ParseException("Illegal type conversion ",e);
-					}
-				}else{
-					String text = (String) val;
-					if(text == null){
-						result = true;
-						text=default_value;
-					}
-					((ParseInput)i).parse(text);
-				}
-			}else{
-				throw new ConsistencyError("Input cannot parse");
-			}
-			// we want to abort parse on the first good match
-			if( i.getValue() != null ){
-				return result;
-			}
+	public String getString(T val) {
+		if(parse_input != null) {
+			return parse_input.getString(val);
 		}
-		return result;
-	
+		return super.getString(val);
 	}
+
+
+	
+
+	
 
 }

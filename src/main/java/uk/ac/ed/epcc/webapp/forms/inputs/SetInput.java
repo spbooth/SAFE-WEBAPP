@@ -222,11 +222,13 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 
 	@Override
 	public T getItemByTag(String tag) {
-		return data.get(tag);
+		// Stictly speaking we don't have to map tag values 
+		return data.get(mapTag(tag));
 	}
 
 	@Override
 	public String getValueByTag(String tag) {
-		return values.get(tag);
+		// strictly speaking we don't have to map tag values
+		return values.get(mapTag(tag));
 	}
 }

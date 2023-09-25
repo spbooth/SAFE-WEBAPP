@@ -1,7 +1,5 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-
 /** This is an input that can either be presented as a {@link ListInput} or an {@link AutoComplete}.
  * 
  * An implementing class needs to select which presentation to use in the #{@link #accept(InputVisitor)} method.

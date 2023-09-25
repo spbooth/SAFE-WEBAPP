@@ -51,7 +51,7 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 		return getItemByTag(value);
 	}
 	@Override
-	public final String convert(Object v) throws TypeException  {
+	public String convert(Object v) throws TypeException  {
 		if( v == null ){
 			return null;
 		}

@@ -155,4 +155,24 @@ public class IntegerSetInput extends AbstractInput<Integer> implements ListInput
 			throw new ConsistencyError("Impossible type error", e);
 		}
 	}
+	@Override
+	public Integer convert(Object v) throws TypeException {
+		if( v == null ) {
+			return null;
+		}
+		if( v instanceof Integer) {
+			return (Integer) v;
+		}
+		if( v instanceof Number) {
+			Integer.valueOf(((Number)v).intValue());
+		}
+		if( v instanceof String) {
+			try {
+				return Integer.parseInt((String)v);
+			}catch(NumberFormatException nfe) {
+				throw new TypeException(nfe);
+			}
+		}
+		throw new TypeException(v.getClass());
+	}
 }

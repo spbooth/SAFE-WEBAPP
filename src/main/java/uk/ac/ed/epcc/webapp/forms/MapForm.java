@@ -207,6 +207,7 @@ public class MapForm extends BaseForm {
 						throw new ParseException("Invalid input",e);
 					}
 				}
+				input.validateInner();
 			}
 		}
 		/** default parse behaviour (use parameter corresponding to input key)
@@ -245,10 +246,7 @@ public class MapForm extends BaseForm {
 			return false;
 
 		}
-		private void parseMapInput(ParseMapInput input, Map<String, Object> params) throws FieldException{
-			input.parse(params);
-			
-		}
+		
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor#visitBinaryInput(uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput)
@@ -275,8 +273,8 @@ public class MapForm extends BaseForm {
 		@Override
 		public <V, I extends Input> Object visitParseMultiInput(
 				ParseMultiInput<V, I> multiInput) throws Exception {
-			parseMapInput(multiInput, params);
-			return null;
+			// should present as a multi-input by default so parse map accordingly
+			return visitMultiInput(multiInput);
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor#visitMultiInput(uk.ac.ed.epcc.webapp.forms.inputs.MultiInput)

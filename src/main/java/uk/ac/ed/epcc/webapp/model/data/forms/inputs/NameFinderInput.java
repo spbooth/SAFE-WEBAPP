@@ -32,18 +32,21 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 * This is the requested operating mode. 
 	 */
 	public static enum Options{
-		CREATE(true,false,true),
-		CREATE_NO_SUGGESTIONS(true,false,false),
-		LIST(false,true,true),
-		AUTO_COMPLETE(false,false,true),
-		TEXT_ONLY(false,false,false);
-		private Options(boolean create, boolean list, boolean suggestions) {
+		CREATE(true,false,true,true),					// Text with create and suggestions
+		CREATE_NO_SUGGESTIONS(true,false,true,false),	// Text create with no suggestions
+		LIST(false,true,false,true),					// force list presentation
+		AUTO_COMPLETE(false,false,false,true),			// adaptive choice of list or text
+		TEXT_COMPLETE(false,false,true,true),			// force text presentation
+		TEXT_ONLY(false,false,true,false);				// text presentation no suggestions
+		private Options(boolean create, boolean list, boolean text,boolean suggestions) {
 			this.create = create;
-			this.list = list;
+			this.force_list = list;
+			this.force_text = text;
 			this.suggestions = suggestions;
 		}
 		final boolean create; // Create new objects, requires text presentations and a NameFinder
-		final boolean list;   // Force list presentation
+		final boolean force_list;   // Force list presentation
+		final boolean force_text;   // forct text presentation
 		final boolean suggestions; // generate suggestions in text mode
 	
 	}
@@ -125,6 +128,9 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		T item = parseItem(v);
 		if( item == null) {
 			try {
+				// Fall back to try paring integer.
+				// In case there is a mis-match between the presentation used by the form
+				// and the 
 				return Integer.parseInt(v);
 			}catch(NumberFormatException nf) {
 				return null;
@@ -133,7 +139,21 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		return getValueByItem(item);
 	}
 	
-	
+	@Override
+	public Integer getValueByTag(String tag) {
+		try {
+			return Integer.parseInt(tag);
+		}catch(NumberFormatException e) {
+			// Try a fallback name lookup if not an integer
+			if( finder != null) {
+				T item = finder.findFromString(tag);
+				if( item != null) {
+					return item.getID();
+				}
+			}
+			throw e;
+		}
+	}
 	
 	
 	
@@ -221,13 +241,13 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	}
 	@Override
 	public boolean useListPresentation() {
-		if( options.list || finder == null) {
+		if( options.force_list || finder == null) {
 			return true;
 		}
 		if( ! options.suggestions) {
 			return false;  // suggtions explicitly not requested
 		}
-		if( options.create) {
+		if( options.create || options.force_text) {
 			return false; // cannot create from list
 		}
 		try {
@@ -276,6 +296,12 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		
 		return true;
 	}
-	
+	public final  <R> R accept(InputVisitor<R> vis) throws Exception{
+		if( useListPresentation()) {
+			return vis.visitListInput(this);
+		}else {
+			return vis.visitAutoCompleteInput(this);
+		}
+	}
 	
 }
