@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.email.inputs;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
@@ -29,17 +30,26 @@ import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
 public class EmailInput extends TextInput {
 
+	private static final int DEFAULT_BOX_WIDTH = 32;
 	/**
 	 * 
 	 */
 	public static final int MAX_EMAIL_LENGTH = 254;
+	/**
+	 * property to set the email input box width
+	 * 
+	 */
+	public static final String EMAIL_MAXWIDTH_PROP = "email.maxwidth";
 	public EmailInput(){
 		super();
-		setBoxWidth(32); // 64 is too long for EmailChangeRequest page
+		setBoxWidth(DEFAULT_BOX_WIDTH); 
 		addValidator(new MaxLengthValidator(MAX_EMAIL_LENGTH));
 
 		setSingle(true);
 		addValidator(new EmailFieldValidator());
+	}
+	public static int defaultBoxWidth(AppContext conn) {
+		return conn.getIntegerParameter(EMAIL_MAXWIDTH_PROP, DEFAULT_BOX_WIDTH);
 	}
 	
 	

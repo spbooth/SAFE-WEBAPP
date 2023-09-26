@@ -58,4 +58,21 @@ private static Set<Integer> getSet(int max){
 	}
 	return result;
 }
+@Override
+public Integer getValueByTag(String tag) {
+	// Also want to accept tag names, in particular when parsing report
+	// parameter specifications.
+	tag = tag.toLowerCase();
+	switch(tag) {
+	case "seconds": return Calendar.SECOND;
+	case "minutes": return Calendar.MINUTE;
+	case "hours": return Calendar.HOUR;
+	case "days": return Calendar.DAY_OF_MONTH;
+	case "weeks": return Calendar.WEEK_OF_YEAR;
+	case "months": return Calendar.MONTH;
+	case "years": return Calendar.YEAR;
+	default:
+		return super.getValueByTag(tag);
+	}
+}
 }

@@ -42,7 +42,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  */
 
 
-public class NullListInput<T extends Indexed>   implements ListInput<Integer,Object>,ParseInput<Integer>, SQLMatcher{
+public class NullListInput<T extends Indexed>   implements AutoCompleteListInput<Integer,Object>,ParseInput<Integer>, SQLMatcher<T>{
     private ListInput<Integer,T> internal;
     public static final String NULLTAG="NULL-VALUE";
     public static final int NULL_VALUE=-1;
@@ -50,6 +50,13 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
    
     public NullListInput(ListInput<Integer,T> input){
     	internal = input;
+    }
+    
+    private boolean useAuto() {
+    	return internal instanceof AutoCompleteListInput;
+    }
+    private AutoCompleteListInput<Integer, T> getAuto(){
+    	return (AutoCompleteListInput<Integer, T>) internal;
     }
 	@Override
 	public Object getItembyValue(Integer value) {
@@ -336,5 +343,39 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		internal.setNull();
 		
 	}
-
+	@Override
+	public String getSuggestionText(Object item) {
+		if( NULLTAG.equals(item)) {
+			return NULLTAG;
+		}
+		return getAuto().getSuggestionText((T)item);
+	}
+	@Override
+	public int getBoxWidth() {
+		return getAuto().getBoxWidth();
+	}
+	@Override
+	public void setBoxWidth(int l) {
+		if( useAuto()) {
+			getAuto().setBoxWidth(l);
+		}
+	}
+	@Override
+	public boolean getSingle() {
+		return true;
+	}
+	@Override
+	public boolean useListPresentation() {
+		if( useAuto()) {
+			return getAuto().useListPresentation();
+		}
+		return true;
+	}
+	public final  <R> R accept(InputVisitor<R> vis) throws Exception{
+		if( useListPresentation()) {
+			return vis.visitListInput(this);
+		}else {
+			return vis.visitAutoCompleteInput(this);
+		}
+	}
 }

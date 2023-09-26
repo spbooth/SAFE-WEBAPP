@@ -110,6 +110,20 @@ public class FieldValidationSet<T> extends LinkedHashSet<FieldValidator<T>> {
 		prev.addValidator(val);
 		return prev;
 	}
+	/** Add a {@link FieldValidator} to {@link FieldValidationSet} allocating a new set if necessary.
+	 * 
+	 * @param <T>
+	 * @param prev {@link FieldValidationSet} previous set may be null
+	 * @param val {@link FieldValidator}
+	 * @return
+	 */
+	public static<T> FieldValidationSet<T> add(FieldValidationSet<T> prev,FieldValidator<T> val){
+		if( prev == null) {
+			prev = new FieldValidationSet<>();
+		}
+		prev.add(val);
+		return prev;
+	}
 	/** Add {@link FieldValidator} with merge
 	 * 
 	 * @param val

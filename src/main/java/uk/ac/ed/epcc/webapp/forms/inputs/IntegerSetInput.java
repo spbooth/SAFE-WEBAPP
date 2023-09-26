@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -30,6 +31,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 
 public class IntegerSetInput extends AbstractInput<Integer> implements ListInput<Integer,Integer> {
+	private NumberFormat nf=null;
     /**
 	 * @author Stephen Booth
 	 *
@@ -124,8 +126,10 @@ public class IntegerSetInput extends AbstractInput<Integer> implements ListInput
 
 	@Override
 	public String getText(Integer item) {
-		// use getString so we can control presented text using the NumberFormat
-		return getString(item);
+		if( nf != null ) {
+			return nf.format(item);
+		}
+		return item.toString();
 	}
 	
 	@Override
@@ -174,5 +178,11 @@ public class IntegerSetInput extends AbstractInput<Integer> implements ListInput
 			}
 		}
 		throw new TypeException(v.getClass());
+	}
+	public NumberFormat getNumberFormat() {
+		return nf;
+	}
+	public void setNumberFormat(NumberFormat nf) {
+		this.nf = nf;
 	}
 }

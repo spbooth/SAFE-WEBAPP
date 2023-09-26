@@ -42,6 +42,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput.Options;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
@@ -437,7 +438,10 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	@Override
 	public DataObjectItemInput<T> getInput(BaseFilter<T> fil, BaseFilter<T> restrict) {
 		
-		return new NameFinderInput<>(this,this, restrict, fil);
+		return new NameFinderInput<>(this,this, defaultInputOptions(),restrict, fil);
+	}
+	protected NameFinderInput.Options defaultInputOptions(){
+		return Options.AUTO_COMPLETE;
 	}
 
 	/* (non-Javadoc)

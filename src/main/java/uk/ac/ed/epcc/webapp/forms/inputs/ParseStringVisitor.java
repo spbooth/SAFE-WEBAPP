@@ -2,9 +2,6 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 
 
-import java.util.HashMap;
-import java.util.Map;
-
 import uk.ac.ed.epcc.webapp.forms.MapForm.ParseVisitor;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
@@ -23,7 +20,7 @@ public class ParseStringVisitor implements InputVisitor<Object> {
 	
 	private <J> J defaultParse(Input<J> input, String data,boolean skip_null) throws ParseException {
 		if( input instanceof ParseInput) {
-			((ParseInput<J>)input).parse(data);
+			return visitParseInput((ParseInput<J>)input, data);
 		} else {
 			if( ! skip_null || data != null ){
 				//Note the check-boxes need to parse null as a result
@@ -42,6 +39,10 @@ public class ParseStringVisitor implements InputVisitor<Object> {
 		return input.getValue();
 		
 	}
+	private <J> J visitParseInput(ParseInput<J> input, String data) throws ParseException {
+		input.parse(data);
+		return input.getValue();
+	}
 	@Override
 	public Object visitBinaryInput(BinaryInput checkBoxInput) throws Exception {
 		
@@ -49,7 +50,7 @@ public class ParseStringVisitor implements InputVisitor<Object> {
 	}
 	@Override
 	public <V, I extends Input> Object visitParseMultiInput(ParseMultiInput<V, I> multiInput) throws Exception {
-		return defaultParse(multiInput, value, true);
+		return visitParseInput(multiInput, value);
 	}
 	@Override
 	public <V, I extends Input> Object visitMultiInput(MultiInput<V, I> multiInput) throws Exception {
@@ -58,11 +59,12 @@ public class ParseStringVisitor implements InputVisitor<Object> {
 	}
 	@Override
 	public <V, T> Object visitListInput(ListInput<V, T> listInput) throws Exception {
-		return defaultParse(listInput, value, true);
+		listInput.setValue(listInput.getValueByTag(value));
+		return listInput.getValue();
 	}
 	@Override
 	public <V, T> Object visitRadioButtonInput(ListInput<V, T> listInput) throws Exception {
-		return defaultParse(listInput, value, true);
+		return visitListInput(listInput);
 	}
 	@Override
 	public Object visitLengthInput(LengthInput input) throws Exception {
@@ -81,4 +83,6 @@ public class ParseStringVisitor implements InputVisitor<Object> {
 		return defaultParse(input, value, true);
 	}
 
+
+	
 }

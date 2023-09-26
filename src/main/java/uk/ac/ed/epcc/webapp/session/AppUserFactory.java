@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Span;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -76,6 +77,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.UpdateAction;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput.Options;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
@@ -630,16 +632,26 @@ Targetted<AU>
 		public AppUserNameInput(AppUserFactory<A> factory, ParseFactory<A> finder, BaseFilter<A> restrict,
 				BaseFilter<A> autocomplete) {
 			super(factory, finder, restrict, autocomplete);
+			if( useEmail()) {
+				setBoxWidth(EmailInput.defaultBoxWidth(getContext()));
+			}
+			
 		}
 
 		public AppUserNameInput(AppUserFactory<A> factory, ParseFactory<A> finder, boolean create,
 				BaseFilter<A> restrict, BaseFilter<A> autocomplete) {
 			super(factory, finder, create, restrict, autocomplete);
+			if( useEmail()) {
+				setBoxWidth(EmailInput.defaultBoxWidth(getContext()));
+			}
 		}
 
 		public AppUserNameInput(AppUserFactory<A> factory, ParseFactory<A> finder, Options options,
 				BaseFilter<A> restrict, BaseFilter<A> autocomplete) {
 			super(factory, finder, options, restrict, autocomplete);
+			if( useEmail()) {
+				setBoxWidth(EmailInput.defaultBoxWidth(getContext()));
+			}
 		}
 
 		/* (non-Javadoc)
@@ -691,9 +703,9 @@ Targetted<AU>
 		BaseFilter<AU> fil = getFinalSelectFilter();
 		if( useAutoCompleteForSelect()) {
 			if( restrict ) {
-				return new NameFinderInput<AU, AppUserFactory<AU>>(this,getRealmFinder(getDefaultRealm()),fil,null );
+				return new AppUserNameInput<AU>(this,getRealmFinder(getDefaultRealm()),Options.TEXT_COMPLETE,fil,null );
 			}else {
-				return new NameFinderInput<AU, AppUserFactory<AU>>(this,getRealmFinder(getDefaultRealm()),null, fil );
+				return new AppUserNameInput<AU>(this,getRealmFinder(getDefaultRealm()),Options.TEXT_COMPLETE,null, fil );
 			}
 			
 		}
@@ -1170,8 +1182,9 @@ Targetted<AU>
 			// the role is sufficient
 			return super.getSelectFilter();
 		}
+		// degault filter must be true as it narrows the relationship
 		return getAndFilter(super.getSelectFilter(),
-				sess.getRelationshipRoleFilter(this, AppUserFactory.VIEW_PERSON_RELATIONSHIP,new GenericBinaryFilter<>(false)));
+				sess.getRelationshipRoleFilter(this, AppUserFactory.VIEW_PERSON_RELATIONSHIP,new GenericBinaryFilter<>(true)));
 	}
 	@Override
 	public FormUpdate<AU> getFormUpdate(AppContext c) {

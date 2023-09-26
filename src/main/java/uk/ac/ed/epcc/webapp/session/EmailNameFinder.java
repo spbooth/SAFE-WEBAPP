@@ -103,11 +103,6 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 	public static final EmailStatus.Value VALID = e_status.new Value("V", "Valid");
 	public static final EmailStatus.Value UNKNOWN = e_status.new Value("U", "Unknown");
 	public static final EmailStatus.Value INVALID = e_status.new Value("I", "InValid");
-	/**
-	 * property to set the email input box width
-	 * 
-	 */
-	public static final String EMAIL_MAXWIDTH_PROP = "email.maxwidth";
 	public static final String EMAIL = "Email";
 	public static final String EMAIL_VERIFIED_FIELD = "EmailVerified";
 	public static final Feature CHANGE_EMAIL_FEATURE = new Feature("email.change_transition", true,
@@ -141,7 +136,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 			@Override
 			public Input getInput() {
 				EmailInput email = new EmailInput();
-				email.setBoxWidth(getContext().getIntegerParameter(EMAIL_MAXWIDTH_PROP, 32));
+				email.setBoxWidth(EmailInput.defaultBoxWidth(getContext()));
 				return email;
 			}
 
@@ -864,5 +859,4 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 			}
 		}
 	}
-	
 }
