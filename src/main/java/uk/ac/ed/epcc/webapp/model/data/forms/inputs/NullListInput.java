@@ -42,7 +42,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  */
 
 
-public class NullListInput<T extends Indexed>   implements AutoCompleteListInput<Integer,Object>,ParseInput<Integer>, SQLMatcher<T>{
+public class NullListInput<T extends Indexed>   implements AutoCompleteListInput<Integer,Object>,ParseInput<Integer>, SQLMatcher<T>,HTML5Input,FormatHintInput{
     private ListInput<Integer,T> internal;
     public static final String NULLTAG="NULL-VALUE";
     public static final int NULL_VALUE=-1;
@@ -377,5 +377,21 @@ public class NullListInput<T extends Indexed>   implements AutoCompleteListInput
 		}else {
 			return vis.visitAutoCompleteInput(this);
 		}
+	}
+
+	@Override
+	public String getFormatHint() {
+		if( internal instanceof FormatHintInput) {
+			return ((FormatHintInput)internal).getFormatHint();
+		}
+		return null;
+	}
+
+	@Override
+	public String getType() {
+		if( internal instanceof HTML5Input) {
+			return ((HTML5Input)internal).getType();
+		}
+		return null;
 	}
 }
