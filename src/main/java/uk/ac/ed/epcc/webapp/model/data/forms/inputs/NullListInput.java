@@ -96,7 +96,7 @@ public class NullListInput<T extends Indexed>   implements AutoCompleteListInput
 	}
 	@Override
 	public Object getItemByTag(String tag) {
-		if( tag == null ) {
+		if( tag == null || tag.isEmpty()) {
 			return null;
 		}
 		if( tag.equals(NULLTAG)) {
@@ -263,11 +263,12 @@ public class NullListInput<T extends Indexed>   implements AutoCompleteListInput
 	}
 	@Override
 	public Integer parseValue(String v) throws ParseException {
-		if( v == NULLTAG){
-			return NULL_VALUE;
-		}
+		
 		if( v == null || v.isEmpty()){
 			return null;
+		}
+		if( NULLTAG.equals(v)){
+			return NULL_VALUE;
 		}
 		if( internal instanceof ParseInput){
 			return ((ParseInput<Integer>)internal).parseValue(v);
@@ -388,10 +389,8 @@ public class NullListInput<T extends Indexed>   implements AutoCompleteListInput
 	}
 
 	@Override
-	public String getType() {
-		if( internal instanceof HTML5Input) {
-			return ((HTML5Input)internal).getType();
-		}
+	public final String getType() {
+		// Always supress this as we need to parse NULL-VALUE
 		return null;
 	}
 }

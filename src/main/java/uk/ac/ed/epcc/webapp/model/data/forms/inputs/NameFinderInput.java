@@ -141,6 +141,9 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	
 	@Override
 	public Integer getValueByTag(String tag) {
+		if( tag == null || tag.isEmpty()) {
+			return null;
+		}
 		try {
 			return Integer.parseInt(tag);
 		}catch(NumberFormatException e) {
