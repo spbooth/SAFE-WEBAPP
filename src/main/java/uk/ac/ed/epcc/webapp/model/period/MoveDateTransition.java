@@ -32,7 +32,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
-public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTransition<T> implements GatedTransition<T>{
+public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTransition<T> implements TimeLocked<T>{
 	public class MoveDateAction extends FormAction{
 		
 		
@@ -211,7 +211,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 	 * @see uk.ac.ed.epcc.webapp.model.period.GatedTransition#allow(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.Object)
 	 */
 	@Override
-	public boolean allow(SessionService<?> serv, T target) {
+	public boolean allowTimeBounds(SessionService<?> serv, T target) {
 		Date limit = fac.getEditLimit(serv);
 		if( limit != null ) {
 			if( move_start ) {
