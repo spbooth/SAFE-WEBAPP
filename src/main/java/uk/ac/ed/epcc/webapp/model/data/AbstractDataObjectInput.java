@@ -70,6 +70,9 @@ public abstract class AbstractDataObjectInput<BDO extends DataObject> extends Ab
 	
 	@Override
 	public Integer getValueByTag(String tag) {
+		if(tag == null || tag.isEmpty()){
+			return null;
+		}
 		return Integer.parseInt(tag);
 	}
 	@Override
@@ -78,7 +81,7 @@ public abstract class AbstractDataObjectInput<BDO extends DataObject> extends Ab
 	}
 	@Override
 	public BDO getItemByTag(String tag) {
-		if( tag == null) {
+		if( tag == null || tag.isEmpty()) {
 			return null;
 		}
 		return getItembyValue(getValueByTag(tag));

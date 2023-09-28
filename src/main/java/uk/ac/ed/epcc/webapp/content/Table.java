@@ -1753,6 +1753,20 @@ public class Table<C, R> {
 			return c.setFormat(t);
 		}
 	}
+	public void setDeDup(C col_name,boolean dedup) {
+		if( hasColumnGroup(col_name)) {
+			for(C g : getColumnGroup(col_name)) {
+				Col c = getCol(g);
+				c.setDedup(dedup);
+			}
+		}else {
+			// make col
+			Col c = getCol(col_name);
+			if( c != null ) {
+				c.setDedup(dedup);
+			}
+		}
+	}
 
 	@SuppressWarnings("unchecked")
 	public Table.Formatter setColFormat(C col_name, Transform t) {
