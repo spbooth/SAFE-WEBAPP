@@ -263,7 +263,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 			hb.open("tbody");
 			hb.clean("\n");
 		}
-		
+		int pos=0;
 		for (R row_key: t.getRows()) {
 			hb.open("tr", new String[][]{
 					{"count",Integer.toString(nrow)}
@@ -310,9 +310,9 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 								row_keys.add(row);
 							}
 						}
-						addTdWithDeDup(row_keys, t, row_key, nrow-1, col, key, n, dc, cols);
+						addTdWithDeDup(row_keys, t, row_key, pos, col, key, n, dc, cols);
 					}else {
-						addTd(t, row_key, nrow-1,col, key, n, dc, cols,1);
+						addTd(t, row_key,col, key, n, dc, cols,1);
 					}
 					col++;
 				}
@@ -320,6 +320,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 			hb.close();
 			hb.clean("\n");
 			nrow++;
+			pos++;
 		}
 		if( table_sections){
 			hb.close();
@@ -335,7 +336,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 	 * @param dc
 	 * @param cols
 	 */
-	protected void addTd(Table<C, R> t, R row_key, int row,int col, C key, Object n, String dc, int cols,int rows) {
+	protected void addTd(Table<C, R> t, R row_key, int col, C key, Object n, String dc, int cols,int rows) {
 		hb.open("td",new String[][]{
 			{"class",col==0?"first":"main"},
 			{"count",Integer.toString(col)}
@@ -352,16 +353,16 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 		addCell(t,key,row_key, n);
 		hb.close();
 	}
-    protected void addTdWithDeDup(ArrayList<R> row_keys,Table<C, R> t, R row_key, int row,int col, C key, Object n, String dc, int cols) {
+    protected void addTdWithDeDup(ArrayList<R> row_keys,Table<C, R> t, R row_key, int pos,int col, C key, Object n, String dc, int cols) {
     	int rows=1;
-    	if( row > 0 ) {
-			Object prev = t.get(key, row_keys.get(row-1));
+    	if( pos > 0 ) {
+			Object prev = t.get(key, row_keys.get(pos-1));
 			if( n != null && prev != null && n.equals(prev)) {
 				hb.clean("\t\t");
 				return;  //supress duplicate
 			}
 		}
-		for( int i=row+1; i< t.nRows();i++) {
+		for( int i=pos+1; i< row_keys.size();i++) {
 			Object next= t.get(key, row_keys.get(i));
 			if( n != null && next != null && n.equals(next)) {
 				rows++;
@@ -369,7 +370,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 				break;
 			}
 		}
-		addTd(t, row_key, row, col, key, n, dc, cols, rows);
+		addTd(t, row_key, col, key, n, dc, cols, rows);
     }
     /* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.TableFormatPolicy#addColumn(uk.ac.ed.epcc.webapp.content.Table, C)
