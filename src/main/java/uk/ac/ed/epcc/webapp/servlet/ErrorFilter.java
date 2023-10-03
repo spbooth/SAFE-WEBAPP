@@ -183,7 +183,7 @@ public class ErrorFilter implements Filter {
 			// want to do this without creating an AppContext
 			res.setHeader("X-XSS-Protection", "1;mode-block");
 			res.setHeader("X-Content-Type-Options", "nosniff");
-			res.setHeader("X-Frame-Options","DENY");
+			res.setHeader("X-Frame-Options","SAMEORIGIN");
 			res.setHeader("Referrer-Policy", "same-origin");
 			String csp = ctx.getInitParameter("ContentSecurityPolicy");
 			if( csp != null ) {

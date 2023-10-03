@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -41,7 +42,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 @WebServlet(name="DataServlet",urlPatterns=ServeDataServlet.DATA_PATH+"*")
 public class ServeDataServlet extends WebappServlet {
-
+   public static final Feature HTML_AS_TEXT = new Feature("serve_data.html_As_text", true, "Force html data to text/plain");
 	/**
 	 * 
 	 */
@@ -82,7 +83,10 @@ public class ServeDataServlet extends WebappServlet {
 					// Disable any scripting in this content
 					res.setHeader("Content-Security-Policy", "script-src 'none'; object-src 'none'; default-src 'none'");
 					String lc = content_type.toLowerCase();
-					if( lc.contains("javascript") ||  lc.contains("html") ) {
+					if( lc.contains("javascript")  ) {
+						content_type="text/plain";
+					}
+					if( HTML_AS_TEXT.isEnabled(conn) && lc.contains("html")) {
 						content_type="text/plain";
 					}
 				}

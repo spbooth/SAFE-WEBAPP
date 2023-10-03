@@ -29,6 +29,7 @@ import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.internet.MimePart;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.XMLContentBuilder;
@@ -43,7 +44,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 
 public class ContentMessageVisitor extends AbstractVisitor {
-	
+	public static final Feature USE_SANDBOX= new Feature("email_content.use_sandox",false,"Use sandbox iframes for html emails");
 	  static final int MAX_INLINE_LENGTH = 262144;
 	protected ContentBuilder sb;
 	  protected  MessageLinker linker;
@@ -74,9 +75,24 @@ public class ContentMessageVisitor extends AbstractVisitor {
 		}
 		try {
 			if( parent.isMimeType("text/html")){
+				if( linker instanceof DirectMessageLinker && USE_SANDBOX.isEnabled(getContext())) {
+					try {
+						ExtendedXMLBuilder t = sb.getText();
+						t.open("iframe");
+						t.attr("sandbox", "");
+						t.attr("src",((DirectMessageLinker)linker).getLocation(w.getPath()));
+						t.clean(" "); // browsers don't like single tag iframes ???
+						t.close();
+						t.appendParent();
+						return;
+					}catch(Exception e) {
+						getLogger().error("Error embedding iframe", e);
+					}
+				}
 				HtmlStripper stripper = new HtmlStripper(sb,w.getContext());
 				stripper.clean(string);
 				return;
+				
 			}
 		} catch (Exception e) {
 			getLogger().error("Error checking for html",e);

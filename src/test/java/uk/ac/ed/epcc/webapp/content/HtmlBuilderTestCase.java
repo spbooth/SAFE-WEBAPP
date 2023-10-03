@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder.Heading;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder.Panel;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder.Text;
+import uk.ac.ed.epcc.webapp.editors.mail.DirectMessageLinker;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 
@@ -422,5 +423,23 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 		assertEquals("<span class='warn'>1234</span>",h.toString().trim());
 	}
 	
+	// REgressiton test
+	@Test
+	public void testBug() {
+		HtmlBuilder parent = new HtmlBuilder();
+		parent.addHeading(2, "A title");
+		ContentBuilder list = parent.getPanel("list");
+		list.addText("Hello");
+		ExtendedXMLBuilder inner = list.getText();
+		inner.open("iframe");
+		inner.attr("sandbox", "");
+		inner.attr("src","xyz");
+		//t.clean(" ");
+		inner.close(); // need to be emppty attr only to trigger
+		inner.appendParent();
+		list.addText("GoodBye");
+		list.addParent();
+		assertEquals("X", parent.toString());
+	}
 	
 }
