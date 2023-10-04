@@ -42,6 +42,7 @@ public class ServeDataServletTest extends ServletTest {
 		MockServletConfig config = new MockServletConfig(serv_ctx, "ServeDataServlet");
 		servlet.init(config);
 		req.servlet_path=ServeDataServlet.DATA_PATH;
+		res.setHeader(ErrorFilter.CONTENT_SECURITY_POLICY_HEADER, "media-src 'none'");
 	}
 	@Test
 	public void testServeData() throws Exception{
@@ -63,6 +64,30 @@ public class ServeDataServletTest extends ServletTest {
 		assertEquals("text/plain",res.getContentType());
 		assertTrue(res.stream.isClosed());
 		assertTrue(res.getOutputStream().toString().startsWith("hello world")); // windows CR LR ignore newline etc.
+		assertEquals("media-src 'none'", res.getHeader(ErrorFilter.CONTENT_SECURITY_POLICY_HEADER));
+	}
+	
+	
+	@Test
+	public void testServeDataExternal() throws Exception{
+		AppContext conn = getContext();
+		SettableServeDataProducer producer = conn.makeObject(SettableServeDataProducer.class, "ExternalData");
+		assertNotNull(producer);
+		ByteArrayMimeStreamData data = new ByteArrayMimeStreamData();
+		data.setMimeType("text/plain");
+		data.setName("testdata.txt");
+		PrintWriter writer = new PrintWriter(data.getOutputStream());
+		writer.println("hello world");
+		writer.close();
 		
+		List<String> args = producer.setData(data);
+		req.path_info=ServeDataServlet.getURL(conn, producer, args).substring(ServeDataServlet.DATA_PATH.length());
+		
+		doPost();
+		
+		assertEquals("text/plain",res.getContentType());
+		assertTrue(res.stream.isClosed());
+		assertTrue(res.getOutputStream().toString().startsWith("hello world")); // windows CR LR ignore newline etc.
+		assertEquals("media-src 'none';script-src 'none';object-src 'none';default-src 'none'", res.getHeader(ErrorFilter.CONTENT_SECURITY_POLICY_HEADER));
 	}
 }

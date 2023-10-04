@@ -80,6 +80,8 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 @WebFilter(filterName="FaultFilter", urlPatterns = {"/*"} )
 public class ErrorFilter implements Filter {
+	public static final String CONTENT_SECURITY_POLICY_REPORT_ONLY_HEADER = "Content-Security-Policy-Report-Only";
+	public static final String CONTENT_SECURITY_POLICY_HEADER = "Content-Security-Policy";
 	public static final String REQUEST_START = "RequestStart";
 	private static final Feature SESSION_STEALING_CHECK_FEATURE = new Feature("session-stealing-check",false,"reset session if ip address changes");
 	private static final Feature CONTEXT_CONFIG_FEATURE = new Feature("context.configuration",false,"Allow additional properties files based on the application Context");
@@ -167,6 +169,19 @@ public class ErrorFilter implements Filter {
 		}
 		
    }
+   /** Query the servlet config with fallback
+    * 
+    * @param name
+    * @param def
+    * @return
+    */
+    public String getConfig(String name, String def) {
+    	String val = ctx.getInitParameter(name);
+    	if( val != null ) {
+    		return val;
+    	}
+    	return def;
+    }
 	public final void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws ServletException, java.io.IOException {
 
@@ -181,17 +196,24 @@ public class ErrorFilter implements Filter {
 			
 			// standard static security headers
 			// want to do this without creating an AppContext
-			res.setHeader("X-XSS-Protection", "1;mode-block");
-			res.setHeader("X-Content-Type-Options", "nosniff");
-			res.setHeader("X-Frame-Options","SAMEORIGIN");
-			res.setHeader("Referrer-Policy", "same-origin");
+			// so any parameterisation should be from the servlet context
+			// 
+			res.setHeader("X-XSS-Protection", getConfig("XSSProtectionHeader","1;mode-block"));
+			res.setHeader("X-Content-Type-Options", getConfig("ContentTypeOptionsHeader","nosniff"));
+			res.setHeader("X-Frame-Options",getConfig("FrameOptionsHeader","SAMEORIGIN"));
+			res.setHeader("Referrer-Policy", getConfig("ReferrerPolicyHeader","same-origin"));
 			String csp = ctx.getInitParameter("ContentSecurityPolicy");
 			if( csp != null ) {
 				String base_url = req.getScheme()+"://"+req.getServerName()+":"+req.getLocalPort()+req.getContextPath();
 				csp = csp.replace("{base-url}", base_url);
-				res.setHeader("Content-Security-Policy", csp);
+				res.setHeader(CONTENT_SECURITY_POLICY_HEADER, csp);
 			}
-		
+			String report = ctx.getInitParameter("ContentSecurityPolicyReport");
+			if( report != null ) {
+				String base_url = req.getScheme()+"://"+req.getServerName()+":"+req.getLocalPort()+req.getContextPath();
+				report = report.replace("{base-url}", base_url);
+				res.setHeader(CONTENT_SECURITY_POLICY_REPORT_ONLY_HEADER, csp);
+			}
 		}
 		
 		

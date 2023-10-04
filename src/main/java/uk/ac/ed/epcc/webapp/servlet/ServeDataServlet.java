@@ -42,7 +42,8 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 @WebServlet(name="DataServlet",urlPatterns=ServeDataServlet.DATA_PATH+"*")
 public class ServeDataServlet extends WebappServlet {
-   public static final Feature HTML_AS_TEXT = new Feature("serve_data.html_As_text", true, "Force html data to text/plain");
+   private static final String CONTENT_SECURITY_POLICY_HEADER = ErrorFilter.CONTENT_SECURITY_POLICY_HEADER;
+public static final Feature HTML_AS_TEXT = new Feature("serve_data.html_as_text", true, "Force html serve-data to text/plain");
 	/**
 	 * 
 	 */
@@ -81,7 +82,15 @@ public class ServeDataServlet extends WebappServlet {
 				String content_type = msd.getContentType();
 				if( producer.isExternalContent(args)) {
 					// Disable any scripting in this content
-					res.setHeader("Content-Security-Policy", "script-src 'none'; object-src 'none'; default-src 'none'");
+					// This will override any header set in the ErrorFilter
+					// We could just add an additional header but the final restriction is
+					// the most restrictive intersection
+					CSPUtils util = new CSPUtils();
+					util.parse(res.getHeader(CONTENT_SECURITY_POLICY_HEADER));
+					util.addPolicy(conn.getExpandedProperty("serve_data_servlet.external_csp", "script-src 'none'; object-src 'none'; default-src 'none'"));
+					if( ! util.isEmpty()) {
+						res.setHeader(CONTENT_SECURITY_POLICY_HEADER, util.toString());
+					}
 					String lc = content_type.toLowerCase();
 					if( lc.contains("javascript")  ) {
 						content_type="text/plain";
