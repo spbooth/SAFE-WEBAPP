@@ -39,24 +39,7 @@ import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.result.BackResult;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.transition.AnonymousTransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.DefaultingTransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.DirectTargetlessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.DirectTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
-import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryFinder;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
-import uk.ac.ed.epcc.webapp.forms.transition.ValidatingFormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
+import uk.ac.ed.epcc.webapp.forms.transition.*;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -777,6 +760,11 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 						@Override
 						public FormResult doTargetLessTransition(TargetLessTransition<B> t) throws TransitionException {
 							return null;
+						}
+
+						@Override
+						public FormResult doModalTransition(ModalTransition<B> t) throws TransitionException {
+							throw new TransitionException("Modal Transition");
 						}
 					});
 				} catch (Exception e) {

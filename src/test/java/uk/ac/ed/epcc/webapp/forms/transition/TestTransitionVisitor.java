@@ -78,5 +78,14 @@ public   class TestTransitionVisitor<T> implements TransitionVisitor<T>{
 		
 		return null;
 	}
+	@Override
+	public FormResult doModalTransition(ModalTransition<T> t) throws TransitionException {
+		assertNull(target);
+		if( t.useDirect(target)) {
+			return doDirectTransition(t);
+		}else {
+			return doFormTransition(t);
+		}
+	}
 	
 }

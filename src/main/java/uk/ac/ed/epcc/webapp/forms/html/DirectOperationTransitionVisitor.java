@@ -17,13 +17,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.transition.DirectTargetlessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.DirectTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
-import uk.ac.ed.epcc.webapp.forms.transition.ValidatingFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.*;
 
 /** A {@link TransitionVisitor} that executes direct transitions and returns the {@link FormResult}
  * A null value is returned for any other kind of {@link Transition}.
@@ -84,5 +78,15 @@ public class DirectOperationTransitionVisitor<X> implements TransitionVisitor<X>
 	public FormResult doTargetLessTransition(TargetLessTransition<X> t) throws TransitionException {
 		return null;
 	}
-
+	@Override
+	public FormResult doModalTransition(ModalTransition<X> t) throws TransitionException {
+		if( target == null ){
+			throw new TransitionException("No target specified");
+		}
+		if( t.useDirect(target)) {
+			return doDirectTransition(t);
+		}else {
+			return doFormTransition(t);
+		}
+	}
 }
