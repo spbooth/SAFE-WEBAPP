@@ -776,17 +776,18 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 
 			
 			result.addClass("input");
-			
+			boolean no_autocomplete=false;
 			if (use_datalist) {
 				// add list attribute
 				result.attr("list", name + "_list");
+				no_autocomplete=true; // don't compete with a datalist
 			}
-			boolean no_autocomplete=true;
+			
 			if( input instanceof AutoCompleteHint) {
 				String hint = ((AutoCompleteHint)input).getAutoCompleteHint();
 				if( hint != null && ! hint.isEmpty()) {
 					result.attr("autocomplete",hint);
-					no_autocomplete=false;
+					no_autocomplete=false; // unless explicitly asked for
 				}
 			}
 			if( no_autocomplete) {
