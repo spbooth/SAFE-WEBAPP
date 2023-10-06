@@ -725,9 +725,9 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		if( boxwid <=0 ) {
 			force_single=true; // unspecified width defaults to single
 		}
-		boolean autocomplete = suggestions != null  && suggestions.useAutoComplete();
-		boolean use_datalist = autocomplete && use_html5 && USE_DATALIST.isEnabled(conn);
-		if(autocomplete) {
+		boolean has_suggestions = suggestions != null  && suggestions.useAutoComplete();
+		boolean use_datalist = has_suggestions && use_html5 && USE_DATALIST.isEnabled(conn);
+		if(has_suggestions) {
 			force_single=true; // autocomplete (via list) is single
 		}
 		boolean old_escape = result.setEscapeUnicode(! force_password && ESCAPE_UNICODE_FEATURE.isEnabled(conn));
@@ -781,11 +781,16 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				// add list attribute
 				result.attr("list", name + "_list");
 			}
+			boolean no_autocomplete=true;
 			if( input instanceof AutoCompleteHint) {
 				String hint = ((AutoCompleteHint)input).getAutoCompleteHint();
 				if( hint != null && ! hint.isEmpty()) {
 					result.attr("autocomplete",hint);
+					no_autocomplete=false;
 				}
+			}
+			if( no_autocomplete) {
+				result.attr("autocomplete", "off");
 			}
 			// Now for html verification
 			if( use_html5){
@@ -817,7 +822,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 						}
 					}
 				}
-				if( use_html5 && use_required && (use_datalist || ! autocomplete)){
+				if( use_html5 && use_required && (use_datalist || ! has_suggestions)){
 					if( ! optional){
 						//Note we have to set
 						// formnovalidate for non validating submit elements.
@@ -833,7 +838,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			}
 			result.close();
 			
-			if (autocomplete) {
+			if (has_suggestions) {
 				if (use_html5) {
 					emitDataList(result, use_datalist,suggestions, name,false);
 				}

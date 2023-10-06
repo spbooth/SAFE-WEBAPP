@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.content;
 
+import java.lang.reflect.Constructor;
+
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 /** SimpleXML Builder that generates a String representation
  * 
@@ -77,7 +79,8 @@ public class XMLPrinter extends AbstractXMLBuilder {
 
 	public SimpleXMLBuilder getNested() throws UnsupportedOperationException {
 		try {
-			XMLPrinter nested = getClass().newInstance();
+			Constructor<? extends XMLPrinter> constructor = getClass().getDeclaredConstructor();
+			XMLPrinter nested = constructor.newInstance();
 			nested.parent=this;
 			return nested;
 		} catch (Exception e) {

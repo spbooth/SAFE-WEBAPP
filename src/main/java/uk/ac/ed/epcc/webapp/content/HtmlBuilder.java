@@ -19,14 +19,9 @@ package uk.ac.ed.epcc.webapp.content;
 import java.text.NumberFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.forms.action.DisabledAction;
-import uk.ac.ed.epcc.webapp.forms.action.FormAction;
-import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisitor;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
@@ -173,6 +168,10 @@ protected static final class Text extends Panel {
 				return attr.get(name);
 			}
 			return super.getAttribute(name);
+		}
+		@Override
+		public SimpleXMLBuilder getNested() throws UnsupportedOperationException {
+			return new SpanText(this);
 		}
 	}
 public HtmlBuilder(){
