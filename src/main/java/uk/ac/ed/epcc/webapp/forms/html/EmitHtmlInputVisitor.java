@@ -43,6 +43,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	private static final Feature USE_DATALIST = new Feature("html5.use_datalist",true,"Use html5 datalist syntax, disable to test the fallback mode (as if browser does not userstand datalist)");
 	static final Feature LOCK_FORCED_LIST = new Feature("html.list_input.lock_forced",false,"Supress mandatory pull-down inputs with a single choice");
 	private static final Feature MULTI_INPUT_TABLE = new Feature("html.multi_input.use_table",false,"Use layout tables for multi-input");
+	public static final Preference NO_HISTORY_FEATURE = new Preference("html.datalist.no_history",true,"Supress history auto-complete when the application provides suggested values");
 	private ExtendedXMLBuilder hb;
 	private boolean use_post;
 	private boolean use_html5;
@@ -780,7 +781,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			if (use_datalist) {
 				// add list attribute
 				result.attr("list", name + "_list");
-				no_autocomplete=true; // don't compete with a datalist
+				no_autocomplete=NO_HISTORY_FEATURE.isEnabled(getContext()); // don't compete with a datalist
 			}
 			
 			if( input instanceof AutoCompleteHint) {
