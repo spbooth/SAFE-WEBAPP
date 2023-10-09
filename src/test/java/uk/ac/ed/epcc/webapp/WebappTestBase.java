@@ -491,6 +491,15 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 		ctx.setService(serv);
 		return cal.getTime();
     }
+   public Date addTime(int field, int count) {
+	   TestTimeService serv = (TestTimeService) ctx.getService(CurrentTimeService.class);
+	   Date d = serv.getCurrentTime();
+	   Calendar c = Calendar.getInstance();
+	   c.setTime(d);
+	   c.add(field, count);
+	   serv.setResult(c.getTime());
+	   return c.getTime();
+   }
    
    public void checkImageEqual(String expected,byte actual[]) throws IOException {
 	   checkImageEqual(expected, ImageIO.read(new ByteArrayInputStream(actual)));

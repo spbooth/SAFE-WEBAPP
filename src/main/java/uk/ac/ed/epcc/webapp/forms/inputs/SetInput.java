@@ -16,10 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.forms.Identified;
@@ -111,7 +108,6 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 	public Iterator<T> getItems() {
 		return data.values().iterator();
 	}
-
 	@Override
 	public int getCount(){
 		return data.size();
