@@ -63,6 +63,7 @@ import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
  */
 public  abstract class DataObjectFormFactory<BDO extends DataObject> extends DataObjectLabeller<BDO> implements FormFactory, FormBuilder, IndexedProducer<BDO>{
    public static final Feature DEFAULT_FORBID_HTML = new Feature("form_factory.default_forbid_html_text",true,"Forbid HTML in auto generated text inputs for database fields");
+   public static final Feature DEFAULT_FORBID_HIGH_UNICODE = new Feature("form_factory.default_forbid_high_unicode_text",true,"Forbid High unicode in auto generated text inputs for database fields");
    public static final Feature DEFER_CONTENT = new Feature("form_factory.defer_content",true,"Defer form label generation till needed.");
    public static final Feature WARN_REDUNDANT = new Feature("form_factory.warn_redundant",false,"Generate errors if an explicit Seelctor matches the auto-generated value");
 protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
@@ -482,6 +483,9 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 			if( info.isString() && ! info.isTruncate()) {
 				int max = info.getMax();
 				FieldValidationSet.add(val, field, new MaxLengthValidator(max));
+			}
+			if( info.isString()) {
+				FieldValidationSet.add(val, field, new LowUnicodeValidator());
 			}
 		}
 		return val;
