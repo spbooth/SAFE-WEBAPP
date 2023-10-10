@@ -21,6 +21,7 @@ import java.io.InputStream;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 /** This interface indicates an object that stores a MimeMessage
  * In addition to get/set methods for the MimeMessage there are also
@@ -99,5 +100,14 @@ public interface MessageProvider {
     public default boolean canSend() throws DataFault, MessagingException {
     	MimeMessage m = getMessage();
     	return EmailTransitionProvider.hasRecipient(m);
+    }
+    /** Add additional content showing the context of this message
+     * 
+     * @param <X>
+     * @param cb
+     * @return
+     */
+    default public <X extends ContentBuilder> X addMessageContext(X cb) {
+    	return cb;
     }
 }

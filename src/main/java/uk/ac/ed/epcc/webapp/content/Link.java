@@ -30,6 +30,7 @@ public class Link extends AbstractContexed implements XMLGenerator,UIGenerator {
 	private final String text;
 	private final String help;
 	private final FormResult result;
+	private boolean new_window=false;
 	public Link(AppContext conn,String text,FormResult result){
 		this(conn,text,null,result);
 	}
@@ -64,7 +65,21 @@ public class Link extends AbstractContexed implements XMLGenerator,UIGenerator {
 		return text.hashCode();
 	}
 	public ContentBuilder addContent(ContentBuilder builder) {
-		builder.addLink(conn, text, help,result);
+		
+		if(builder instanceof XMLContentBuilder && new_window) {
+			XMLContentBuilder xb = (XMLContentBuilder)builder;
+			boolean prev = xb.setNewTab(true);
+			xb.addLink(conn, text, help,result);
+			xb.setNewTab(prev);
+		}else {
+			builder.addLink(conn, text, help,result);
+		}
 		return builder;
+	}
+	public boolean isNewWindow() {
+		return new_window;
+	}
+	public void setNewWindow(boolean new_window) {
+		this.new_window = new_window;
 	}
 }

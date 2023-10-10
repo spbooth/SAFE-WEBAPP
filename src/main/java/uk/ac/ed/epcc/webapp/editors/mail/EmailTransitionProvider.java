@@ -485,8 +485,15 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	@Override
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb,
 			MailTarget target) {
-		
-		return cb;
+		if(target == null) {
+			return cb;
+		}
+		try {
+			return target.getHandler().getMessageProvider().addMessageContext(cb);
+		} catch (Exception e) {
+			getLogger().error("Error adding message context",e);
+			return cb;
+		}
 	}
 	
 	@Override
