@@ -24,12 +24,12 @@ public class SanitisingLogger implements Logger {
 				for( int i=0 ; i< input.length() ; i++) {
 					int code = input.codePointAt(i);
 					if( Character.isWhitespace(code)) {
-						sb.append(Character.toString(code));
+						sb.append(Character.toChars(code));
 					}else if( code < 32 || code == 127 ) {
 						sb.append("\\");
 						sb.append(Integer.toHexString(code));
 					}else {
-						sb.append(Character.toString(code));
+						sb.append(Character.toChars(code));
 					}
 				}
 				return sb.toString();

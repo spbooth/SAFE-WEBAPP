@@ -23,11 +23,11 @@ public class TestSanitise extends WebappTestBase {
 		ctx.setService(sl);
 		
 		Logger l = ctx.getService(LoggerService.class).getLogger(getClass());
-		l.warn("A message with a \u0007  \b \n");
+		l.warn("A message with a \u0007  \b \t\n");
 		
 		String string = bl.getBuffer().toString();
 		string = string.replace("\r\n", "\n");
-		assertEquals("A message with a \\7  \\8 \n"
+		assertEquals("A message with a \\7  \\8 \t\n"
 				+ "\n"
 				+ "", string);
 		

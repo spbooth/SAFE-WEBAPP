@@ -23,7 +23,7 @@ public class LowUnicodeValidator implements FieldValidator<String> {
 
 	public void validateCodePoint(int code) throws FieldException{
 		if( code > 0xfff ) {
-			throw new ValidateException("Invalid character "+Character.toString(code));
+			throw new ValidateException("Invalid character "+String.valueOf(Character.toChars(code)));
 		}
 		if( Character.isWhitespace(code)) {
 			return;
