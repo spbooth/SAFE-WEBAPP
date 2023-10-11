@@ -71,7 +71,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
 		if( nested != null ){
 			l = nested.getLogger(name);
 		}
-		if( EMAIL_LOGGING_FEATURE.isEnabled(getContext())) {
+		if( ! EMAIL_LOGGING_FEATURE.isEnabled(getContext())) {
 			return l;
 		}
 		return new EmailLogger(this, l);

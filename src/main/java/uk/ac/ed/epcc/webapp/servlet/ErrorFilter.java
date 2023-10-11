@@ -49,6 +49,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintWrapper;
+import uk.ac.ed.epcc.webapp.logging.sanitise.SanitisingLoggerService;
 import uk.ac.ed.epcc.webapp.model.datastore.DataStoreResourceService;
 import uk.ac.ed.epcc.webapp.servlet.config.ServletContextConfigService;
 import uk.ac.ed.epcc.webapp.servlet.logging.ServletWrapper;
@@ -90,7 +91,7 @@ public class ErrorFilter implements Filter {
 	public static final Feature CONNECTION_STATUS_FEATURE = new Feature("database.connection_status",false,"Track active database connections");
 	public static final Feature TIMER_FEATURE = new Feature("Timer",false,"gather timing information for performance analyis");
 	public static final Feature DATASTORE_RESOURCE_FEATURE = new Feature("resource_service.use_datastore",true,"Use datastore table to hold resources");
-	
+	public static final Feature SANITISE_LOGS_FEATURE = new Feature("logging.sanitise",true,"Sanitise strings added to logs");
 	private static final String LAST_ADDR_ATTR = "LastAddr";
 	public static final String APP_CONTEXT_ATTR = "AppContext";
 	public static final String SERVLET_CONTEXT_ATTR = "ServletContext";
@@ -470,12 +471,16 @@ public class ErrorFilter implements Filter {
 				conn = makeContext(servlet_ctx);
 				// report error logs by email with page info need to replace this within closer
 				conn.setService( new ServletEmailLoggerService(conn));
-				request.setAttribute(APP_CONTEXT_ATTR, conn);
-				
-				
+				if( SANITISE_LOGS_FEATURE.isEnabled(conn)) {
+					conn.setService(new SanitisingLoggerService(conn));
+				}
+				if( request != null ) {
+					request.setAttribute(APP_CONTEXT_ATTR, conn);
+				}
 				// Now for request specific customisation
 				//
 				if( request != null && response != null ){
+					
 					// null request/response means this is a dummy context generated for
 					// a context listener
 					Class<? extends ServletService> clazz = conn.getPropertyClass(ServletService.class,DefaultServletService.class,  "servlet.service");
