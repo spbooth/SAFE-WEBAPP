@@ -23,22 +23,22 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.SetInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
-/** A transition to show all people with a specific Relationship
+/** A transition to show all people with a specific Relationship to any target
  * @author spb
  *
  */
-public class ViewRelationTransition<X extends DataObject> extends AbstractFormTransition<X> {
+public class ViewRelationTargetlessTransition<X extends DataObject> extends AbstractTargetLessTransition<X> {
 
 	/**
 	 * 
 	 */
 	private static final String RELATIONSHIP_FIELD = "Relationship";
 	private final DataObjectFactory<X> fac;
-	public ViewRelationTransition(DataObjectFactory<X> fac) {
+	public ViewRelationTargetlessTransition(DataObjectFactory<X> fac) {
 		super();
 		this.fac = fac;
 	}
@@ -56,17 +56,15 @@ public class ViewRelationTransition<X extends DataObject> extends AbstractFormTr
 		return rels;
 	}
 	public class ShowAction extends FormAction{
-		public ShowAction(X target) {
+		public ShowAction() {
 			super();
-			this.target = target;
 		}
-		private final X target;
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
 		 */
 		@Override
 		public FormResult action(Form f) throws ActionException {
-			return new RelationshipList<>(target.getContext(), (String)f.get(RELATIONSHIP_FIELD),fac, target);
+			return new RelationshipList<>(fac.getContext(), (String)f.get(RELATIONSHIP_FIELD),fac, null);
 		}
 		
 	}
@@ -74,10 +72,10 @@ public class ViewRelationTransition<X extends DataObject> extends AbstractFormTr
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 	 */
 	@Override
-	public void buildForm(Form f, X target, AppContext conn) throws TransitionException {
+	public void buildForm(Form f, AppContext conn) throws TransitionException {
 		SetInput<String> r = new SetInput<>(getRelationships());
 		f.addInput(RELATIONSHIP_FIELD,"Relationship", r);
-		f.addAction("View", new ShowAction(target));
+		f.addAction("View", new ShowAction());
 		
 		
 	}
