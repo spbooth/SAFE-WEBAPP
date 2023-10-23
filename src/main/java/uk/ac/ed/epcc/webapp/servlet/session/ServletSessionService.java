@@ -228,7 +228,9 @@ public void clearCurrentPerson() {
 			Integer id = getWtmpID();
 			if( id != null ){
 				Wtmp w = man.find(id);
-				w.logout();
+				if( w != null ) {
+					w.logout();
+				}
 			}
 		}
 	}catch(Exception e){

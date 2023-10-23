@@ -115,7 +115,11 @@ public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed i
 			String provider_name = name.substring(pos+1);
 			NamedFilterProvider<T> prov = fac.getContext().makeObject(NamedFilterProvider.class, provider);
 			if( prov != null) {
-				return prov.getNamedFilter(provider_name);
+				BaseFilter<T> namedFilter = prov.getNamedFilter(provider_name);
+				if( namedFilter == null ) {
+					getLogger().error("Unrecognised named filter "+name+" for "+fac.getConfigTag());
+				}
+				return namedFilter;
 			}else {
 				getLogger().error("Bad explicit NamedFilterProvider "+provider);
 			}
