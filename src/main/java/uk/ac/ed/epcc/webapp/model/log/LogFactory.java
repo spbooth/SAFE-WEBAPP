@@ -267,7 +267,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		public final void remove() throws Exception {
 			try{
 				L data = getLink();
-				if (data != null && data instanceof Removable) {
+				if (data != null && data instanceof Removable && shouldRemove(data)) {
 					((Removable) data).remove();
 				}
 			}catch(DataNotFoundException e){
@@ -276,6 +276,14 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 				getLogger().error("Link not found",e);
 			}
 			delete();
+		}
+		/** Should the linked object be removed then the item is removed. 
+		 * 
+		 * @param link
+		 * @return
+		 */
+		public boolean shouldRemove(L link) {
+			return true;
 		}
 
 		/**
@@ -644,7 +652,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 * @param q
 	 * @throws DataFault 
 	 */
-	public final void purge(O q) throws DataFault{
+	public void purge(O q) throws DataFault{
 		try(CloseableIterator<T> it = getLog(q)){
 			while(it.hasNext()) {
 
@@ -654,7 +662,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		}catch(DataFault e) {
 			throw e;
 		} catch (Exception e) {
-			throw new DataFault("Error in close", e);
+			throw new DataFault("Error in purge", e);
 		}
 
 	}
