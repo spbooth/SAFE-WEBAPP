@@ -400,6 +400,11 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			sb.append("&issuer=");
 			sb.append(URLEncoder.encode(issuer, "UTF-8"));
 		}
+		String image = getContext().getExpandedProperty("totp.image");
+		if( image != null) {
+			sb.append("&image=");
+			sb.append(URLEncoder.encode(image, "UTF-8"));
+		}
 		return new URI(sb.toString());
 	}
 	public class CodeValidator implements FieldValidator<Integer>{
