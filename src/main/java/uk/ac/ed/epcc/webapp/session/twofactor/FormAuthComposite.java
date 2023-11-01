@@ -128,7 +128,7 @@ public abstract class FormAuthComposite<AU extends AppUser,F extends FormAuthCom
 
 	}
 	@Override
-	protected Class<? super FormAuthComposite> getType() {
+	protected Class<? super F> getType() {
 		return FormAuthComposite.class;
 	}
 
