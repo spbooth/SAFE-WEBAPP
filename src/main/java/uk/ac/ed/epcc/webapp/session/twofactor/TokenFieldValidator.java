@@ -27,7 +27,7 @@ public class TokenFieldValidator<A extends AppUser, T> implements FieldValidator
 	/**
 	 * @param comp
 	 */
-	public TokenFieldValidator(CodeAuthComposite<A, T> comp,A user) {
+	public TokenFieldValidator(CodeAuthComposite<A,?, T> comp,A user) {
 		super();
 		this.comp = comp;
 		this.user=user;
@@ -56,6 +56,6 @@ public class TokenFieldValidator<A extends AppUser, T> implements FieldValidator
 			comp.authenticated();
 		}
 	}
-	private final CodeAuthComposite<A, T> comp;
+	private final CodeAuthComposite<A,?, T> comp;
 	private final A user;
 }

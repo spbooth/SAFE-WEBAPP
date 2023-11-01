@@ -22,7 +22,7 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory;
  * @author Stephen Booth
  *
  */
-public abstract class CodeAuthComposite<AU extends AppUser,T> extends FormAuthComposite<AU> {
+public abstract class CodeAuthComposite<AU extends AppUser,F extends FormAuthComposite, T> extends FormAuthComposite<AU,F> {
 
 	
 	/** form field for autentication code in augmented forms.

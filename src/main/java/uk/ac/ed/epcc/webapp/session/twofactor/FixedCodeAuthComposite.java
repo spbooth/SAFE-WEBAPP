@@ -22,7 +22,7 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory;
  * @author Stephen Booth
  *
  */
-public class FixedCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<A,String> {
+public class FixedCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<A,FormAuthComposite,String> {
 
 	/**
 	 * @param fac
