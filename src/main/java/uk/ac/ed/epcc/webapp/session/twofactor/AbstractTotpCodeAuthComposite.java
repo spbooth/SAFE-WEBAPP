@@ -81,7 +81,7 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 	private static final String FAIL_COUNT="AuthCodeFails";
 	
 	public static final String USED_COUNTER_ATTR="UsedCounter";
-	public static final String RECOVERY_FIELD="AuthCodeRecover";
+
 	
 	public static final Feature NOTIFY_MFA_LOCK = new Feature("mfa.notify-lock",true,"Notify by email if maximum mfa attempts are exceeded");
 
@@ -164,7 +164,6 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 	public void clearSecret(A user) {
 		Record record = getRecord(user);
 		record.setProperty(mutate(SECRET_FIELD), null);
-		record.setOptionalProperty(mutate(RECOVERY_FIELD), null);
 	}
 	
     public final Key decodeKey(String enc) {
@@ -180,12 +179,7 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 		}
 		return decodeKey(secret);
 	}
-	public int getRecoveryCode(A user) {
-		return getRecord(user).getIntProperty(mutate(RECOVERY_FIELD), -1);
-	}
-	public void setRecoveryCode(A user, int code) {
-		getRecord(user).setProperty(mutate(RECOVERY_FIELD), code);
-	}
+	
 	public final String getEncodedSecret(Key key) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
 		if( key == null) {
 			return null;
@@ -264,22 +258,6 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 	@Override
 	public boolean verify(A user,Integer value) {
 		try {
-			int recovery = getRecoveryCode(user);
-			if( recovery > MAX_NORMAL_CODE && value.intValue() > MAX_NORMAL_CODE) {
-				if( recovery == value.intValue() ) {
-					clearSecret(user);
-					user.commit();
-					try {
-						Emailer m = Emailer.getFactory(getContext());
-						m.userNotification(user,"mfa_used_recovery_token.txt");
-					} catch (Exception e) {
-						getLogger().error("Failed to notify of use of recovery token", e);
-					}
-					return true;
-				}else {
-					doFail(user);
-				}
-			}
 			return verify(user,getSecret(user),value);
 		} catch (Exception e) {
 			getLogger().error("Error getting secret", e);
@@ -354,15 +332,12 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 	public final int getMaxFail() {
 		return getContext().getIntegerParameter(getConfigPrefix()+"max_fail",100);
 	}
-	public boolean useRecoveryCode() {
-		return getRepository().hasField(mutate(RECOVERY_FIELD));
-	}
+	
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
 		spec.setOptionalField(mutate(SECRET_FIELD), new StringFieldType(true, null, 32));
 		spec.setOptionalField(mutate(LAST_USED_FIELD), new LongFieldType(true, null));
 		spec.setOptionalField(mutate(FAIL_COUNT), new IntegerFieldType(true, 0));
-		spec.setOptionalField(mutate(RECOVERY_FIELD), new IntegerFieldType(true, null));
 		return spec;
 	}
 
@@ -371,7 +346,6 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 		suppress.add(mutate(SECRET_FIELD));
 		suppress.add(mutate(LAST_USED_FIELD));
 		suppress.add(mutate(FAIL_COUNT));
-		suppress.add(mutate(RECOVERY_FIELD));
 		return suppress;
 	}
 
@@ -592,7 +566,7 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 	}
 	
 	
-	private void resetNavigation() {
+	protected void resetNavigation() {
 		NavigationMenuService nms = getContext().getService(NavigationMenuService.class);
 		if( nms != null ){
 			nms.resetMenu();

@@ -43,6 +43,9 @@ import uk.ac.ed.epcc.webapp.session.*;
  * <li>https://tools.ietf.org/html/rfc4226</li>
  * <li>https://tools.ietf.org/html/rfc6238</li>
  * </ul>
+ * 
+ * This class adds support for making the use of TOTP mandatory and a recovery code
+ * 
  * @author Stephen Booth
  *
  */
@@ -53,7 +56,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends AbstractTotpCodeAu
 	
 	public static final String MAKE_RECOVERY_CODE_ROLE="MakeRecoveryCode";
 	public static final String REMOVE_KEY_ROLE="RemoveTwoFactor";
-	
+	public static final String RECOVERY_FIELD="AuthCodeRecover";
 	/**
 	 * @param fac
 	 */
