@@ -1,6 +1,7 @@
 package uk.ac.ed.epcc.webapp.session.twofactor;
 
 import java.io.UnsupportedEncodingException;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -15,8 +16,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
+
 /** Interface for classes (usually composites) that implement TOTP code verification.
  * Most of the TOTP logic is implemented as default methods to avoid code duplication.
  * It might be better to extract the logic to its own class
@@ -218,5 +221,36 @@ public interface TotpProvider<X extends DataObject> extends Contexed {
 			doFail(user);
 		}
 		return false;
+	}
+	public String getLocation(X user) throws DataException;
+    public String getImageURL(X user);
+    
+   public String getName(X user);
+	
+	default public URI getURI(X user,Key key) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException, URISyntaxException, DataException {
+		
+		String location = getLocation(user);
+		StringBuilder sb = new StringBuilder();
+		sb.append("otpauth://totp/");
+		sb.append(URLEncoder.encode(location,"UTF-8"));
+		sb.append(":");
+	
+		String name = getName(user);
+		name=URLEncoder.encode(name.trim(), "UTF-8");
+		sb.append(name);
+		sb.append("?secret=");
+		sb.append(TotpProvider.getEncodedSecret(key));
+		
+		String issuer = getContext().getExpandedProperty("website-name");
+		if( issuer != null) {
+			sb.append("&issuer=");
+			sb.append(URLEncoder.encode(issuer, "UTF-8"));
+		}
+		String image = getImageURL(user);
+		if( image != null && ! image.isEmpty()) {
+			sb.append("&image=");
+			sb.append(URLEncoder.encode(image, "UTF-8"));
+		}
+		return new URI(sb.toString());
 	}
 }

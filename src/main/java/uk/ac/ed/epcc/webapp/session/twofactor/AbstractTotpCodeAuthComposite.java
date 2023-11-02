@@ -223,32 +223,20 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 		return suppress;
 	}
 
-	public final URI getURI(A user,Key key) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException, URISyntaxException {
-		StringBuilder sb = new StringBuilder();
-		sb.append("otpauth://totp/");
-		sb.append(URLEncoder.encode(getServiceNameForURI(),"UTF-8"));
-		sb.append(":");
+	@Override
+	public String getName(A user) {
 		AppUserFactory<A> factory = (AppUserFactory<A>) getFactory();
 		String name = factory.getCanonicalName(user);
-		name=URLEncoder.encode(name.trim(), "UTF-8");
-		sb.append(name);
-		sb.append("?secret=");
-		sb.append(TotpProvider.getEncodedSecret(key));
-		
-		String issuer = getContext().getExpandedProperty("website-name");
-		if( issuer != null) {
-			sb.append("&issuer=");
-			sb.append(URLEncoder.encode(issuer, "UTF-8"));
-		}
-		String image = getContext().getExpandedProperty(getConfigPrefix()+"image");
-		if( image != null) {
-			sb.append("&image=");
-			sb.append(URLEncoder.encode(image, "UTF-8"));
-		}
-		return new URI(sb.toString());
+		return name;
 	}
+	@Override
+	public String getImageURL(A user) {
+		return getContext().getExpandedProperty(getConfigPrefix()+"image");
+	}
+	
 
-	protected String getServiceNameForURI() {
+	@Override
+	public String getLocation(A user) {
 		return getContext().getInitParameter("service.name");
 	}
 	public String getUsedAttribute() {
