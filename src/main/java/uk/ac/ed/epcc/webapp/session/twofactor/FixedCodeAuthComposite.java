@@ -57,7 +57,7 @@ public class FixedCodeAuthComposite<A extends AppUser> extends CodeAuthComposite
 	 * @see uk.ac.ed.epcc.webapp.session.twofactor.CodeAuthComposite#verify(java.lang.Object)
 	 */
 	@Override
-	public boolean verify(A target,String value) {
+	public boolean verify(A target,String value,StringBuilder notes) {
 		if( value == null) {
 			return false;
 		}

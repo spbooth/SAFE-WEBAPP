@@ -113,7 +113,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends AbstractTotpCodeAu
 	 * @see uk.ac.ed.epcc.webapp.session.twofactor.CodeAuthComposite#verify(java.lang.Object)
 	 */
 	@Override
-	public boolean verify(A user,Integer value) {
+	public boolean verify(A user,Integer value,StringBuilder notes) {
 		try {
 			int recovery = getRecoveryCode(user);
 			if( recovery > 999999 && value.intValue() > MAX_NORMAL_CODE) {
@@ -131,7 +131,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends AbstractTotpCodeAu
 					doFail(user);
 				}
 			}
-			return super.verify(user, value);
+			return super.verify(user, value,notes);
 		} catch (Exception e) {
 			getLogger().error("Error getting secret", e);
 			return false;

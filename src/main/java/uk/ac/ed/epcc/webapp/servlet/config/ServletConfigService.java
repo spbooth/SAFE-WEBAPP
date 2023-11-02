@@ -24,8 +24,6 @@ import javax.servlet.ServletConfig;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.ConfigServiceListener;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** ConfigService that augments the properties with Servlet InitParams.
  * This needs to be added to the {@link AppContext} within the servlet itself
  * after any caching {@link ConfigService}s and once the {@link ServletConfig} is available.
@@ -90,10 +88,6 @@ public class ServletConfigService implements ConfigService {
 	@Override
 	public ConfigService getNested() {
 		return nested_service;
-	}
-
-	private Logger getLogger() {
-		return c.getService(LoggerService.class).getLogger(getClass());
 	}
 	
 }

@@ -528,9 +528,7 @@ public class DefaultDataBaseService implements DatabaseService {
 		
 		return map;
 	}
-	protected Logger getLogger() {
-		return getContext().getService(LoggerService.class).getLogger(getClass());
-	}
+	
 	@Override
 	public void addCleanup(Runnable r) {
 		if( ! in_transaction) {

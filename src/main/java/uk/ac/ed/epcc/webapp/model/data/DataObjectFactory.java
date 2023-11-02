@@ -1300,7 +1300,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * 
      * @return {@link Logger}
      */
-	protected Logger getLogger() {
+	public Logger getLogger() {
 		AppContext context = getContext();
 		if( context == null) {
 			context = AppContext.getContext();

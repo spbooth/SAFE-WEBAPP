@@ -16,11 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.config;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -35,8 +31,6 @@ import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
 
@@ -341,8 +335,4 @@ public class DataBaseConfigService implements ConfigService {
 		return nested;
 	}
 
-	private Logger getLogger() {
-		LoggerService ls = getContext().getService(LoggerService.class);
-		return ls.getLogger(getClass());
-	}
 }

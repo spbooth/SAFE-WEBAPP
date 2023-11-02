@@ -25,8 +25,6 @@ import javax.xml.validation.Schema;
 import org.w3c.dom.Document;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -52,9 +50,7 @@ public class TestXMLTargetFactory implements XMLTargetFactory {
 	public AppContext getContext() {
 		return c;
 	}
-	protected final Logger getLogger(){
-		return c.getService(LoggerService.class).getLogger(getClass());
-	}
+	
 	@Override
 	public Schema getSchema() {
 		return null;

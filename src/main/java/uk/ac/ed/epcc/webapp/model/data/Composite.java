@@ -208,13 +208,7 @@ public abstract class Composite<BDO extends DataObject, X > implements Contexed,
 	public final AppContext getContext(){
 		return fac.getContext();
 	}
-	/** get a {@link Logger} for this class
-	 * 
-	 * @return
-	 */
-	protected final  Logger getLogger() {
-		return getContext().getService(LoggerService.class).getLogger(getClass());
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.TableStructureContributer#customiseUpdateForm(uk.ac.ed.epcc.webapp.forms.Form, uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */

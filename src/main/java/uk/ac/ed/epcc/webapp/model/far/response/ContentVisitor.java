@@ -171,12 +171,7 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 		return cb;
 	}
 
-	/**
-	 * @return
-	 */
-	protected final Logger getLogger() {
-		return sess.getContext().getService(LoggerService.class).getLogger(getClass());
-	}
+	
 	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.far.PartVisitor#visitSection(uk.ac.ed.epcc.webapp.model.far.SectionManager.Section)

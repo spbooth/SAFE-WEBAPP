@@ -17,20 +17,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
 import java.util.Set;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
@@ -38,7 +30,9 @@ import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
-import uk.ac.ed.epcc.webapp.forms.exceptions.*;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.inputs.ConstantInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
@@ -48,7 +42,6 @@ import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
 import uk.ac.ed.epcc.webapp.jdbc.table.*;
-import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -57,7 +50,6 @@ import uk.ac.ed.epcc.webapp.servlet.QRServlet;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 import uk.ac.ed.epcc.webapp.session.*;
-import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /**  A {@link FormAuthComposite} that implements time-based authentication codes compatible
  * with google authenticator
@@ -73,7 +65,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  * @author Stephen Booth
  *
  */
-public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends FormAuthComposite> extends CodeAuthComposite<A,F,Integer> {
+public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends FormAuthComposite> extends CodeAuthComposite<A,F,Integer> implements TotpProvider<A> {
 	protected static final int MAX_NORMAL_CODE = 999999;
 	public static final Feature VERIFY_OLD_CODE=new Feature("two_factor.verify_previous_code",true,"Verify current code on key change");
 	private static final String SECRET_FIELD="AuthCodeSecret";
@@ -136,27 +128,14 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 		}
 	}
 	
-	public final Key makeNewKey() throws NoSuchAlgorithmException {
-		KeyGenerator gen = KeyGenerator.getInstance(ALG);
-		gen.init(128);
-		return gen.generateKey();
+	
+	
+	
+
+	public void setMFASecret(A user, String secret) {
+		getRecord(user).setProperty(mutate(SECRET_FIELD), secret);
 	}
 	
-	public final void setSecret(A user, Key key) {
-		if( key == null) {
-			clearSecret(user);
-			return;
-		}
-		
-		getRecord(user).setProperty(mutate(SECRET_FIELD), Base32.encode(key.getEncoded()));
-	}
-	public final void setSecret(A user, String enc) {
-		if( enc == null || enc.isEmpty()) {
-			clearSecret(user);
-			return;
-		}
-		setSecret(user, decodeKey(enc));
-	}
 
 	/**
 	 * @param user
@@ -166,51 +145,18 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 		record.setProperty(mutate(SECRET_FIELD), null);
 	}
 	
-    public final Key decodeKey(String enc) {
-    	if( enc == null || enc.isEmpty()) {
-    		return null;
-    	}
-    	return new SecretKeySpec(Base32.decode(enc), ALG);
-    }
-	public final Key getSecret(A user) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
-		String secret = getRecord(user).getStringProperty(mutate(SECRET_FIELD));
-		if(secret == null || secret.length() == 0) {
-			return null;
-		}
-		return decodeKey(secret);
+    
+	
+
+	public String getMFASecret(A user) {
+		return getRecord(user).getStringProperty(mutate(SECRET_FIELD));
 	}
 	
-	public final String getEncodedSecret(Key key) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
-		if( key == null) {
-			return null;
-		}
-		String encode = Base32.encode(key.getEncoded());
-		return encode;
-	}
-	private static final String ALG="HmacSHA1";
 	
 	
-	public final long getCode(Key key,long counter) throws NoSuchAlgorithmException, InvalidKeyException {
-		Mac mac = Mac.getInstance(ALG);
-		mac.init(key);
-		ByteBuffer buffer = ByteBuffer.allocate(8);
-        buffer.putLong(0, counter);
-
-        byte[] hmac = mac.doFinal(buffer.array());
-        int offset = hmac[hmac.length - 1] & 0x0f;
-        int number = 0;
-        for (int i = 0; i < 4; i++) {
-            // Note that we're re-using the first four bytes of the buffer here; we just ignore the latter four from
-            // here on out.
-        	number <<=8;
-        	number |= ( hmac[i+offset] & 0xff);
-        }
-
-        final int hotp = number & 0x7fffffff;
-
-        return hotp % 1000000;
-		
-	}
+	
+	
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.session.twofactor.CodeAuthComposite#getInput()
 	 */
@@ -241,96 +187,24 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 		return getRecord(user).getLongProperty(mutate(LAST_USED_FIELD),0L);
 	}
 	
-	/** Set the counter value (not the time stamp) or a successful authentication.
-	 * 
-	 * @param user
-	 * @param counter
-	 */
-	public final void setLastUsedCounter(A user, long counter) {
-		if( user == null) {
-			return;
-		}
-		getRecord(user).setOptionalProperty(mutate(LAST_USED_FIELD), Long.valueOf(counter * getNorm()));
+	public void setLastUsed(A user, long time) {
+		getRecord(user).setOptionalProperty(mutate(LAST_USED_FIELD), time);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.session.twofactor.CodeAuthComposite#verify(java.lang.Object)
 	 */
 	@Override
-	public boolean verify(A user,Integer value) {
+	public boolean verify(A user,Integer value,StringBuilder notes) {
 		try {
-			return verify(user,getSecret(user),value);
+			return verify(user,getSecret(user),value,notes);
 		} catch (Exception e) {
 			getLogger().error("Error getting secret", e);
 			return false;
 		}
 	}
-	/** Validate a value against a key.
-	 * 
-	 * If the user parameter is not null the last used value is also checked.
-	 * 
-	 * @param user
-	 * @param key
-	 * @param value
-	 * @return
-	 */
-	public final boolean verify(A user,Key key,Integer value) {
-		Logger logger = getLogger();
-		if( key == null) {
-			logger.debug("No key allow login");
-			return true;
-		}
-		CurrentTimeService serv = getContext().getService(CurrentTimeService.class);
-		Date currentTime = serv.getCurrentTime();
-		long counter = currentTime.getTime();
-		long norm = getNorm();
-		counter = counter / norm;
-		long last_counter = getLastUsed(user) / norm;
-		int window = getWindow();
-		
-		for(int i=-(window-1)/2 ; i<= window/2 ; ++i) {
-			try {
-				long code = getCode(key, counter+i);
-				logger.debug("i="+i+" code="+code+" value="+value);
-				if( value.longValue() == code) {
-					if( (counter+i) > last_counter ) {
-						if(user != null  ) {
-							// code is ok but check fail count
-							if( getFailCount(user) > getMaxFail() && getMaxFail() > 0) {
-								logger.error("User exceeded MFA fail count "+user.getIdentifier());
-								return false;
-							}
-							clearFailCount(user);
-							// Don't set the authenticated time here as
-							// verification may be called multiple times
-							// remember it in the AppContext
-							getContext().setAttribute(mutate(USED_COUNTER_ATTR), (counter+i));
-						}
-						return true;
-					}else {
-						logger.error("Code re-use for "+user.getIdentifier()+" "+(counter+i)+"<"+last_counter);
-						return false;
-					}
-				}
-			} catch (Exception e) {
-				logger.error("Error checking code", e);
-			}
-		}
-		logger.debug("code does not match");
-		doFail(user);
-		return false;
-	}
-	/** number of milliseconds per code value
-	 * 
-	 * @return
-	 */
-	public final long getNorm() {
-		return getContext().getLongParameter(getConfigPrefix()+"refresh.millis", 30000L); // 30 second
-	}
-	public final int getWindow() {
-		return getContext().getIntegerParameter(getConfigPrefix()+"window",3);
-	}
-	public final int getMaxFail() {
-		return getContext().getIntegerParameter(getConfigPrefix()+"max_fail",100);
+	
+	public boolean verify(A user,Key key,Integer value,StringBuilder notes) {
+		return verify(user,key,value,(l)->getContext().setAttribute(getUsedAttribute(), l),notes);
 	}
 	
 	@Override
@@ -359,7 +233,7 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 		name=URLEncoder.encode(name.trim(), "UTF-8");
 		sb.append(name);
 		sb.append("?secret=");
-		sb.append(getEncodedSecret(key));
+		sb.append(TotpProvider.getEncodedSecret(key));
 		
 		String issuer = getContext().getExpandedProperty("website-name");
 		if( issuer != null) {
@@ -377,27 +251,8 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 	protected String getServiceNameForURI() {
 		return getContext().getInitParameter("service.name");
 	}
-	public class CodeValidator implements FieldValidator<Integer>{
-		/**
-		 * @param key
-		 */
-		public CodeValidator(Key key) {
-			super();
-			this.key = key;
-		}
-
-		private final Key key;
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.FieldValidator#validate(java.lang.Object)
-		 */
-		@Override
-		public void validate(Integer data) throws FieldException {
-			if( ! verify(null,key, data) ) {
-				throw new ValidateException("Incorrect");
-			}
-			
-		}
+	public String getUsedAttribute() {
+		return mutate(USED_COUNTER_ATTR);
 	}
 	public class SetToptTransition extends AbstractFormTransition<A> implements ExtraContent<A>{
 		/**
@@ -432,7 +287,7 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 				}else {
 					new_key=makeNewKey();
 					try {
-						service.setAttribute(mutate(NEW_AUTH_KEY_ATTR), getEncodedSecret(new_key));
+						service.setAttribute(mutate(NEW_AUTH_KEY_ATTR), TotpProvider.getEncodedSecret(new_key));
 					} catch (Exception e) {
 						getLogger().error("Error encoding new key", e);
 					}
@@ -487,10 +342,10 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 					modifyForm(target, f);
 				}
 				Key key2 = getKey();
-				String enc = getEncodedSecret(key2);
+				String enc = TotpProvider.getEncodedSecret(key2);
 				f.addInput(KEY, new ConstantInput<>(enc,enc));
 				f.addInput(NEW_CODE,  getInput());
-				f.getField(NEW_CODE).addValidator(new CodeValidator(key2));
+				f.getField(NEW_CODE).addValidator(new CodeValidator<A>(AbstractTotpCodeAuthComposite.this, key2));
 				if( ! verify ) {
 					// will be single field
 					f.setAutoFocus(NEW_CODE);
@@ -578,7 +433,7 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 	 * @see uk.ac.ed.epcc.webapp.session.twofactor.FormAuthComposite#getConfigPrefix()
 	 */
 	@Override
-	protected String getConfigPrefix() {
+	public String getConfigPrefix() {
 		return "totp.";
 	}
 
@@ -595,7 +450,7 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 	
 	@Override
 	public final void completeAuth(A target) {
-		Long used = (Long) getContext().getAttribute(mutate(USED_COUNTER_ATTR));
+		Long used = (Long) getContext().getAttribute(getUsedAttribute());
 		if( used != null) {
 			setLastUsedCounter(target, used);
 			try {
@@ -609,7 +464,7 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 	public final int getFailCount(A target) {
 		return getRecord(target).getIntProperty(mutate(FAIL_COUNT), 0);
 	}
-	private void clearFailCount(A target) {
+	public void clearFailCount(A target) {
 		if( target == null ) {
 			return;
 		}
@@ -620,7 +475,7 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 			getLogger().error("Error resetting fail count", e);
 		}
 	}
-	protected final void doFail(A target) {
+	public final void doFail(A target) {
 		if( ! getRepository().hasField(mutate(FAIL_COUNT))  || target == null) {
 			return;
 		}

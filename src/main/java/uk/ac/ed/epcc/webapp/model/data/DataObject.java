@@ -34,7 +34,6 @@ import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
@@ -301,9 +300,6 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 		return getIdentifier(Identified.MAX_IDENTIFIER);
 	}
 
-	protected uk.ac.ed.epcc.webapp.logging.Logger getLogger() {
-		return getContext().getService(LoggerService.class).getLogger(getClass());
-	}
 
 	protected final String getFactoryTag() {
 		return record.getRepository().getTag();
