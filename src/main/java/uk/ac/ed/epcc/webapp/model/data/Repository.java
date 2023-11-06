@@ -1051,7 +1051,12 @@ public final class Repository extends AbstractContexed implements AppContextClea
 				return def;
 			}
 			try {
-				return t.find(val);
+				F v = t.find(val);
+				if( v == null) {
+					// Might be non-null but invalid e.g. empty string
+					return def;
+				}
+				return v;
 			} catch (Exception e) {
 				getLogger().error("Error converting via TypeProducer",e);
 				return def;
