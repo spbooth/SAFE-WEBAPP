@@ -492,7 +492,7 @@ protected  boolean showAsLink(MimePart parent, String string) {
  * @param extra
  * @return combined path
  */
-public static LinkedList<String> addPath(LinkedList<String> path, String ...extra){
+public static LinkedList<String> addPath(List<String> path, String ...extra){
 	LinkedList<String> result = new LinkedList<>();
 	if( path != null){
 		result.addAll(path);
