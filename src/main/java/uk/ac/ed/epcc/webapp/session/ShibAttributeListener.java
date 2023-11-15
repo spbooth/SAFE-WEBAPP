@@ -13,10 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.content.TemplateContributor;
@@ -24,6 +21,7 @@ import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
@@ -84,13 +82,20 @@ HistoryFieldContributor
 			Record record = getRecord(user);
 			Date now = getContext().getService(CurrentTimeService.class).getCurrentTime();
 			Date update=null;
+			Logger log = getLogger();
+			for(String name : serv.getAttributeNames()) {
+				log.debug("Seen request attribute "+name);
+			}
+			
 			for(String a : attr) {
 				Object res = serv.getRequestAttribute(a);
 				if( res != null) {
 					update=now;
 					record.setOptionalProperty(a, res.toString());
 				}else {
-					record.setOptionalProperty(a, null); // remove if not seen
+					if( getContext().getBooleanParameter(tag+"."+a+".remove", true)) {
+						record.setOptionalProperty(a, null); // remove if not seen
+					}
 				}
 			}
 			record.setOptionalProperty(tag+AUTHENTICATED_SUFFIX, update);
