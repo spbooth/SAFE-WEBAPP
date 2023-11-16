@@ -135,9 +135,11 @@ HistoryFieldContributor
 	public void addAttributes(Map<String, Object> attributes, AU target) {
 		Record rec = getRecord(target);
 		for(String a : attr) {
-			String v = rec.getStringProperty(a);
-			if( v != null ) {
-				attributes.put(getContext().getInitParameter(tag+"."+a+".label", a), v);
+			if( getContext().getBooleanParameter(tag+"."+a+".show", true)) {
+				String v = rec.getStringProperty(a);
+				if( v != null ) {
+					attributes.put(getContext().getInitParameter(tag+"."+a+".label", a), v);
+				}
 			}
 		}
 		Date d = rec.getDateProperty(tag+AUTHENTICATED_SUFFIX);
