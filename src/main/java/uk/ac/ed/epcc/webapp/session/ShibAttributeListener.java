@@ -88,7 +88,8 @@ HistoryFieldContributor
 			}
 			
 			for(String a : attr) {
-				Object res = serv.getRequestAttribute(a);
+				String tag = getContext().getInitParameter(a+".external_name", a);
+				Object res = serv.getRequestAttribute(tag);
 				if( res != null) {
 					update=now;
 					record.setOptionalProperty(a, res.toString());
@@ -136,7 +137,7 @@ HistoryFieldContributor
 		for(String a : attr) {
 			String v = rec.getStringProperty(a);
 			if( v != null ) {
-				attributes.put(getContext().getInitParameter(a+".label", a), v);
+				attributes.put(getContext().getInitParameter(tag+"."+a+".label", a), v);
 			}
 		}
 		Date d = rec.getDateProperty(tag+AUTHENTICATED_SUFFIX);
