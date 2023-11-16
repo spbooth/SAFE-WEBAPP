@@ -88,8 +88,8 @@ HistoryFieldContributor
 			}
 			
 			for(String a : attr) {
-				String tag = getContext().getInitParameter(a+".external_name", a);
-				Object res = serv.getRequestAttribute(tag);
+				String external = getContext().getInitParameter(tag+"."+a+".external_name", a);
+				Object res = serv.getRequestAttribute(external);
 				if( res != null) {
 					update=now;
 					record.setOptionalProperty(a, res.toString());
