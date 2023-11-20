@@ -16,19 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.content;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Stack;
-import java.util.Vector;
+import java.io.*;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.model.TemplateFinder;
@@ -543,8 +532,6 @@ public class TemplateFile {
 		if ((element != null) && (element instanceof Property)) {
 			return template_values[((Property) element).value_index];
 		} else {
-			// getContext().getLogger().info("template missing property
-			// "+getFilename()+" prop "+name);
 			return null;
 		}
 	}
@@ -932,9 +919,9 @@ public class TemplateFile {
 	public void writePropertyValue(Writer out, String name,Object value)
 			throws IOException {
 		// Ignore null values
-		if (value == null)
+		if (value == null) {
 			return;
-
+		}
 		// Write out value
 		if (value instanceof String) {
 			// Just a string, write it as standard

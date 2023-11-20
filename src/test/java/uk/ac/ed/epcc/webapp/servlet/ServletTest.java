@@ -544,7 +544,7 @@ public abstract class ServletTest extends WebappTestBase{
 		assertNotNull("null provider",provider);
 		TransitionFactory transitionFactory = (TransitionFactory)req.getAttribute(TransitionServlet.TRANSITION_PROVIDER_ATTR);
 		assertNotNull("null factory",transitionFactory);
-		assertEquals(provider.getTargetName(), transitionFactory.getTargetName());
+		assertEquals("Transition target type mis-match",provider.getTargetName(), transitionFactory.getTargetName());
 		if( key == null ){
 			assertNull(req.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR));
 		}else{

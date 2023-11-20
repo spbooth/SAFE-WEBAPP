@@ -444,7 +444,7 @@ div.warn{
 	color: var(--warn-color);
 }
 
-div p.warn, div.warn p, .warn, .warn.sorting_1 {
+div p.warn, div.warn p, .warn, .warn.sorting_1, div.warn div.para {
 	background-color: var(--warn-bg-color);
 	color: var(--warn-color);
 }

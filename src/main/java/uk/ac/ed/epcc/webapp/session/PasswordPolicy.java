@@ -9,7 +9,6 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.PasswordInput;
-import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 
 /** class holding password policy/complexity rules
