@@ -438,13 +438,13 @@ form table tr.highlight:hover td {
 }
 
 /* a warning paragraph */
-div.warn{
+div.warn, div.block div.warn{
 	border: var(--warn-border);
 	background-color: var(--warn-bg-color);
 	color: var(--warn-color);
 }
 
-div p.warn, div.warn p, .warn, .warn.sorting_1, div.warn div.para {
+div p.warn, div.warn p, .warn, .warn.sorting_1, div.warn div.para  {
 	background-color: var(--warn-bg-color);
 	color: var(--warn-color);
 }
