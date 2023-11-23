@@ -911,6 +911,7 @@ public class DefaultServletService implements ServletService{
 				}
 			}
 			props.put("headers", headers);
+			props.put("request_method", req.getMethod());
 
 			StringBuilder service_list = new StringBuilder();
 			for(AppContextService s : getContext().getServices()){

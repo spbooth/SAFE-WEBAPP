@@ -24,6 +24,7 @@ User Info:
   Person:      %%person=<Unknown>%%
   Email:       %%person.email=<Unknown>%%
   IP Address:  %%ip_address=<Unknown>%%
+  Method:      %%request_method=<Unknown>%%
   Headers:
 %%headers=    <none>%%
   Parameters:
