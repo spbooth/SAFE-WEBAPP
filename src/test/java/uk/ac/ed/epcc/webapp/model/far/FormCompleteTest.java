@@ -17,6 +17,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Calendar;
+
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -55,6 +57,8 @@ public class FormCompleteTest<D extends DynamicForm,R extends PersonalResponseMa
 	
 	@Test
 	public void testCreateResponse() throws Exception{
+		setTime(2023, Calendar.NOVEMBER, 24, 21, 20);
+		takeBaseline();
 		AppUser p = setupPerson();
 		DynamicFormManager<D> form_manager = new DynamicFormManager(getContext(), "TestForms");
 		D form = form_manager.findFromString("FirstForm");
@@ -62,7 +66,7 @@ public class FormCompleteTest<D extends DynamicForm,R extends PersonalResponseMa
 		PersonalResponseManager<R, D> response_manager = new PersonalResponseManager<>(getContext(),"TestResponse" );
 		PersonalResponseTransitionProvider provider = response_manager.getPersonalResponseTransitionProvider();
 		
-		takeBaseline();
+		
 		setTransition(provider, PersonalResponseTransitionProvider.CREATE, null);
 		checkFormContent(null,"create_response_content.xml");
 		addParam(PersonalResponseTransitionProvider.CreateTransition.FORM_INPUT_FIELD, form);

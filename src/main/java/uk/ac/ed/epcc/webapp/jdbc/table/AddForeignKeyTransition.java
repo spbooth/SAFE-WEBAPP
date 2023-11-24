@@ -58,18 +58,17 @@ public class AddForeignKeyTransition<T extends DataObjectFactory> extends EditTa
 							query.append(", ");
 						}
 						seen=true;
-						query.append(" ADD FOREIGN KEY ");
+						query.append(" ADD CONSTRAINT ");
 						// This adds a name that can be used to 
 						// delete index note foreign key will need to be dropped first
 						//
 						// We want a globally unique name so depend on table
 						// as well as field
-						sql.quote(query, target.getTag()+"_"+field+"_ref_key");
-						query.append(" (");
+						sql.quote(query, target.getTag()+"_"+field+"_fk");
+						query.append(" FOREIGN KEY (");
 						info.addName(query, false, true);
 						query.append(") REFERENCES ");
 						query.append(desc);
-						
 						if(MySqlCreateTableVisitor.FOREIGN_KEY_DELETE_CASCASE_FEATURE.isEnabled(c)) {
 							if( ! info.getNullable()) {
 								query.append(" ON DELETE CASCADE");

@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.apps.Command;
 import uk.ac.ed.epcc.webapp.apps.CommandLauncher;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
+import uk.ac.ed.epcc.webapp.jdbc.table.MySqlCreateTableVisitor;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 
 /** A {@link Command} to upgrade the current database.
@@ -107,21 +108,28 @@ public class DatabaseUpgrader extends Object implements Command {
 			String desc = Repository.getForeignKeyDescriptor(getContext(), ref, true);
 			if( info.isReference() && desc != null){
 				stmt.executeUpdate("UPDATE "+table_name+" SET "+info.getName(true)+"=NULL WHERE "+info.getName(true)+" <= 0");
-				String index_name = field+"_ref_key";
-				if(  ! res.hasIndex(index_name)){
+				//String index_name = field+"_ref_key";
+				if( MySqlCreateTableVisitor.FOREIGN_KEY_FEATURE.isEnabled(conn) &&  ! info.isIndexed()){
 					System.out.println("add foreign key "+name+"."+field+" -> "+ref);
 					StringBuilder query = new StringBuilder();
 					query.append("ALTER TABLE ");
 					res.addTable(query, true);
+					query.append(" ADD CONSTRAINT ");
+					query.append(table_name+"_"+field+"_fk");
+					query.append(" FOREIGN KEY (");
 					
-					query.append(" ADD FOREIGN KEY ");
-					query.append(field);
-					query.append("_ref_key (");
 					info.addName(query, false, true);
 					query.append(") REFERENCES ");		
 					query.append(desc);
 					query.append(" ON UPDATE CASCADE ");
 					System.out.println(query.toString());
+					if( MySqlCreateTableVisitor.FOREIGN_KEY_DELETE_CASCASE_FEATURE.isEnabled(conn)) {
+						if( ! info.getNullable()) {
+							query.append(" ON DELETE CASCADE");
+						}else {
+							query.append(" ON DELETE SET NULL");
+						}
+					}
 					stmt.executeUpdate(query.toString());
 				}
 

@@ -232,13 +232,14 @@ public class LoginServletTest<A extends AppUser> extends AbstractLoginServletTes
 	public void testLoginWithWtmp() throws DataException, Exception{
 		setTime(2020, Calendar.JANUARY, 1, 10, 00);
 		MockTansport.clear();
+		takeBaseline();
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.makeBDO();
 		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
 		user.setEmail("fred@example.com");
 		composite.setPassword(user,"FredIsDead");
 		user.commit();
-		takeBaseline();
+		
 		
 		req.header.put("user-agent", "junit");
 		addParam("username", "fred@example.com");
@@ -260,13 +261,14 @@ public class LoginServletTest<A extends AppUser> extends AbstractLoginServletTes
 	public void testLoginWithWtmpNewlogin() throws DataException, Exception{
 		setTime(2020, Calendar.JANUARY, 1, 10, 00);
 		MockTansport.clear();
+		takeBaseline();
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.makeBDO();
 		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
 		user.setEmail("fred@example.com");
 		composite.setPassword(user,"FredIsDead");
 		user.commit();
-		takeBaseline();
+		
 		
 		req.header.put("user-agent", "junit");
 		addParam("username", "fred@example.com");
@@ -292,13 +294,11 @@ public class LoginServletTest<A extends AppUser> extends AbstractLoginServletTes
 	public void testLoginWithWtmpOldlogin() throws DataException, Exception{
 		setTime(2020, Calendar.MAY, 1, 10, 00);
 		MockTansport.clear();
-		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
-		A user =  fac.makeBDO();
-		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
-		user.setEmail("fred@example.com");
-		composite.setPassword(user,"FredIsDead");
-		user.commit();
 		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.findByEmail("fred@example.com");
+		assertNotNull(user);
+		
 		
 		req.header.put("user-agent", "junit");
 		addParam("username", "fred@example.com");

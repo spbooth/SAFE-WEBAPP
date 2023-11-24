@@ -1,17 +1,41 @@
-<!--| Copyright - The University of Edinburgh 2015                             |-->
-<!--|                                                                          |-->
-<!--| Licensed under the Apache License, Version 2.0 (the "License");          |-->
-<!--| you may not use this file except in compliance with the License.         |-->
-<!--| You may obtain a copy of the License at                                  |-->
-<!--|                                                                          |-->
-<!--|    http://www.apache.org/licenses/LICENSE-2.0                            |-->
-<!--|                                                                          |-->
-<!--| Unless required by applicable law or agreed to in writing, software      |-->
-<!--| distributed under the License is distributed on an "AS IS" BASIS,        |-->
-<!--| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |-->
-<!--| See the License for the specific language governing permissions and      |-->
-<!--| limitations under the License.                                           |-->
-<Diff><TableSpecification name='TestResponse'>
+<Diff><TableSpecification name='Person'>
+<Email type='String' nullable='true' max='254'/>
+<Updated type='Long' nullable='true'/>
+<PasswordFails type='Integer' nullable='false'/>
+<PasswordStatus type='String' nullable='false' max='1'/>
+<Salt type='String' nullable='false' max='16'/>
+<Alg type='Integer' nullable='false'/>
+<Password type='String' nullable='false' max='64'/>
+<WebName type='String' nullable='true' max='128'/>
+<SignupDate type='Long' nullable='true'/>
+<Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
+<WebName_index type='Index' unique='true'><Column name='WebName'/></WebName_index>
+</TableSpecification>
+<Person id='1'>
+<Email>fred@example.com</Email>
+<PasswordFails>0</PasswordFails>
+<PasswordStatus>I</PasswordStatus>
+<Salt></Salt>
+<Alg>2</Alg>
+<Password>locked</Password>
+</Person>
+<Properties id='5'>
+<Name>reference.TestResponse.FormID</Name>
+<Value>TestForms</Value>
+</Properties>
+<Properties id='6'>
+<Name>reference.TestResponse.SubmitterID</Name>
+<Value>Person</Value>
+</Properties>
+<TableSpecification name='role_table'>
+<PersonID type='Integer' nullable='false'/>
+<Role type='String' nullable='false' max='32'/>
+</TableSpecification>
+<role_table id='1'>
+<PersonID>1</PersonID>
+<Role>Admin</Role>
+</role_table>
+<TableSpecification name='TestResponse'>
 <FormID reference='TestForms'/>
 <SubmitterID reference='Person'/>
 </TableSpecification>

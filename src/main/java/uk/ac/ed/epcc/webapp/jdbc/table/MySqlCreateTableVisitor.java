@@ -16,9 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.function.UnaryOperator;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -49,6 +47,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	private final List<Object> args;
 	boolean use_date;
 	boolean use_timestamp;
+	private final String config_tag;
 	public MySqlCreateTableVisitor(MysqlSQLContext ctx,String config_tag,StringBuilder sb, List<Object> args){
 		this.ctx=ctx;
 		this.sb=sb;
@@ -59,6 +58,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 		this.use_memory = conn.getBooleanParameter("create_table.use_memory", use_memory);
 		use_date =  conn.getBooleanParameter("create_table.use_date."+config_tag, USE_DATE.isEnabled(ctx.getContext()));
 		use_timestamp = conn.getBooleanParameter("create_table.use_timestamp."+config_tag, USE_TIMESTAMP.isEnabled(ctx.getContext()));
+		this.config_tag=config_tag;
 	}
 	 
 	public void visitDateFieldType(DateFieldType dateFieldType) {
@@ -245,8 +245,12 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 			String desc = Repository.getForeignKeyDescriptor(conn,tag,true);
 			if( desc != null ){
 				sb.append(",\n");
-				sb.append("FOREIGN KEY ");
-				ctx.quote(sb, tag+"_"+name+"_ref_key");
+				sb.append("CONSTRAINT ");
+				// This needs to be a globally unique name (also not conflict with table names)
+				// So name after the referencing field
+				ctx.quote(sb, config_tag+"_"+name+"_fk");
+				sb.append(" FOREIGN KEY ");
+				
 				sb.append(" ( ");
 				ctx.quote(sb, name);
 				sb.append(" ) REFERENCES ");
@@ -303,12 +307,12 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#useIndex(uk.ac.ed.epcc.webapp.jdbc.table.IndexType)
 	 */
 	public boolean useIndex(IndexType i) {
-		if( FOREIGN_KEY_FEATURE.isEnabled(ctx.getContext())) {
-			if( i.isRef()) {
-				// This will duplicate the automatic foreign key
-				return false;
-			}
-		}
+//		if( FOREIGN_KEY_FEATURE.isEnabled(ctx.getContext())) {
+//			if( i.isRef()) {
+//				// This will duplicate the automatic foreign key
+//				return false;
+//			}
+//		}
 		return true;
 	}
 
