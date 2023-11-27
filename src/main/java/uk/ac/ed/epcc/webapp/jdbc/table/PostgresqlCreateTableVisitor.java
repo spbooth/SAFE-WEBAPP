@@ -173,7 +173,7 @@ public class PostgresqlCreateTableVisitor implements FieldTypeVisitor {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#visitForeignKey(uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType)
 	 */
-	public void visitForeignKey(String name, ReferenceFieldType referenceField) {
+	public void visitForeignKey(String name, String prefix,ReferenceFieldType referenceField) {
 		// TODO Auto-generated method stub
 		
 	}

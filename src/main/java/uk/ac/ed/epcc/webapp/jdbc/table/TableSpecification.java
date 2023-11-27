@@ -210,6 +210,11 @@ public class TableSpecification {
 					int length = Integer.parseInt(type.substring("string".length()));
 					setField(name, new StringFieldType(true, def , length));
 				}else{
+					boolean want_fk = false;
+					if( type.startsWith("@")) {
+						want_fk=true;
+						type = type.substring(1);
+					}
 					if( def != null) {
 						Integer r = null;
 						try {
@@ -224,9 +229,9 @@ public class TableSpecification {
 								}
 							}
 						}
-						setField(name,new ReferenceFieldType(r==null, type, r));
+						setField(name,new ReferenceFieldType(r==null, type, r,want_fk));
 					}else {
-						setField(name, new ReferenceFieldType(type));
+						setField(name, new ReferenceFieldType(true,type,want_fk));
 					}
 				}
 			}catch(Exception t) {

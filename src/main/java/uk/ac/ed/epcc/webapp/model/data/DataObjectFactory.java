@@ -1353,8 +1353,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param allow_null
 	 * @return ReferenceFieldType
 	 */
-	public ReferenceFieldType getReferenceFieldType(boolean allow_null){
-		return new ReferenceFieldType(allow_null,getTag());
+	public ReferenceFieldType getReferenceFieldType(boolean allow_null) {
+		return getReferenceFieldType(allow_null, false);
+	}
+	public ReferenceFieldType getReferenceFieldType(boolean allow_null,boolean want_fk){
+		return new ReferenceFieldType(allow_null,getTag(),want_fk);
 	}
 
 	/**

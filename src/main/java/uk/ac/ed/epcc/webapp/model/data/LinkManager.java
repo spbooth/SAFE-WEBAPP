@@ -640,8 +640,8 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			IndexedProducer<L> leftFac, String leftField,
 			IndexedProducer<R> rightFac, String rightField) {
 		TableSpecification s = super.getDefaultTableSpecification(c, table, leftFac, leftField, rightFac, rightField);
-		s.setField(leftField, new ReferenceFieldType(false,((DataObjectFactory<L>)leftFac).getTag()));
-		s.setField(rightField, new ReferenceFieldType(false,((DataObjectFactory<R>)rightFac).getTag()));
+		s.setField(leftField, new ReferenceFieldType(false,((DataObjectFactory<L>)leftFac).getTag(),true));
+		s.setField(rightField, new ReferenceFieldType(false,((DataObjectFactory<R>)rightFac).getTag(),true));
 		try {
 			// Might double as an index on leftField
 			// parent makes link index

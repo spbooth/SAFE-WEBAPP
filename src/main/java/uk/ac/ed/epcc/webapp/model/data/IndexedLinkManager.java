@@ -496,12 +496,12 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			IndexedProducer<R> rightFac, String rightField) {
 		TableSpecification s = new TableSpecification();
 		if( leftFac instanceof DataObjectFactory){
-			s.setField(leftField, ((DataObjectFactory)leftFac).getReferenceFieldType(false));
+			s.setField(leftField, ((DataObjectFactory)leftFac).getReferenceFieldType(false,true));
 		}else{
 			s.setField(leftField, new IntegerFieldType(false,null));
 		}
 		if( rightFac instanceof DataObjectFactory){
-			s.setField(rightField, ((DataObjectFactory)rightFac).getReferenceFieldType(false));
+			s.setField(rightField, ((DataObjectFactory)rightFac).getReferenceFieldType(false,true));
 		}else{
 			s.setField(rightField, new IntegerFieldType(false,null));
 		}

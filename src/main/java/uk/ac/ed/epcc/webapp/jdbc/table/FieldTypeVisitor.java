@@ -45,8 +45,10 @@ public interface FieldTypeVisitor {
     public boolean useIndex(IndexType i);
     
     /** Add a foreign key definition for a reference field. 
+     * @param name  String field name
+     * @param prefix SQL prefix to add if not NOP
      * 
      * @param referenceField
      */
-    public void visitForeignKey(String name,ReferenceFieldType referenceField);
+    public void visitForeignKey(String name,String prefix,ReferenceFieldType referenceField);
 }

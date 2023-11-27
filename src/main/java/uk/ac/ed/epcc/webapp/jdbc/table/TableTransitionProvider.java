@@ -92,7 +92,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
     /**
 	 * 
 	 */
-	static final TableTransitionKey ADD_FOREIGN_KEYS_KEY = new TableDeveloperKey("AddForeignKeys");
+	static final TableTransitionKey ADD_FOREIGN_KEYS_KEY = new TableDeveloperKey("AddForeignKeys","Add foreign keys for ALL reference fields");
 	/**
 	 * 
 	 */
@@ -148,6 +148,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 	 * 
 	 */
 	static final TableTransitionKey ADD_STD_FIELD = new TableStructureAdminOperationKey("Add Std field","Add missing fields from the default table specification for this class");
+	static final TableTransitionKey ADD_STD_FK = new TableStructureAdminOperationKey("Add Std foreign key","Add missing foreign key from the default table specification for this class");
 	static final TableTransitionKey DROP_OPTIONAL_FIELD =new TableStructureAdminOperationKey("Drop optional field","Drop optional existing field");
 
     public TableTransitionProvider(AppContext conn){
@@ -187,6 +188,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 		}
 		if( target.getTableSpecification() != null ) {
 			map.put(ADD_STD_FIELD, new AddStdFieldTransition<>());
+			map.put(ADD_STD_FK, new AddStdFkTransition<>());
 			map.put(ADD_STD_INDEX, new AddStdIndexTransition<>());
 			map.put(DROP_OPTIONAL_FIELD, new DropOptionalFieldTransition<>());
 		}

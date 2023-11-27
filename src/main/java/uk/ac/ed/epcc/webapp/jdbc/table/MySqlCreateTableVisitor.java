@@ -34,6 +34,8 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	public static final Feature FOREIGN_KEY_FEATURE=new Feature("foreign-key",false,"Generate foreign keys");
+	public static final Feature FOREIGN_CREATE_TABLE_KEY_FEATURE=new Feature("foreign-key.create_table",true,"Automatically create parent table of foreign key if missing");
+
 	public static final Feature FOREIGN_KEY_DELETE_CASCASE_FEATURE = new Feature("foreign-key.delete_cascase",true,"Default to DELETE CASCASE on foreign keys for references that do not allow null");
     public static final Feature FORCE_MYISAM_ON_FULLTEXT_FEATURE=new Feature("mysql.force_myisam_on_fulltext",false,"Always use MyISAM if table contains fulltext index");
     public static final Feature USE_TIMESTAMP=new Feature("mysql.use_timestamp",false,"use timestamp fields by default");
@@ -229,22 +231,29 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#visitForeignKey(uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType)
 	 */
-	public void visitForeignKey(String name,ReferenceFieldType referenceField) {
+	public void visitForeignKey(String name,String prefix,ReferenceFieldType referenceField) {
 		AppContext conn = ctx.getContext();
-		if( FOREIGN_KEY_FEATURE.isEnabled(conn)){
+		// Allow per reg supression (e.g. for circular references)
+		if(  FOREIGN_KEY_FEATURE.isEnabled(conn) && referenceField.wantForeighKey() ){
 			String tag = referenceField.getRemoteTable();
-			try{
-				// Try to make referenced factory.
-				// This is to ensure the referenced table is auto-created before the
-				// current one (in case we have a foreign key)
-				conn.makeObject(DataObjectFactory.class, tag);
-			}catch(Exception t){
-				conn.getService(LoggerService.class).getLogger(getClass()).error("Problem making referenced facory for "+tag);
+			if(FOREIGN_CREATE_TABLE_KEY_FEATURE.isEnabled(conn)) {
+				try{
+					// Try to make referenced factory.
+					// This is to ensure the referenced table is auto-created before the
+					// current one (in case we have a foreign key)
+					conn.makeObject(DataObjectFactory.class, tag);
+				}catch(Exception t){
+					conn.getService(LoggerService.class).getLogger(getClass()).error("Problem making referenced facory for "+tag);
+				}
+			}
+			DataBaseHandlerService hand = conn.getService(DataBaseHandlerService.class);
+			if( ! hand.tableExists(tag)) {
+				return;
 			}
 			// Note this will only work if the table has already been created.
 			String desc = Repository.getForeignKeyDescriptor(conn,tag,true);
 			if( desc != null ){
-				sb.append(",\n");
+				sb.append(prefix);
 				sb.append("CONSTRAINT ");
 				// This needs to be a globally unique name (also not conflict with table names)
 				// So name after the referencing field

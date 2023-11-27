@@ -100,7 +100,7 @@ public class MakeSelectorVisitor implements FieldTypeVisitor {
 	}
 
 	@Override
-	public void visitForeignKey(String name, ReferenceFieldType referenceField) {
+	public void visitForeignKey(String name, String prefix,ReferenceFieldType referenceField) {
 		
 	}
 

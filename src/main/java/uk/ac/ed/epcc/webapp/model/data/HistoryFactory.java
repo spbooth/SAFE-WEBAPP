@@ -594,7 +594,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		boolean tail_status = HISTORY_STATUS_FEATURE.isEnabled(c);
 		TableSpecification spec = new TableSpecification("HistoryID");
 		if( peer_factory != null ) {
-			spec.setField(getPeerName(), peer_factory.getReferenceFieldType(false));
+			spec.setField(getPeerName(), peer_factory.getReferenceFieldType(false,true));
 		}else {
 			spec.setField(getPeerName(), new IntegerFieldType(false,null));
 		}

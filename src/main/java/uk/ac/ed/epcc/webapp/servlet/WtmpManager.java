@@ -247,7 +247,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	  public TableSpecification getDefaultTableSpecification(AppContext ctx,
    			String homeTable) {
 		  TableSpecification spec = new TableSpecification();
-		  spec.setField(PERSON_ID, new ReferenceFieldType(false, ctx.getService(SessionService.class).getLoginFactory().getTag()));
+		  spec.setField(PERSON_ID, new ReferenceFieldType(false, ctx.getService(SessionService.class).getLoginFactory().getTag(),true));
 		  spec.setOptionalField(SUPER_PERSON_ID, new IntegerFieldType());
 		  spec.setField(START_TIME, new DateFieldType(true, null));
 		  spec.setField(END_TIME, new DateFieldType(true, null));

@@ -24,7 +24,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 
-/**
+/** This transition adds foreign keys to ALL reference fields (reguardless of any Tablespecification)
  * @author spb
  *
  */

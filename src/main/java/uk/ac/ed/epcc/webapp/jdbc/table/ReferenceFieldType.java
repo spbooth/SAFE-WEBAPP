@@ -20,6 +20,7 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 
 public class ReferenceFieldType extends IntegerFieldType {
    private final String remote_table;
+   private final boolean want_fk;
    /** Constructor for the default nullable reference
     * 
     * @param remote
@@ -35,13 +36,21 @@ public class ReferenceFieldType extends IntegerFieldType {
     * @param remote
     */
    public ReferenceFieldType(boolean allow_null,String remote){
-	   this(allow_null,remote,null);
+	   this(allow_null,remote,false);
    }
-   public ReferenceFieldType(boolean allow_null,String remote,Integer def){
+   public ReferenceFieldType(boolean allow_null,String remote,boolean want_fk){
+	   this(allow_null,remote,null,want_fk);
+   }
+   public ReferenceFieldType(boolean allow_null,String remote,Integer def,boolean want_fk){
 	   super(allow_null,def);
 	   remote_table=remote;
+	   this.want_fk=want_fk;
    }
    public String getRemoteTable(){
 	   return remote_table;
+   }
+   
+   public boolean wantForeighKey() {
+	   return want_fk;
    }
 }
