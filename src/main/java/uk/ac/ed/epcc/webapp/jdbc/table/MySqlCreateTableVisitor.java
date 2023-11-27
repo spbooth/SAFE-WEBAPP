@@ -247,7 +247,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 				}
 			}
 			DataBaseHandlerService hand = conn.getService(DataBaseHandlerService.class);
-			if( ! hand.tableExists(tag)) {
+			if( ! hand.tableExists(Repository.tagToTable(conn, tag))) {
 				return;
 			}
 			// Note this will only work if the table has already been created.
