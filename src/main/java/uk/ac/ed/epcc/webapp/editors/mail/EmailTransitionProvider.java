@@ -13,10 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.editors.mail;
 
-import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import jakarta.mail.Address;
 import jakarta.mail.Message;
@@ -32,23 +29,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
-import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
-import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
-import uk.ac.ed.epcc.webapp.forms.transition.DirectTargetlessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.ShowDisabledTransitions;
-import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
-import uk.ac.ed.epcc.webapp.forms.transition.ViewPathTransitionProvider;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.forms.result.*;
+import uk.ac.ed.epcc.webapp.forms.transition.*;
 import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
 import uk.ac.ed.epcc.webapp.model.serv.SettableServeDataProducer;
 import uk.ac.ed.epcc.webapp.session.SessionDataProducer;
@@ -743,10 +725,6 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		return vis.visitPathTransitionProvider(this);
 	}
 	
-	public Logger getLogger(){
-		return getContext().getService(LoggerService.class).getLogger(getClass());
-	}
-
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getBottomContent(uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)

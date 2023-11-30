@@ -635,7 +635,7 @@ public class Emailer implements Contexed{
 			// in an email so never roll back to before a point an email is sent
 			db.commitTransaction();
 		}
-		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+		Logger log = Logger.getLogger(conn,getClass());
 		if( EMAILS_FEATURE.isEnabled(conn)  && (conn.getAttribute(SUPRESS_EMAIL_ATTR) == null)){
 			String force_email = conn.getInitParameter(EMAIL_FORCE_ADDRESS);
 			Address[] recipients = m.getRecipients(RecipientType.TO);
@@ -1037,9 +1037,6 @@ public class Emailer implements Contexed{
 		return m;
 	}
 
-	public Logger getLogger() {
-		return getContext().getService(LoggerService.class).getLogger(getClass());
-	}
 
 	/** should we specify an encoding for the string
 	 * @param subject
@@ -1413,7 +1410,7 @@ public class Emailer implements Contexed{
 			// Error emails are never queued. so suppress them if queueing is forced
 			return;
 		}
-		Logger log = conn.getService(LoggerService.class).getLogger(conn.getClass());
+		Logger log = Logger.getLogger(conn,Emailer.class);
 		try {
 
 			if (!doReport(log,conn)) {

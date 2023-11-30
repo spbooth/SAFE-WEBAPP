@@ -24,12 +24,9 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.inputs.RegularPeriodInput;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 //import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreeChartData;
-import uk.ac.ed.epcc.webapp.time.CalendarFieldSplitPeriod;
-import uk.ac.ed.epcc.webapp.time.RegularSplitPeriod;
-import uk.ac.ed.epcc.webapp.time.SplitTimePeriod;
-import uk.ac.ed.epcc.webapp.time.TimePeriod;
+import uk.ac.ed.epcc.webapp.time.*;
 
 /**
  * A helper class used to make graphs
@@ -189,7 +186,7 @@ public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 			try {
 				col = Color.decode(col_str);
 			}catch(Exception t) {
-				getContext().getService(LoggerService.class).getLogger(getClass()).error("Error parsing color "+col_str, t);
+				Logger.getLogger(getContext(),getClass()).error("Error parsing color "+col_str, t);
 			}
 		}
 		((TimeChartData)getChartData()).addWarningLevel(value,col);

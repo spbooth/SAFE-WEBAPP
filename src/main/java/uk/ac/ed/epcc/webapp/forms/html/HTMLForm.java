@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.action.ConfirmMessage;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 //import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
@@ -198,11 +198,11 @@ public class HTMLForm extends BaseHTMLForm {
 		}
 		boolean ok = parsePost(getErrors(req), params,false);
 		if (!ok) {
-			c.getService(LoggerService.class).getLogger(getClass()).debug("internal parse failed");
+			Logger.getLogger(c,getClass()).debug("internal parse failed");
 		}
 		ok = ok && validate(getMissing(req), getErrors(req));
 		if (!ok) {
-			c.getService(LoggerService.class).getLogger(getClass()).debug("internal validate failed");
+			Logger.getLogger(c,getClass()).debug("internal validate failed");
 		}
 		return ok;
 	}
@@ -247,7 +247,7 @@ public class HTMLForm extends BaseHTMLForm {
 			}
 			ctx.getService(ServletService.class).forward(form_url);
 		} catch (Exception e) {
-			ctx.getService(LoggerService.class).getLogger(HTMLForm.class).error("Exception dispatching form error", e);
+			Logger.getLogger(ctx,HTMLForm.class).error("Exception dispatching form error", e);
 
 		}
 	}

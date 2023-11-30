@@ -18,7 +18,7 @@ import java.util.Iterator;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.validation.MaxValueValidator;
 import uk.ac.ed.epcc.webapp.validation.MinValueValidator;
 
@@ -154,7 +154,7 @@ public class CanSubmitVisitor implements InputVisitor<Boolean> {
     					}
     				}
     			} catch (Exception e) {
-    				f.getContext().getService(LoggerService.class).getLogger(CanSubmitVisitor.class).error("Error checking submit",e);
+    				Logger.getLogger(f.getContext(),CanSubmitVisitor.class).error("Error checking submit",e);
     			}
     		}
     	}

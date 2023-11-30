@@ -16,30 +16,16 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.sql.*;
+import java.util.*;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.AppContextService;
-import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
@@ -132,7 +118,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     	// look for config overrides to specification
     	String prefix ="create_table."+name+".";
     	s.setFromParameters(conn,prefix, conn.getInitParameters(prefix));
-    	Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+    	Logger log = getLogger();
     	String text="unknown";
     	DatabaseService db_service = conn.getService(DatabaseService.class);
     	try{
@@ -255,7 +241,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
         		// is correct.
     			service.commitTransaction(); 
     		}
-    		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+    		Logger log = getLogger();
     		
 			SQLContext c = service.getSQLContext();
 			
@@ -278,6 +264,8 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     		throw new DataFault("Cannot update table "+res.getTable(),e);
     	}
     }
+
+	
 	/** produce the SQL to create a table.
 	 * @param res
 	 * @param s
@@ -344,7 +332,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
         		// is correct.
     			service.commitTransaction(); 
     		}
-    		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+    		Logger log = getLogger();
     		
 			SQLContext c = service.getSQLContext();
 			
@@ -377,7 +365,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 				// is correct.
 				service.commitTransaction(); 
 			}
-			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+			Logger log = getLogger();
 
 			SQLContext c = service.getSQLContext();
 

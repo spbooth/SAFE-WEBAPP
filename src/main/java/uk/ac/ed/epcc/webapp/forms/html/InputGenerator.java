@@ -21,7 +21,6 @@ import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.XMLGenerator;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 public class InputGenerator implements XMLGenerator{
 	private final boolean use_post;
@@ -50,6 +49,6 @@ public class InputGenerator implements XMLGenerator{
 	}
 	
 	public Logger getLogger() {
-		return conn.getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(conn,getClass());
 	}
 }

@@ -16,7 +16,6 @@ package uk.ac.ed.epcc.webapp.model.lifecycle;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** A {@link AbstractAction} that implements {@link Contexed}
  * @author spb
@@ -41,6 +40,6 @@ public class AbstractContexedAction<R> extends AbstractAction<R> implements Cont
 	}
 	
 	public Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(conn,getClass());
 	}
 }

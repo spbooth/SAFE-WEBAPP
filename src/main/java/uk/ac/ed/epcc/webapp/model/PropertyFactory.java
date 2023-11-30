@@ -16,10 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model;
 
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
@@ -35,7 +32,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -121,7 +117,7 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 	}
     public void loadProperties(Properties props){
     	try {
-    		Logger log= getContext().getService(LoggerService.class).getLogger(getClass());
+    		Logger log= getLogger();
 			for(Property p: all()){
 				String name=p.getName().trim();
 				String value=p.getValue().trim();

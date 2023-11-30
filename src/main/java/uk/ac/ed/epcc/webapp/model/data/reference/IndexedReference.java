@@ -22,7 +22,6 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.IndexedError;
 
 /** A lightweight class that holds the id of an Indexed type 
@@ -86,7 +85,7 @@ private final int id;
 	 
   }
 protected Logger getLogger(AppContext c) {
-	return c.getService(LoggerService.class).getLogger(getClass());
+	return Logger.getLogger(c,getClass());
 }
  
 @SuppressWarnings("unchecked")

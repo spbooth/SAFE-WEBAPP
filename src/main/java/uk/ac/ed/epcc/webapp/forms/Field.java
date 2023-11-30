@@ -19,7 +19,7 @@ package uk.ac.ed.epcc.webapp.forms;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.inputs.*;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /**
@@ -97,7 +97,7 @@ public final class Field<I> {
     		try {
 				return sel.accept(new IsForcedVisitor());
 			} catch (Exception e) {
-				f.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error checking for fixed input",e);
+				Logger.getLogger(f.getContext(),getClass()).error("Error checking for fixed input",e);
 				return false;
 			}
     	}

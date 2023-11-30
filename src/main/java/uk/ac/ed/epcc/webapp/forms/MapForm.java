@@ -24,7 +24,6 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.*;
 import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 
 /** Form that can take its inputs as a Map
@@ -91,7 +90,7 @@ public class MapForm extends BaseForm {
 	 */
 	public boolean validate(Collection<String> missing_fields, Map<String,String> errors) {
 		boolean ok = true;
-		Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
+		Logger log = getLogger();
 		for (Iterator<String> it = getFieldIterator(); it.hasNext();) {
 			String key = it.next();
 			//log.debug("field " + key);

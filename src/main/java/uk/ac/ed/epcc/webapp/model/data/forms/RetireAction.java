@@ -25,7 +25,6 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Retirable;
 
@@ -64,7 +63,7 @@ import uk.ac.ed.epcc.webapp.model.data.Retirable;
 			
 			if (dat.canRetire()) {
 				try {
-					dat.getContext().getService(LoggerService.class).getLogger(getClass()).info("Retiring object "+dat.getIdentifier());
+					Logger.getLogger(dat.getContext(),getClass()).info("Retiring object "+dat.getIdentifier());
 					dat.retire();
 					return new MessageResult("object_retired",type_name);
 				} catch (Exception e) {

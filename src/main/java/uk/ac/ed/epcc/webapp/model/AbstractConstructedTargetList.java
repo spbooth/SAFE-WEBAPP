@@ -19,7 +19,6 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Targetted;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
@@ -78,9 +77,10 @@ public abstract class AbstractConstructedTargetList<T extends DataObject,L exten
 	}
 	
 	private Logger logger=null;
+	@Override
 	public Logger getLogger(){
 		if( logger == null){
-			logger=conn.getService(LoggerService.class).getLogger(getClass());
+			logger=Logger.getLogger(conn,getClass());
 		}
 		return logger;
 	}

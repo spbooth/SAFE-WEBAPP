@@ -31,21 +31,13 @@ import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.action.NestAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
-import uk.ac.ed.epcc.webapp.forms.result.BackResult;
-import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.result.ConfirmTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.result.CustomPageResult;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.result.FormResultVisitor;
-import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
-import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
+import uk.ac.ed.epcc.webapp.forms.result.*;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
@@ -68,7 +60,7 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
     public SwingFormResultVisitor(JFrame parent,AppContext c){
     	this.parent=parent;
     	conn=c;
-    	log = c.getService(LoggerService.class).getLogger(getClass());
+    	log = Logger.getLogger(c,getClass());
     }
     public void reset(){
     	next_result=null;

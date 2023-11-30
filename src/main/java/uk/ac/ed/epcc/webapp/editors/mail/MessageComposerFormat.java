@@ -24,7 +24,6 @@ import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** MessageComposerFormat generates the html edit forms
  * from a MessageComposer
@@ -127,6 +126,6 @@ public class MessageComposerFormat {
 		return sb.toString();
 	}
 	protected Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(conn,getClass());
 	}
 }

@@ -21,21 +21,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
-import uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue;
-import uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue;
-import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
+import uk.ac.ed.epcc.webapp.jdbc.expr.*;
 import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
-import uk.ac.ed.epcc.webapp.model.data.filter.FieldOrderFilter;
-import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
-import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
-import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.model.data.filter.*;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
@@ -220,8 +211,7 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 	}
 
 	private Logger getLogger() {
-		LoggerService ls = repository.getContext().getService(LoggerService.class);
-		return ls.getLogger(getClass());
+		return Logger.getLogger(repository.getContext(), getClass());
 	}
 
 }

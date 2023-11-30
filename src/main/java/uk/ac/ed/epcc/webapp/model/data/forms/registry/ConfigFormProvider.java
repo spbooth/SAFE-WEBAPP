@@ -19,15 +19,11 @@ package uk.ac.ed.epcc.webapp.model.data.forms.registry;
 import java.util.HashMap;
 import java.util.Map;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.Indexed;
+import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.forms.registry.FormFactoryProvider;
 import uk.ac.ed.epcc.webapp.forms.registry.FormFactoryProviderRegistry;
 import uk.ac.ed.epcc.webapp.forms.registry.FormPolicy;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -54,7 +50,7 @@ public class ConfigFormProvider extends FormFactoryProviderRegistry {
 	@SuppressWarnings("unchecked")
 	public ConfigFormProvider(AppContext conn, String tag){
 		super(conn);
-		log=conn.getService(LoggerService.class).getLogger(getClass());
+		log=Logger.getLogger(conn,getClass());
 		this.tag=tag;
 		log.debug("tag="+tag);
 		// Now build the map

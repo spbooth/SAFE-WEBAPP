@@ -16,8 +16,6 @@ package uk.ac.ed.epcc.webapp.model.far;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.PageManager.Page;
 import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
@@ -110,6 +108,6 @@ public class DuplicateVisitor implements PartVisitor<PartManager.Part> {
 	}
 
 	Logger getLogger(Part p){
-		return p.getContext().getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(p.getContext(),getClass());
 	}
 }

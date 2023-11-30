@@ -24,7 +24,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.ValidatingFormTransition;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** transition that generates an update form based on a {@link EditFormBuilder}
  * 
@@ -43,7 +43,7 @@ public abstract class EditTransition<X> implements
 		try {
 			update.buildUpdateForm(f, dat,c.getService(SessionService.class));
 		} catch (Exception e) {
-			update.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error updating object",e);
+			Logger.getLogger(update.getContext(),getClass()).error("Error updating object",e);
 			throw new TransitionException("Update failed");
 		}
 	}

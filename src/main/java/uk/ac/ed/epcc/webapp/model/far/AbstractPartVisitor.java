@@ -15,7 +15,6 @@ package uk.ac.ed.epcc.webapp.model.far;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
 
@@ -37,7 +36,7 @@ public abstract class AbstractPartVisitor<X> implements PartVisitor<X>{
 	public AbstractPartVisitor(AppContext conn) {
 		super();
 		this.conn=conn;
-		this.log = conn.getService(LoggerService.class).getLogger(getClass());
+		this.log = Logger.getLogger(conn,getClass());
 	}
 
 	public <O extends PartOwner> void visitOwner(PartOwnerFactory<O> my_manager, O owner) throws DataFault {

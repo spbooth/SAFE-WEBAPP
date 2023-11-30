@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterSelect;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -66,7 +66,7 @@ public class FilterDelete<T extends DataObject> extends FilterSelect<T>{
 			list=getFilterArguments(my_filter, list);
     		setParams(1, sql, stmt, list);
     		if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(res.getContext())){
-    			res.getContext().getService(LoggerService.class).getLogger(getClass()).debug("Query is "+sql);
+    			Logger.getLogger(res.getContext(),getClass()).debug("Query is "+sql);
     		}
     		int count = stmt.executeUpdate();
     		if( count > 0) {

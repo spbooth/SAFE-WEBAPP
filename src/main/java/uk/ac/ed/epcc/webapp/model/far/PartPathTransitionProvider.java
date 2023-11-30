@@ -13,10 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Button;
@@ -33,12 +30,9 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
+import uk.ac.ed.epcc.webapp.forms.transition.*;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
 import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
@@ -172,7 +166,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 				try {
 					sibling = target.getFactory().getSibling(target, go_up);
 				} catch (DataFault e) {
-					sess.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error getting sibling",e);
+					Logger.getLogger(sess.getContext(),getClass()).error("Error getting sibling",e);
 				}
 				return sibling != null ;
 			}

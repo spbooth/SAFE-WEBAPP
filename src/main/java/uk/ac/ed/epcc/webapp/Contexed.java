@@ -17,7 +17,6 @@
 package uk.ac.ed.epcc.webapp;
 
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** Interface for objects that can provide an AppContext.
  * 
@@ -37,6 +36,6 @@ public interface Contexed extends ContextProvider {
 	   return AppContext.getContext();
    }
    default public Logger getLogger() {
-	   return getContext().getService(LoggerService.class).getLogger(getClass());
+	   return Logger.getLogger(getContext(),getClass());
    }
 }

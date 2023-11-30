@@ -48,7 +48,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -116,7 +115,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 
 	protected static InputStream getResourceStream(AppContext conn,
 			final String group, String name) {
-		Logger log = conn.getService(LoggerService.class).getLogger(TextFileOverlay.class);
+		Logger log = Logger.getLogger(conn,TextFileOverlay.class);
 		ResourceService serv = conn.getService(ResourceService.class);
 		String dirs=conn.getInitParameter(group);
 		log.debug("dirs="+dirs);
@@ -161,7 +160,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		}
 		URL getURL(){
 			AppContext conn = getContext();
-			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+			Logger log = getLogger();
 			log.debug("In getURL");
 			if(base_url != null ){
 				try {
@@ -210,7 +209,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		 */
 		boolean hasResourceStream(){
 			AppContext conn = getContext();
-			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+			Logger log = getLogger();
 			ResourceService serv = conn.getService(ResourceService.class);
 			String dirs=conn.getInitParameter(getGroup());
 			log.debug("dirs="+dirs);

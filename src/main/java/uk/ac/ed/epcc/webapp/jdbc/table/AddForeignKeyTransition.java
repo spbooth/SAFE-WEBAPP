@@ -19,7 +19,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
@@ -82,7 +82,7 @@ public class AddForeignKeyTransition<T extends DataObjectFactory> extends EditTa
 			}
 			if( seen ){
 
-				c.getService(LoggerService.class).getLogger(getClass()).info(query);
+				Logger.getLogger(c,getClass()).info(query);
 				try(java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString())){
 
 					stmt.execute();
@@ -90,7 +90,7 @@ public class AddForeignKeyTransition<T extends DataObjectFactory> extends EditTa
 				resetStructure(target);
 			}
 		} catch (Exception e) {
-			c.getService(LoggerService.class).getLogger(getClass()).error("Error adding foreign keys",e);
+			Logger.getLogger(c,getClass()).error("Error adding foreign keys",e);
 			throw new TransitionException("Update failed");
 		}
 		return new ViewTableResult(target);

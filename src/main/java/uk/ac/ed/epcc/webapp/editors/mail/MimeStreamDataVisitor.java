@@ -17,12 +17,10 @@ import java.io.InputStream;
 
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimePart;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
@@ -45,7 +43,7 @@ public class MimeStreamDataVisitor extends AbstractVisitor{
 	private ByteArrayMimeStreamData data=null;
 	public MimeStreamDataVisitor(AppContext conn){
 		super(conn);
-		log = conn.getService(LoggerService.class).getLogger(getClass());
+		log = Logger.getLogger(conn,getClass());
 	}
 	public MimeStreamData getData(){
 		return data;

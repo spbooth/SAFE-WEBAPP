@@ -48,7 +48,6 @@ import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewPathTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
@@ -111,7 +110,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 			d.setMimeType("text/xml");
 			return new ServeDataResult(producer, producer.setData(d));
 			}catch(Exception e){
-				c.getService(LoggerService.class).getLogger(getClass()).error("Error making download",e);
+				Logger.getLogger(c,getClass()).error("Error making download",e);
 				throw new TransitionException("Internal error");
 			}
 		}
@@ -139,7 +138,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 			try {
 				target.commit();
 			} catch (Exception e) {
-				c.getService(LoggerService.class).getLogger(getClass()).error("Error updating document",e);
+				Logger.getLogger(c,getClass()).error("Error updating document",e);
 				throw new TransitionException("Operation failed");
 			}
 			return new ViewXMLTargetResult(next);
@@ -177,7 +176,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 			try {
 				target.commit();
 			} catch (Exception e) {
-				target.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error updating document",e);
+				Logger.getLogger(target.getContext(),getClass()).error("Error updating document",e);
 				throw new TransitionException("Operation failed");
 			}
 			return new ViewXMLTargetResult(target);
@@ -224,7 +223,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 			try {
 				target.commit();
 			} catch (Exception e) {
-				target.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error updating document",e);
+				Logger.getLogger(target.getContext(),getClass()).error("Error updating document",e);
 				throw new TransitionException("Operation failed");
 			}
 			LinkedList<String> path=target.getTargetPath();
@@ -250,7 +249,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 				f.addInput(TEXT_FORM_FIELD, "Node text", input);
 				f.addAction("Update", new EditNodeAction(target));
 			} catch (Exception e) {
-				conn.getService(LoggerService.class).getLogger(getClass()).error("Error building node edit form",e);
+				Logger.getLogger(conn,getClass()).error("Error building node edit form",e);
 				throw new TransitionException("Internal error");
 			}
 			
@@ -294,7 +293,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 	private Logger log;
 	public DomTransitionProvider(AppContext c) {
 		super(c);
-		log=c.getService(LoggerService.class).getLogger(getClass());
+		log=Logger.getLogger(c,getClass());
 		addTransition(PARENT_KEY, new ParentTransition());
 		addTransition(EDIT_TEXT_KEY, new EditTransition());
 		addTransition(EDIT_NODE_KEY, new EditNodeTransition());
@@ -484,7 +483,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 			t.transform(source, result);
 			res=walker;
 		} catch (Exception e) {
-			getContext().getService(LoggerService.class).getLogger(getClass()).error("Error in validate",e);
+			Logger.getLogger(getContext(),getClass()).error("Error in validate",e);
 		}
 		}
 		DomVisitor val = fac.getValidatingVisitor();

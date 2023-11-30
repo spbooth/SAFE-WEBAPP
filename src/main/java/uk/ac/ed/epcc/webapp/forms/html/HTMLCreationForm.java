@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+
 //import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataException;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
@@ -94,7 +94,7 @@ public class HTMLCreationForm {
 	}
 
 	Logger getLogger(AppContext c) {
-		return c.getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(c,getClass());
 	}
 	/**
 	 * method to parse and validate the post params
@@ -130,7 +130,7 @@ public class HTMLCreationForm {
     	}
 		boolean ok = f.parsePost(req);
 		if (!ok) {
-			conn.getService(LoggerService.class).getLogger(getClass()).debug("form failed to parse");
+			getLogger(conn).debug("form failed to parse");
 			return null;
 		}
 		ConfirmMessage confirm_action = f.mustConfirm(params);

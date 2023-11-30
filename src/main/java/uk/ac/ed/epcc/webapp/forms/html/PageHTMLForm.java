@@ -16,10 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.html;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -28,7 +25,7 @@ import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlPrinter;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 //import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.tags.FormContextTag;
@@ -88,11 +85,11 @@ public class PageHTMLForm extends BaseHTMLForm {
 		
 		boolean ok = parsePost(errors, params,false);
 		if (!ok) {
-			c.getService(LoggerService.class).getLogger(getClass()).debug("internal parse failed");
+			Logger.getLogger(c,getClass()).debug("internal parse failed");
 		}
 		ok = ok && validate(missing, errors);
 		if (!ok) {
-			c.getService(LoggerService.class).getLogger(getClass()).debug("internal validate failed");
+			Logger.getLogger(c,getClass()).debug("internal validate failed");
 		}
 		has_errors = ! ok;
 		

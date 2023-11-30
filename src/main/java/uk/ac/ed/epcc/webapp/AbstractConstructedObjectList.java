@@ -16,7 +16,6 @@ package uk.ac.ed.epcc.webapp;
 import java.util.LinkedList;
 
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.AbstractConstructedTargetList;
 
 /** A {@link LinkedList} of objects that is populated
@@ -78,7 +77,7 @@ public abstract class AbstractConstructedObjectList<L> extends LinkedList<L> imp
 	private Logger logger=null;
 	public Logger getLogger(){
 		if( logger == null){
-			logger=conn.getService(LoggerService.class).getLogger(getClass());
+			logger=Logger.getLogger(conn,getClass());
 		}
 		return logger;
 	}

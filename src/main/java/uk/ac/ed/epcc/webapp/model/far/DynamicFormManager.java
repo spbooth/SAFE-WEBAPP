@@ -13,11 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.XMLPrinter;
@@ -35,7 +31,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.FilterResult;
@@ -280,7 +276,7 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		try {
 			spec.new Index("NameIndex", true, NAME_FIELD);
 		} catch (InvalidArgument e) {
-			c.getService(LoggerService.class).getLogger(getClass()).error("Error making index",e);
+			Logger.getLogger(c,getClass()).error("Error making index",e);
 		}
 		return spec;
 	}

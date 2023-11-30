@@ -27,14 +27,13 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.internet.MimePart;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.XMLContentBuilder;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 
 /** visitor to translate a MimeMessage into a HTML fragment.
  * 
@@ -222,7 +221,7 @@ public class ContentMessageVisitor extends AbstractVisitor {
 	public void doIOError(MessageWalker w,IOException e) {
 		// IO errors ususally unsupported text format or currupt text.
 		// for HTML formatting just trap the error and go on.
-		w.getContext().getService(LoggerService.class).getLogger(getClass()).debug("Error parsing message "+e.getMessage());
+		Logger.getLogger(w.getContext(),getClass()).debug("Error parsing message "+e.getMessage());
 		ExtendedXMLBuilder text = sb.getText();
 		
 		text.attr("class", "warn");
@@ -234,7 +233,7 @@ public class ContentMessageVisitor extends AbstractVisitor {
 	public void doMessageError(MessageWalker w,MessagingException e) {
 		// Messaging error implies a corrupt message part which is more likely to be our fault
 		// for HTML formatting just trap the error and go on.
-		w.getContext().getService(LoggerService.class).getLogger(getClass()).debug("Error parsing message "+e.getMessage());
+		Logger.getLogger(w.getContext(),getClass()).debug("Error parsing message "+e.getMessage());
 		ExtendedXMLBuilder text = sb.getText();
 		
 		text.attr("class", "warn");

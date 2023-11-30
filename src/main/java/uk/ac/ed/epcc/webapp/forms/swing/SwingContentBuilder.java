@@ -13,15 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.swing;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.security.Principal;
 import java.text.NumberFormat;
@@ -30,37 +22,19 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.Border;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
-import uk.ac.ed.epcc.webapp.content.ContentBuilder;
-import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
-import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
-import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
-import uk.ac.ed.epcc.webapp.content.Table;
-import uk.ac.ed.epcc.webapp.content.UIGenerator;
-import uk.ac.ed.epcc.webapp.content.UIProvider;
+import uk.ac.ed.epcc.webapp.content.*;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
-import uk.ac.ed.epcc.webapp.jdbc.filter.GetListFilterVisitor;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** builds a swing version of content.
@@ -112,7 +86,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		this.conn=conn;
 		this.content=content;
 		this.frame=frame;
-		log=conn.getService(LoggerService.class).getLogger(getClass());
+		log=Logger.getLogger(conn,getClass());
 		log.debug("made SwingContentBuilder");
 	}
 	private SwingContentBuilder(SwingContentBuilder parent,String type, String ... type_classes){
@@ -844,7 +818,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 	 * @return
 	 */
 	public Logger getLogger() {
-		return this.conn.getService(LoggerService.class).getLogger(getClass());
+		return log;
 	}
 
 }

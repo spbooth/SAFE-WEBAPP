@@ -21,7 +21,7 @@ import java.util.ResourceBundle;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 
 /** A {@link XMLPrinter} containing pre-defined content from 
@@ -95,12 +95,12 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 				f=null;
 				a=null;
 				if( ! optional) {
-					conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message);
+					Logger.getLogger(conn,getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message);
 				}
 			}
 		}catch(MissingResourceException e) {
 			if( ! optional) {
-				conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message, e);
+				Logger.getLogger(conn,getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message, e);
 			}
 			f=null;
 			a=null;

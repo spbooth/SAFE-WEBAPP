@@ -26,9 +26,7 @@ import java.util.regex.Pattern;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** A SQLValue that maps regexp patterns to canonical strings.
  * 
@@ -45,7 +43,7 @@ public class SQLValuePatternTransform implements NestedSQLValue<String,String> {
     	this.conn=conn;
     	this.base=base;
     	map = new HashMap<>();
-    	Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+    	Logger log = Logger.getLogger(conn,getClass());
     	String prefix = "SQLValuePatternTransform."+tag+".";
 		Map<String,String> conf = conn.getInitParameters(prefix);
 		

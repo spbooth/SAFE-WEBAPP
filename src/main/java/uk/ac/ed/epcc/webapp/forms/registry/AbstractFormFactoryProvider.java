@@ -18,12 +18,8 @@ package uk.ac.ed.epcc.webapp.forms.registry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
-import uk.ac.ed.epcc.webapp.forms.factory.FormCreatorProducer;
-import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
-import uk.ac.ed.epcc.webapp.forms.factory.FormUpdateProducer;
+import uk.ac.ed.epcc.webapp.forms.factory.*;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** 
  * This type is intended to provide a way of producing lists of classes that can be modified via forms.
@@ -90,7 +86,7 @@ public abstract class AbstractFormFactoryProvider<F extends Contexed, T> impleme
 				return policy.canUpdate(p);
 			}
 		} catch (Exception e) {
-			p.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error making factory",e);
+			getLogger(p.getContext()).error("Error making factory",e);
 		}
 		return false;
 	}
@@ -110,7 +106,7 @@ public abstract class AbstractFormFactoryProvider<F extends Contexed, T> impleme
 				return policy.canCreate(p);
 			}
 		} catch (Exception e) {
-			p.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error making factory",e);
+			getLogger(p.getContext()).error("Error making factory",e);
 		}
 		return false;
 	}
@@ -205,7 +201,6 @@ public abstract class AbstractFormFactoryProvider<F extends Contexed, T> impleme
 		return true;
 	}
 	protected Logger getLogger(AppContext conn) {
-		LoggerService ls = conn.getService(LoggerService.class);
-		return ls.getLogger(getClass());
+		return Logger.getLogger(conn,getClass());
 	}
 }

@@ -17,12 +17,8 @@ import java.io.Writer;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.content.HtmlBuilder.Heading;
-import uk.ac.ed.epcc.webapp.content.HtmlBuilder.Panel;
-import uk.ac.ed.epcc.webapp.content.HtmlBuilder.SpanText;
-import uk.ac.ed.epcc.webapp.content.HtmlBuilder.Text;
+import uk.ac.ed.epcc.webapp.content.HtmlBuilder.*;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** A streaming version of the {@link XMLContentBuilder}
  * @see HtmlBuilder
@@ -83,7 +79,7 @@ public class HtmlWriter extends XMLWriter implements Contexed ,XMLContentBuilder
 	 */
 	@Override
 	public Logger getLogger(AppContext conn) {
-		return conn.getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(conn,getClass());
 	}
 
 	/* (non-Javadoc)

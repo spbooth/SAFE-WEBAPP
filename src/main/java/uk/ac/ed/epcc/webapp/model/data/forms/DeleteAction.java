@@ -25,7 +25,6 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Retirable;
 
@@ -60,7 +59,7 @@ import uk.ac.ed.epcc.webapp.model.data.Retirable;
 			
 		
 				try {
-					dat.getContext().getService(LoggerService.class).getLogger(getClass()).info("Deleting object "+dat.getIdentifier());
+					Logger.getLogger(dat.getContext(),getClass()).info("Deleting object "+dat.getIdentifier());
 					if( dat instanceof Retirable){
 						if(((Retirable)dat).canRetire()){
 							((Retirable)dat).retire();

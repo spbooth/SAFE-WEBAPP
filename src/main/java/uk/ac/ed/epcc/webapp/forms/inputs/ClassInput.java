@@ -24,7 +24,7 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** Input to select a target class from the set of definitions from the configuration service.
@@ -62,7 +62,7 @@ public class ClassInput<T> extends SimpleListInput<Class<? extends T>>{
 				}
 			} catch (Exception e) {
 				// just skip
-				c.getService(LoggerService.class).getLogger(getClass()).error("Class "+params.get(name)+" from parameter "+name+" not found",e);
+				Logger.getLogger(c,getClass()).error("Class "+params.get(name)+" from parameter "+name+" not found",e);
 			}
     	}
     	addValidator(new FieldValidator<String>() {

@@ -136,7 +136,7 @@ public class CommandLauncher extends AbstractContexed{
 		try {
 			c = conn.makeContexedObject(comm);
 		} catch (Exception e) {
-			conn.getService(LoggerService.class).getLogger(getClass()).error("error making object",e);
+			Logger.getLogger(conn,getClass()).error("error making object",e);
 			return;
 		}
 		
@@ -149,7 +149,7 @@ public class CommandLauncher extends AbstractContexed{
 		if( System.getProperty("testing") == null ){
 			context.setService(new CommandLineLoggerService());
 		}
-		Logger log = context.getService(LoggerService.class).getLogger(CommandLauncher.class);
+		Logger log = Logger.getLogger(context,CommandLauncher.class);
 		Options.Instance opts = options.newInstance();
 		Properties prop = new Properties();
 		

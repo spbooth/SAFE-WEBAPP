@@ -3,7 +3,7 @@ package uk.ac.ed.epcc.webapp.model.relationship;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPageResult;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -47,7 +47,7 @@ public class RelationshipList<X extends DataObject> extends CustomPageResult{
 			cb.addList(sess.getPeopleInRelationship(fac, relationship, target));
 		} catch (Exception e) {
 			cb.addText("Internal error occured");
-			conn.getService(LoggerService.class).getLogger(getClass()).error("Error making list",e);
+			Logger.getLogger(conn,getClass()).error("Error making list",e);
 		}
 		return cb;
 	}

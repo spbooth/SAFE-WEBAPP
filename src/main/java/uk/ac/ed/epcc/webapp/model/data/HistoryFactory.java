@@ -18,12 +18,7 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
@@ -37,18 +32,10 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpressionMatchFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
-import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
+import uk.ac.ed.epcc.webapp.jdbc.table.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableStructureListener;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.TimePurgeFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
@@ -56,14 +43,10 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
-import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
-import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
-import uk.ac.ed.epcc.webapp.model.data.filter.FilterWipe;
-import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
+import uk.ac.ed.epcc.webapp.model.data.filter.*;
 import uk.ac.ed.epcc.webapp.model.data.iterator.DecoratingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
-import uk.ac.ed.epcc.webapp.model.history.History;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 import uk.ac.ed.epcc.webapp.model.history.HistoryHandler;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
@@ -618,7 +601,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 			Index tail = spec.new Index("TailIndex", false, getPeerName(), status.getField(),END_TIME_FIELD);
 		}
 		}catch(Exception e){
-			c.getService(LoggerService.class).getLogger(getClass()).error("Error making index",e); 
+			Logger.getLogger(c,getClass()).error("Error making index",e); 
 		}
 		
 		return spec;
@@ -701,7 +684,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		  current = find(fil,true);  // null is allowed
 		}catch(MultipleResultException e){
 		  // Somehow we have multiple matching records. sequence is corrupt
-	      Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
+	      Logger log = getLogger();
 	      log.error("Corrupt history sequence duplicate records",e);
 	      // Try to fix this set of records.
 	      fixSeries(peer, new FilterIterator(fil));

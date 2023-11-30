@@ -16,10 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,7 +25,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
@@ -117,7 +114,7 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 								throw new MultipleResultException("Found multiple results expecting 1 :"+query.toString());
 							}else{
 								// just log
-								conn.getService(LoggerService.class).getLogger(getClass()).error("Multiple result expecting 1"+query.toString(),new Exception());
+								Logger.getLogger(conn,getClass()).error("Multiple result expecting 1"+query.toString(),new Exception());
 							}
 						}
 					}else{

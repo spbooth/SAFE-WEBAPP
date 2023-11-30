@@ -23,7 +23,6 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 
 
@@ -302,7 +301,7 @@ public void addScriptFile(String path){
 	close();
 }
 public final Logger getLogger(AppContext conn){
-	return conn.getService(LoggerService.class).getLogger(getClass());
+	return Logger.getLogger(conn,getClass());
 }
 
 

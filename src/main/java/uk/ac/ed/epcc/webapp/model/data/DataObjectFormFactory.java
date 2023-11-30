@@ -32,7 +32,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
@@ -297,7 +296,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 			}
 			if( start == keys.size()) {
 				// No additional inputs have been added this pass
-				conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("No additional inputs added");
+				Logger.getLogger(conn,DataObjectFormFactory.class).error("No additional inputs added");
 				support_multi_stage=false; // This should emit the remaining inputs next pass
 				multi_stage=false; // should be false anyway
 			}
@@ -316,7 +315,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 						}
 					}
 				} catch (TransitionException e) {
-					conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("Form poll failed",e);
+					Logger.getLogger(conn,DataObjectFormFactory.class).error("Form poll failed",e);
 					support_multi_stage=false; // This should emit the remaining inputs next pass
 				}
 			}
@@ -384,7 +383,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 			try{
 				return conn.makeObject(c);
 			}catch(Exception e){
-				conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("Failed to make input",e);
+				Logger.getLogger(conn,DataObjectFormFactory.class).error("Failed to make input",e);
 				
 			}
 		}
@@ -411,7 +410,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 		Repository res = factory.res;
 		TableSpecification ts = getSpecification(); // may be null.
 		boolean warn_redundant = WARN_REDUNDANT.isEnabled(conn);
-		Logger logger = conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class);
+		Logger logger = getLogger();
 		for(String field : res.getFields()){
 			Repository.FieldInfo info = res.getInfo(field);
 			if( warn_redundant || ! sel.containsKey(field)){

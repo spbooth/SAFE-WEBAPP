@@ -22,12 +22,7 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.Map;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -40,12 +35,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
-import uk.ac.ed.epcc.webapp.editors.xml.AbstractXMLTarget;
-import uk.ac.ed.epcc.webapp.editors.xml.DomVisitor;
-import uk.ac.ed.epcc.webapp.editors.xml.ViewXMLTargetResult;
-import uk.ac.ed.epcc.webapp.editors.xml.XMLDocumentInput;
-import uk.ac.ed.epcc.webapp.editors.xml.XMLTarget;
-import uk.ac.ed.epcc.webapp.editors.xml.XMLTargetFactory;
+import uk.ac.ed.epcc.webapp.editors.xml.*;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
@@ -56,7 +46,6 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.TextFileOverlay;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -205,7 +194,7 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 			return path;
 		}
 		public void setDocument(Document document) throws TransformerFactoryConfigurationError, TransformerException{
-			Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
+			Logger log = getLogger();
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 		    Source source = new DOMSource(document);
 		    StreamResult output = new StreamResult(new StringWriter());

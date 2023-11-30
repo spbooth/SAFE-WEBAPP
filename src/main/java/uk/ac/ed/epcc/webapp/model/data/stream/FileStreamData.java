@@ -13,16 +13,10 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data.stream;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** StreamData Object wrapping a file.
  * 
  * @author spb
@@ -51,7 +45,7 @@ public class FileStreamData implements StreamData {
 		}
 	}
 	Logger getLogger() {
-		return conn.getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(conn,getClass());
 	}
 
 	public OutputStream getOutputStream() {

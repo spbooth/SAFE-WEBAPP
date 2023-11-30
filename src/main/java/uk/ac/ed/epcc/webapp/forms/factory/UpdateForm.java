@@ -18,9 +18,7 @@ package uk.ac.ed.epcc.webapp.forms.factory;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /**
  * UpdateForm is handler class for updating Objects where the Factory can provide a class implementing
@@ -71,7 +69,7 @@ public class UpdateForm<T> {
 		return updater.getContext();
 	}
 	protected final Logger getLogger(){
-		return getContext().getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(getContext(),getClass());
 	}
 
 	/**

@@ -14,7 +14,6 @@
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
@@ -226,7 +225,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	private Logger log;
 	public Logger getLogger() {
 		if( log == null) {
-			log=fac.getContext().getService(LoggerService.class).getLogger(getClass());
+			log=Logger.getLogger(fac.getContext(),getClass());
 		}
 		return log;
 	}

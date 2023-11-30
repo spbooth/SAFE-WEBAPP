@@ -13,11 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -28,7 +24,6 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
@@ -74,7 +69,7 @@ public class AddStdIndexTransition<T extends DataObjectFactory> extends EditTabl
 				List<Object> args = new LinkedList<>();
 				
 				type.accept(null,sql.getCreateVisitor(res.getParamTag(),query, args));
-				Logger log = res.getContext().getService(LoggerService.class).getLogger(getClass());
+				Logger log = Logger.getLogger(res.getContext(),getClass());
 				log.debug("Query is "+query.toString());
 				try(java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString())){
 					int pos=1;

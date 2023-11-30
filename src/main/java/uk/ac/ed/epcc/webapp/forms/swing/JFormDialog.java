@@ -20,18 +20,9 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Iterator;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -39,7 +30,6 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /**
  * JFormDialog is a modal dialog window for editing the contents of a Form. This
@@ -65,7 +55,7 @@ public class JFormDialog extends JDialog implements Contexed{
 	public JFormDialog(AppContext conn, JFrame parent) {
 		super(parent, true);
 		this.conn=conn;
-		this.log = conn.getService(LoggerService.class).getLogger(getClass());
+		this.log = Logger.getLogger(conn,getClass());
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		content=new SwingContentBuilder(this);
 	}

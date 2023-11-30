@@ -31,7 +31,8 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.factory.*;
-import uk.ac.ed.epcc.webapp.forms.inputs.*;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.*;
 import uk.ac.ed.epcc.webapp.jdbc.filter.*;
@@ -39,7 +40,6 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -51,7 +51,6 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
-import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemParseInput;
 import uk.ac.ed.epcc.webapp.model.data.iterator.SortingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
@@ -960,7 +959,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     						throw new MultipleResultException("Found multiple "+getTag()+" records expecting 1");
     					}else{
     						// just log
-    						getContext().getService(LoggerService.class).getLogger(getClass()).error("Multiple "+getTag()+" records expecting 1",new Exception());
+    						getLogger().error("Multiple "+getTag()+" records expecting 1",new Exception());
     					}
     				}
     				return result;
@@ -1305,7 +1304,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		if( context == null) {
 			context = AppContext.getContext();
 		}
-		return context.getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(context,getClass());
 	}
 
 	/** get the set of fields that can be null in the database.
@@ -1793,7 +1792,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		this.tag = homeTable;
 		String composite_list = ctx.getExpandedProperty(homeTable+COMPOSITES_SUFFIX);
 		// can't use getLogger as context not set yet
-		Logger logger = ctx.getService(LoggerService.class).getLogger(getClass());
+		Logger logger = getLogger();
 		
 		if( composite_list != null && composite_list.trim().length() > 0){
 			for(String comp : composite_list.split("\\s*,\\s*")){

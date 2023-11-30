@@ -16,17 +16,16 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.UnaryOperator;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.MysqlSQLContext;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.FullTextIndex;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexField;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.*;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
@@ -243,7 +242,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 					// current one (in case we have a foreign key)
 					conn.makeObject(DataObjectFactory.class, tag);
 				}catch(Exception t){
-					conn.getService(LoggerService.class).getLogger(getClass()).error("Problem making referenced facory for "+tag);
+					Logger.getLogger(conn,getClass()).error("Problem making referenced facory for "+tag);
 				}
 			}
 			DataBaseHandlerService hand = conn.getService(DataBaseHandlerService.class);

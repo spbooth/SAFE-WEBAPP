@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
@@ -235,7 +235,7 @@ public class TableSpecification {
 					}
 				}
 			}catch(Exception t) {
-				conn.getService(LoggerService.class).getLogger(getClass()).error("Error parsing table specification parameter "+name+"="+type,t);
+				Logger.getLogger(conn,getClass()).error("Error parsing table specification parameter "+name+"="+type,t);
 			}
 		}
 	}
