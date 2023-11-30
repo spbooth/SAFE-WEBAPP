@@ -93,7 +93,10 @@ public interface Logger {
 		warn(message.get(),t);
 	}
 	
+	public static Logger getLogger(AppContext c,Class clazz) {
+		return c.getService(LoggerService.class).getLogger(clazz);
+	}
 	public static Logger getLogger(Class clazz) {
-		return AppContext.getContext().getService(LoggerService.class).getLogger(clazz);
+		return getLogger(AppContext.getContext(),clazz);
 	}
 }
