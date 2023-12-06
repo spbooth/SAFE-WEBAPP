@@ -142,7 +142,7 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 	 */
 	public void clearSecret(A user) {
 		Record record = getRecord(user);
-		record.setProperty(mutate(SECRET_FIELD), null);
+		record.setOptionalProperty(mutate(SECRET_FIELD), null);
 	}
 	
     

@@ -1,11 +1,7 @@
 package uk.ac.ed.epcc.webapp.session.perms;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.NegatingFilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
@@ -50,7 +46,7 @@ public abstract class MakeFilterPermissionVisitor<R extends DataObject,T extends
 		} catch (UnknownRelationshipException e) {
 			throw e;
 		} catch (Exception e) {
-			getFactory().getContext().getService(LoggerService.class).getLogger(getClass()).error("Error negating filter",e);
+			Logger.getLogger(getFactory().getContext(),getClass()).error("Error negating filter",e);
 			throw new UnknownRelationshipException("!");
 		}
 	}
