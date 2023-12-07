@@ -2720,7 +2720,7 @@ public final class Repository extends AbstractContexed implements AppContextClea
 	 * @param key field name
 	 * @return {@link FieldValue}
 	 */
-	public <X extends DataObject> FieldValue<Date,X> getDateExpression(String key) {
+	public <X extends DataObject> FieldSQLExpression<Date,X> getDateExpression(String key) {
 		
 		FieldInfo info = getInfo(key);
 		if( info == null ){
