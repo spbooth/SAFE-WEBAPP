@@ -452,14 +452,16 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			Integer old = getValue();
 			try {
 					l =  find(id);
-					left_input.setValue(l.getLeftID().intValue());
-					right_input.setValue(l.getRightID().intValue());
-					// reset the fixed values to maintain consistency
-					if (fix_left != null) {
-						fixLeft(l.getLeft());
-					}
-					if (fix_right != null) {
-						fixRight(l.getRight());
+					if( l != null ) {
+						left_input.setValue(l.getLeftID().intValue());
+						right_input.setValue(l.getRightID().intValue());
+						// reset the fixed values to maintain consistency
+						if (fix_left != null) {
+							fixLeft(l.getLeft());
+						}
+						if (fix_right != null) {
+							fixRight(l.getRight());
+						}
 					}
 			} catch (DataException e) {
 				l = null;
