@@ -880,6 +880,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	@Override
 	public  BDO find(int id)
 			throws uk.ac.ed.epcc.webapp.jdbc.exception.DataException {
+		if( id <= 0) {
+			return null;
+		}
 		Repository.Record rec = res.new Record();
 		rec.setID(id);
 		// set the ID before making the object in case this is
@@ -902,7 +905,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 	@Override
 	public final BDO find(Number id) {
-		if (id == null || id.intValue()==0) {
+		if (id == null || id.intValue()<=0) {
 			return null;
 		}
 		try {

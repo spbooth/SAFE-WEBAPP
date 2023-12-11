@@ -19,9 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
@@ -71,6 +69,9 @@ public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed i
 	 */
 	@Override
 	public BaseFilter<T> getNamedFilter(String name) {
+		if( name.equals("false")) {
+			return new FalseFilter<>();
+		}
 		// We need to handle AND/OR combinations here for code that uses explicitly name-filter
 		// when called from the SessionService relationship code the AND/OR combinations should
 		// be parsed at that level
