@@ -55,12 +55,16 @@ public interface CreateTemplate<BDO extends DataObject> extends CreateCustomizer
 	default public Object getActionText() {
 		return null;
 	}
-	/** create the uncomitted blank object to be populated
+	/** create the uncomitted blank object to be populated.
+	 * 
+	 * This usually defaults to makeBDO on the factory and ignores the
+	 * {@link Form} however a polymorphic type (where the class depends on field values) will
+	 * need access to the form to create the correct typel
 	 * 
 	 * @return
 	 * @throws DataFault
 	 */
-	public default BDO makeObject() throws DataException {
+	public default BDO makeObject(Form f) throws DataException {
 		return getFactory().makeBDO();
 	}
 	public default void addActions(Form f) {

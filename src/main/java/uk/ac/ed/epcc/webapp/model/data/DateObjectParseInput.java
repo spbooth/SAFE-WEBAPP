@@ -27,6 +27,9 @@ public class DateObjectParseInput<BDO extends DataObject> extends DataObjectInte
 	@Override
 	public Integer parseValue(String v) throws ParseException {
 		try{
+			if( v == null || v.isEmpty()) {
+				return null;
+			}
 			return Integer.valueOf(v);
 		}catch(NumberFormatException e){
 			if( getFactory() instanceof ParseFactory){
