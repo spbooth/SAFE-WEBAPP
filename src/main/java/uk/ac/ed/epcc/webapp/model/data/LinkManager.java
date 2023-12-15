@@ -342,8 +342,8 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 
 		public LinkInput() {
 			super();
-			addInput("left",  (left_input =  getLeftInput()));
-			addInput("right",  (right_input = getRightInput()));
+			addInput("left",  (left_input =  getLeftSelector().getInput()));
+			addInput("right",  (right_input = getRightSelector().getInput()));
 		}
 
 		/**
@@ -818,37 +818,25 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	}
 
 	
-	/**
+	/** {@link Selector} to use for LEFT object
 	 * @return
 	 */
-	protected DataObjectItemInput<L> getLeftInput() {
-		return getLeftFactory().getInput();
+	protected  DataObjectSelector<L> getLeftSelector() {
+		return getLeftFactory();
 	}
 
-	/**
+	/** {@link Selector} to use for RIGHT object
 	 * @return
 	 */
-	protected DataObjectItemInput<R> getRightInput() {
-		return getRightFactory().getInput();
+	protected DataObjectSelector<R> getRightSelector() {
+		return getRightFactory();
 	}
 
 	@Override
 	protected Map<String, Selector> getSelectors() {
 		Map<String, Selector> result = super.getSelectors();
-		result.put(getLeftField(),new Selector() {
-
-			@Override
-			public Input getInput() {
-				return getLeftInput();
-			}
-		});
-		result.put(getRightField(),new Selector() {
-
-			@Override
-			public Input getInput() {
-				return getRightInput();
-			}
-		});
+		result.put(getLeftField(),getLeftSelector());
+		result.put(getRightField(),getRightSelector());
 		return result;
 	}
 
