@@ -13,10 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.Map.Entry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -34,14 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPageResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ScriptCustomPage;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
-import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionProvider;
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.forms.transition.*;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
