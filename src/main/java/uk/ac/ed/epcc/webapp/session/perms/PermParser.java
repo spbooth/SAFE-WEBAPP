@@ -78,7 +78,7 @@ public class PermParser<A extends AppUser> extends AbstractContexed {
 							or.add(p);
 						}catch(UnknownRelationshipException e){
 							if(AbstractSessionService.ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE.isEnabled(getContext())){
-								getLogger().error( "Bad relationship in OR branch",e);
+								getLogger().error( "Bad relationship "+e.getMessage()+" in OR branch",e);
 							}else{
 								throw e;
 							}
@@ -92,17 +92,14 @@ public class PermParser<A extends AppUser> extends AbstractContexed {
 				AndPermissionClause<T> and = new AndPermissionClause<>();
 				for( String  s  : role.split("\\+")){
 					try {
-					PermissionClause<T> p = parse(fac2,s);
-					if(p == null) {
-						throw new UnknownRelationshipException(s);
-					}
-					and.add(p);
-					}catch(UnknownRelationshipException e){
-						if(AbstractSessionService.ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE.isEnabled(getContext())){
-							getLogger().error( "Bad relationship in AND branch",e);
-						}else{
-							throw e;
+						PermissionClause<T> p = parse(fac2,s);
+						if(p == null) {
+							throw new UnknownRelationshipException(s);
 						}
+						and.add(p);
+					}catch(UnknownRelationshipException e){
+							getLogger().error( "Bad relationship "+e.getMessage()+" in AND branch",e);
+							throw e;
 					}
 				}
 				return and;
