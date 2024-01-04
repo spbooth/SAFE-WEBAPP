@@ -977,8 +977,8 @@ public class DefaultServletService implements ServletService{
 		if( REPORT_URL_MODIFY.isEnabled(getContext())) {
 			StringBuffer sb = new StringBuffer();
 			sb.append(req.getScheme());
-			sb.append(":/ "); // extra space
-			
+			sb.append(":/ /"); // extra space
+			sb.append(req.getServerName());
 			sb.append(req.getContextPath());
 			sb.append("/");
 			sb.append(encodePage());
