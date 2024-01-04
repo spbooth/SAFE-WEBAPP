@@ -160,6 +160,12 @@ public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransit
 		return AUTHENTICATE;
 	}
 
+	@Override
+	public boolean useParser() {
+		// use ids in preference for people due to multiple possible names
+		return false;
+	}
+
 	
 
 }

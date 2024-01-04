@@ -67,6 +67,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
 import uk.ac.ed.epcc.webapp.model.data.filter.IdAcceptFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.PrimaryOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
@@ -134,6 +135,8 @@ Targetted<AU>
 	public static final Feature BOOTSTRAP_ADMIN_FEATURE = new Feature("bootstrap.admin",true,"automatically give first user Admin role");
 	public static final String BOOTSTRAP_ROLE_PROPERTY = "bootstrap-role";
 
+	// Might need to set this if auto-creating users f
+	public static final Feature USER_SUPPLIED_LOOKUP = new Feature("app_user.name_lookup.user_supplied_only",true,"The default NameFinder for AppUsers only considers user supplied ids");
 	public static final Feature REQUIRE_PERSON_UPDATE_FEATURE = new Feature("require-person-update",false,"require person update if needed");
 	 public static final Feature AUTO_COMPLETE_APPUSER_INPUT = new Preference("app_user.autocomplete_input",false,"Use auto-complete input as the default person input");
 	 // optional field to allow users to be marked as never to recieve emails
@@ -596,6 +599,26 @@ Targetted<AU>
 		name = name.trim();
 		try {
 			return find(getStringFinderFilter(name),true);
+		}catch(MultipleResultException mr) {
+			// In principle we might have duplicate ids in different realms.
+			// e.g. a remote-id that is the same as a users email but the user
+			// has two accounts. We really should not be using the default
+			// NameFinder in these contexts so warn.
+			// however we can use the supplied realms in order to break a tie
+			getLogger().warn("Multiple results from person StringFilterFinder", mr);
+			// Search each realm in turn
+			boolean require_vis = USER_SUPPLIED_LOOKUP.isEnabled(getContext());
+			for( AppUserNameFinder finder : getRealms()) {
+				if( finder.userVisible() || ! require_vis) {
+					AU user = (AU) finder.findFromString(name);
+					if( user != null ) {
+						return user;
+					}
+				}
+			}
+			
+			
+			return null;
 		}catch(DataNotFoundException e){
 			return null;
 		} catch (DataException e) {
@@ -750,7 +773,7 @@ Targetted<AU>
 	}
 
 	public   SQLFilter<AU> getStringFinderFilter(String name){
-		return getStringFinderFilter(name, false);
+		return getStringFinderFilter(name, USER_SUPPLIED_LOOKUP.isEnabled(getContext()));
 	}
 	public   SQLFilter<AU> getStringFinderFilter(String name,boolean require_user_supplied){
 		SQLOrFilter<AU> fil = getSQLOrFilter();
