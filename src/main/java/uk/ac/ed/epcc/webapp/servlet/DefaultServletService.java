@@ -108,6 +108,9 @@ public class DefaultServletService implements ServletService{
 	public static final Feature EXTERNAL_AUTH_VIA_LOGIN_FEATURE = new Feature("external_auth.use_login",false,"Mandatory external auth with only login.jsp protected externally");
 
 	public static final Feature ALLOW_INSECURE = new Feature("session.allow_insecure",false,"Allow insecure connections to use tokes");
+
+	public static final Feature REPORT_URL_MODIFY = new Feature("session.report_url_modify",true,"Report urls with extra spaces to make them un-clickable but readable");
+	
 	// This should be true. If we have just created a session and forward to the login page it will
 	// show the session-id in urls. If we redirect it will be set as a cookie (if cookies enabled(
 	public static final Feature REDIRECT_TO_LOGIN_FEATURE = new Feature("login_page.always_redirect",true,"Always use redirect to go to login page");
@@ -885,7 +888,7 @@ public class DefaultServletService implements ServletService{
 		if (req != null ) {
 			
 			String url = null;
-			StringBuffer buf =  req.getRequestURL();
+			StringBuffer buf =  getRequestURI(req);
 			if( buf != null ){
 				url = buf.toString();
 			}
@@ -957,6 +960,32 @@ public class DefaultServletService implements ServletService{
 			}
 		}
 		
+	}
+
+
+	/** Intercept method to get the requestURI as a StringBuffer
+	 * 
+	 * Though {@link HttpServletRequest} has a method to do this
+	 * this allows us to override this to avoid email URL re-write
+	 * (e.g. MS "safe-links") we want this value to be readable but
+	 * not necessarily clickable
+	 * 
+	 * @param req
+	 * @return
+	 */
+	private StringBuffer getRequestURI(HttpServletRequest req) {
+		if( REPORT_URL_MODIFY.isEnabled(getContext())) {
+			StringBuffer sb = new StringBuffer();
+			sb.append(req.getScheme());
+			sb.append(":/ "); // extra space
+			
+			sb.append(req.getContextPath());
+			sb.append("/");
+			sb.append(encodePage());
+			
+			return sb;
+		}
+		return req.getRequestURL();
 	}
 
 
