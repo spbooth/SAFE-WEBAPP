@@ -174,6 +174,9 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 */
 	@Override
 	public String getString(Integer val) {
+		if( val == null ) {
+			return null;
+		}
 		T p = getItembyValue(val);
 		if( p != null ){
 			return getValue(p);
