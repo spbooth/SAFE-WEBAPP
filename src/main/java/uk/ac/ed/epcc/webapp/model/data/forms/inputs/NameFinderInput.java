@@ -295,6 +295,9 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		if( ! options.suggestions) {
 			return false;  // explicitly disables
 		}
+		if( options.force_text) {
+			return true;
+		}
 		int max = getConfigParam("max_datalist", 102400);
 		if( max > 0 && getCount() > max) {
 			return false; // too many values to add a datalist

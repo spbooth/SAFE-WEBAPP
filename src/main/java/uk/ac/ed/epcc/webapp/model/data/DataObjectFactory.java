@@ -1141,6 +1141,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return getInput(fil,null);
 		}
 	}
+	/** Get an input
+	 * 
+	 * @param fil    {@link BaseFilter} to limit suggestions
+	 * @param restrict {@link BaseFilter} to restrict validation (also restricts suggestions)
+	 * @return
+	 */
 	public DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,BaseFilter<BDO> restrict){
 		return new DataObjectInput(fil,restrict);
 	}
