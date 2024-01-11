@@ -58,6 +58,7 @@ import uk.ac.ed.epcc.webapp.content.XMLWriter;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.exceptions.MissingResourceException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.junit4.AppContextFixtureRule;
@@ -261,7 +262,18 @@ public abstract class WebappTestBase implements ContextHolder{
 			expected_xml = ctx.expandText(expected_xml);
 			if( normalize_transform != null ) {
 
-				String expected_text = XMLDataUtils.readResourceAsString(getClass(),expected_xml);
+				String expected_text;
+				
+				try {
+					expected_text = XMLDataUtils.readResourceAsString(getClass(),expected_xml);
+					
+				}catch(MissingResourceException e) {
+					// log the raw text as we might want to make the resource
+					System.out.println("Raw:");
+					System.out.println(raw);
+					System.out.println("====================================================================");
+					throw e;
+				}
 				// Do a shortcut test in case the two are identical
 				if( expected_text.trim().equals(raw.trim())) {
 					System.out.println("@@@@@@ Shortcut Diff @@@@@@");

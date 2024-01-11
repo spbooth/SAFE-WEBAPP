@@ -40,6 +40,7 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.exceptions.MissingResourceException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -230,7 +231,7 @@ public class XMLDataUtils extends AbstractContexed{
 		StringBuffer fileData = new StringBuffer(1000);
 		InputStream stream = clazz.getResourceAsStream(name);
 		if( stream == null) {
-			throw new IOException("Resource "+name+" not found by "+clazz.getCanonicalName());
+			throw new MissingResourceException("Resource "+name+" not found by "+clazz.getCanonicalName());
 		}
 		InputStreamReader reader = new InputStreamReader(stream);
 		char[] buf = new char[1024];
