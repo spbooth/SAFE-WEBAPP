@@ -29,13 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.html.ForwardResult;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.html.WebFormResultVisitor;
-import uk.ac.ed.epcc.webapp.forms.result.BackResult;
-import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.result.ConfirmTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
-import uk.ac.ed.epcc.webapp.forms.result.CustomPageResult;
-import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
-import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
+import uk.ac.ed.epcc.webapp.forms.result.*;
 import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
@@ -109,8 +103,17 @@ public class ServletFormResultVisitor extends AbstractContexed implements WebFor
 		   return;
 	}
 	public void visitMessageResult(MessageResult mr) throws ServletException, IOException {
+		 // If we can use MessageServlet on post or put to avoid re-submit
+		 String method = req.getMethod();
+		 if( method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT")) {
+			 RedirectResult r = MessageServlet.mapResult(conn, mr);
+			 if( r != null) {
+				 visitRedirectResult(r);
+				 return;
+			 }
+		 }
 		 WebappServlet.messageWithArgs(conn, req, res, mr.getMessage(),mr.getArgs());
-		   return;
+		 return;
 	}
 	public void visitRedirectResult(RedirectResult red) throws IOException {
 		conn.getService(ServletService.class).redirect(red.getURL());
