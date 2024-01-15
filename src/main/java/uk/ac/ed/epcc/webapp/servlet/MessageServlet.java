@@ -1,6 +1,7 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.UIGenerator;
+import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
@@ -104,12 +107,13 @@ public class MessageServlet extends WebappServlet {
 		 url.append(mr.getMessage());
 		 url.append("/");
 		 for(Object a : mr.getArgs()) {
-			 if( a instanceof String) {
-				 url.append(MessageServlet.encodeArg(conn, a));
-				 url.append("/");
-			 }else {
-				 return null; // cannot map
+			 if( a instanceof UIGenerator || a instanceof UIProvider) {
+				 return null;
 			 }
+			 // ok to just convert to string.
+			 url.append(MessageServlet.encodeArg(conn, a));
+			 url.append("/");
+
 		 }
 		 return new RedirectResult(url.toString());
 	}
