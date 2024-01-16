@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
@@ -26,6 +27,7 @@ import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 @WebServlet(name="MssageServlet",urlPatterns = MessageServlet.MESSAGE_PATH+"*")
 public class MessageServlet extends WebappServlet {
 
+	public static final Feature MAP_MESSAGE = new Feature("message_servlet.map_message",true,"Automatically use MessageServlet for post/put operaitons");
 	public static final String MESSAGE_PATH="/Message/";
 	public MessageServlet() {
 		// TODO Auto-generated constructor stub
@@ -102,6 +104,9 @@ public class MessageServlet extends WebappServlet {
 	 * @return RedirectResult or null
 	 */
 	public static RedirectResult mapResult(AppContext conn,MessageResult  mr) {
+		if( ! MAP_MESSAGE.isEnabled(conn)) {
+			return null;
+		}
 		StringBuilder url = new StringBuilder();
 		 url.append(MessageServlet.MESSAGE_PATH);
 		 url.append(mr.getMessage());
