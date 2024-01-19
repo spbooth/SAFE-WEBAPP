@@ -66,6 +66,12 @@ public abstract class WebappServlet extends HttpServlet {
 	 * 
 	 */
 	public static final String MESSAGE_EXTRA_ATTR = "message_extra";
+	/** attribute for a boolean added to the request which
+	 * indicates the current request does not modify state and is safe to
+	 * re-run on a page refresh
+	 * 
+	 */
+	public static final String NON_MODIFY_ATTR = "non_modifying";
 	public static final String CONFIRM_NO = "no";
 	public static final String CONFIRM_YES = "yes";
 	public static final String EXTRA_HTML = "extra_html";
@@ -406,5 +412,15 @@ public void handleFormResult(AppContext conn,HttpServletRequest req, HttpServlet
 			}
 		}
 		return output.toString();
+	}
+	public static void setNonModifying(HttpServletRequest req, boolean non_modifying) {
+		req.setAttribute(NON_MODIFY_ATTR, non_modifying);
+	}
+	public static boolean isNonModifying(HttpServletRequest req) {
+		Boolean val = (Boolean) req.getAttribute(NON_MODIFY_ATTR);
+		if( val != null) {
+			return val.booleanValue();
+		}
+		return false;
 	}
 }

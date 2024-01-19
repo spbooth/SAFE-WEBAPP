@@ -1,7 +1,8 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
-import java.util.Date;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,12 +11,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.content.ObjectMapper;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 /** A servlet for displaying messages via a redirect.
  * 
@@ -29,6 +32,7 @@ public class MessageServlet extends WebappServlet {
 
 	public static final Feature MAP_MESSAGE = new Feature("message_servlet.map_message",true,"Automatically use MessageServlet for post/put operaitons");
 	public static final String MESSAGE_PATH="/Message/";
+	private static final char MARK = '^';
 	public MessageServlet() {
 		// TODO Auto-generated constructor stub
 	}
@@ -79,23 +83,50 @@ public class MessageServlet extends WebappServlet {
 	}
 	
 	public static String encodeString(String s) {
-		StringBuilder output = new StringBuilder();
-
-		for (int i = 0; i < s.length(); i++) {
-			char ch = s.charAt(i);
-			// unreserved chars
-			if (((ch >= 'a') && (ch <= 'z')) || ((ch >= 'A') && (ch <= 'Z'))
-					|| ((ch >= '0') && (ch <= '9'))|| (ch == '_')
-					|| (ch == '-') || (ch == '.') ) {
-				output.append(ch);
-			} else {
-				output.append("%");
-				output.append(String.format("%02x", (int) ch));
-			}
-		}
-		return output.toString();
+		Base64.Encoder enc = Base64.getUrlEncoder().withoutPadding();
+		return enc.encodeToString(s.getBytes(StandardCharsets.UTF_8));
+		// In principal we should be able to use % encoding here
+		// but tomcat seems to dislike % encoded / chars in a URL
+		// Safer to use our own encoding scheme to ensure URL safe chars only
+//		
+//		StringBuilder output = new StringBuilder();
+//		for (int i = 0; i < s.length(); i++) {
+//			char ch = s.charAt(i);
+//			if( ! Character.isISOControl(ch)) {
+//				// non printable ascii or url reserved chars
+//				if( ch > 127  || ch == MARK || 
+//					ch == ':' || ch == '/' || ch == '?' || ch == '#' || ch == '[' || ch ==  ']' || ch == '@' ||
+//                    ch == '!' || ch == '$' || ch == '&' || ch == '\'' || ch == '(' || ch ==  ')' ||
+//				    ch == '*' || ch == '+' || ch == ',' || ch == ';' || ch == '=' ) {
+//					output.append(MARK);
+//					output.append(String.format("%02x", (int) ch));
+//				}else {
+//					output.append(ch);
+//				}
+//			}
+//		}
+//		return output.toString();
 	}
 
+	public static String decodeString( String s) {
+		Base64.Decoder dec = Base64.getDecoder();
+		return new String(dec.decode(s),StandardCharsets.UTF_8);
+//		StringBuilder output = new StringBuilder();
+//		for (int i = 0; i < s.length(); i++) {
+//			char ch = s.charAt(i);
+//			if( ch >= ' ' && ch <= '~') {
+//				// only accept printable ascii as input
+//				if( ch == MARK) {
+//					int code = Integer.parseInt(s.substring(i+1, i+2), 16);
+//					output.append((char)code);
+//					i+=2;
+//				}else{
+//					output.append(ch);
+//				}
+//			}
+//		}
+//		return output.toString();
+	}
 	/** Attempt to map a {@link MessageResult} to a redirect to this servlet.
 	 * If the mapping is not supported then return null;
 	 * 
@@ -113,7 +144,18 @@ public class MessageServlet extends WebappServlet {
 		 url.append("/");
 		 for(Object a : mr.getArgs()) {
 			 if( a instanceof UIGenerator || a instanceof UIProvider) {
-				 return null;
+				 UIGenerator g;
+				 if( a instanceof UIGenerator) {
+					 g = (UIGenerator) a;
+				 }else {
+					 g = ((UIProvider)a).getUIGenerator();
+				 }
+				 String v = ObjectMapper.map(conn, g);
+				 if( v == null ) {
+					 a = g.toString();
+				 }else {
+					 a = v;
+				 }
 			 }
 			 // ok to just convert to string.
 			 url.append(MessageServlet.encodeArg(conn, a));
@@ -133,6 +175,12 @@ public class MessageServlet extends WebappServlet {
 	 * @return
 	 */
 	public static Object decodeArg(AppContext conn, String path) {
+		path = decodeString(path); // undo custom encoding
+		Object res = ObjectMapper.unmap(conn, path);
+		if( res != null) {
+			return res;
+		}
+
 		return path;
 	}
 }

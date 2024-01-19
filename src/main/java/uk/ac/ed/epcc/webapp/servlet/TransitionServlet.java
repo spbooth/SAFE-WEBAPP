@@ -224,6 +224,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			message(conn, req, res, "access_denied");
         	return;
 		}
+		WebappServlet.setNonModifying(req, non_modifying);
 		Transition<T> t = tp.getTransition(target,key);
 		if( t != null ){
 			// check for trivial FormResults that don't need a lock
