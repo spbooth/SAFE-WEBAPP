@@ -13,9 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
-import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 
 /** Wrapper object allowing us to add buttons as {@link Table} content
@@ -25,32 +23,16 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
  */
 
 
-public class Button extends AbstractContexed implements XMLGenerator,UIGenerator {
+public class Button extends FormResultWrapper implements XMLGenerator,UIGenerator {
 
-	private final String text;
-	private final String help;
-	private final FormResult result;
+
 	public Button(AppContext conn,String text,FormResult result){
-		this(conn,text,null,result);
+		super(conn,text,null,result);
 	}
 	public Button(AppContext conn,String text,String help,FormResult result){
-		super(conn);
-		this.text=text;
-		this.help=help;
-		this.result=result;
+		super(conn,text,help,result);
 	}
-	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
-		if( builder instanceof ContentBuilder){
-			addContent((ContentBuilder)builder);
-		}else{
-			builder.clean(text);
-		}
-		return builder;
-	}
-	public String toString(){
-		// makes text tables work sensibly
-		return text;
-	}
+	
 	public ContentBuilder addContent(ContentBuilder builder) {
 		builder.addButton(conn, text, help,result);
 		return builder;

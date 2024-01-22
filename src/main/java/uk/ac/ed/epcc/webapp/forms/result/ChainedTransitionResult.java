@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.forms.result;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryFinder;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 /** A {@link FormResult} to recurse to a new transition after this one.
@@ -71,6 +72,9 @@ public class ChainedTransitionResult<T,K> implements FormResult {
  }
  public T getTarget(){
 	 return target;
+ }
+ public boolean allow(SessionService<?> sess) {
+	 return getProvider().allowTransition(sess.getContext(), getTarget(), getTransition());
  }
 public void accept(FormResultVisitor vis) throws Exception {
 	// view transition sub-classes should useURL

@@ -13,9 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
-import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 
 /** Wrapper object allowing us to add links as {@link Table} content
@@ -25,45 +23,19 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
  */
 
 
-public class Link extends AbstractContexed implements XMLGenerator,UIGenerator {
+public class Link extends FormResultWrapper implements XMLGenerator,UIGenerator {
 
-	private final String text;
-	private final String help;
-	private final FormResult result;
+	
 	private boolean new_window=false;
 	public Link(AppContext conn,String text,FormResult result){
-		this(conn,text,null,result);
+		super(conn,text,null,result);
 	}
 	public Link(AppContext conn,String text,String help,FormResult result){
-		super(conn);
-		this.text=text;
-		this.help=help;
-		this.result=result;
-	}
-	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
-		if( builder instanceof ContentBuilder){
-			addContent((ContentBuilder)builder);
-		}else{
-			builder.clean(text);
-		}
-		return builder;
+		super(conn,text,help,result);
 	}
 	
-	public String toString(){
-		// makes text tables work sensibly
-		return text;
-	}
-	@Override
-	public boolean equals(Object arg0) {
-		if( arg0 instanceof Link){
-			return ((Link)arg0).text.equals(text);
-		}
-		return false;
-	}
-	@Override
-	public int hashCode() {
-		return text.hashCode();
-	}
+
+	
 	public ContentBuilder addContent(ContentBuilder builder) {
 		
 		if(builder instanceof XMLContentBuilder && new_window) {

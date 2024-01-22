@@ -24,13 +24,19 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
@@ -806,13 +812,48 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			supress.add(right_field);
 			return supress;
 		}
+		@Override
+		public FormResult getResult(T dat, Form f) {
+			// TODO Auto-generated method stub
+			// pass the link ends explicitly so MEssageServlet can link to them
+			try {
+				return new MessageResult("link_updated",getTypeName(),dat.getLeft(),dat.getRight());
+			} catch (DataException e) {
+				getLogger().error("Error getting update link result", e);
+				return new MessageResult("object_updated", getTypeName(),dat.getIdentifier());
+			}
+		}
 	}
+	
 	@Override
 	public FormUpdate<T> getFormUpdate(AppContext c) {
 		return new LinkUpdater();
 	}
 	
+	public class LinkCreator extends Creator<T>{
+
+		
+
+		public LinkCreator() {
+			super(IndexedLinkManager.this);
+		}
+		@Override
+		public FormResult getResult(T dat, Form f) {
+			// TODO Auto-generated method stub
+			// pass the link ends explicitly so MEssageServlet can link to them
+			try {
+				return new MessageResult("link_created",getTypeName(),dat.getLeft(),dat.getRight());
+			} catch (DataException e) {
+				getLogger().error("Error getting update link result", e);
+				return new MessageResult("object_created", getTypeName(),dat.getIdentifier());
+			}
+		}
+	}
 	
+	@Override
+	public FormCreator getFormCreator(AppContext c) {
+		return new LinkCreator();
+	}
 	
 	/**
 	 * Do we automatically update the history as part of commit. 
