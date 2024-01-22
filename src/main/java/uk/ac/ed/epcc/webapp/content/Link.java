@@ -54,4 +54,15 @@ public class Link extends FormResultWrapper implements XMLGenerator,UIGenerator 
 	public void setNewWindow(boolean new_window) {
 		this.new_window = new_window;
 	}
+	@Override
+	public boolean equals(Object arg0) {
+		if( arg0 instanceof Link){
+			return ((Link)arg0).text.equals(text);
+		}
+		return false;
+	}
+	@Override
+	public int hashCode() {
+		return text.hashCode();
+	}
 }
