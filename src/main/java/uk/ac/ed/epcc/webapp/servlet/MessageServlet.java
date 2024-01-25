@@ -115,7 +115,7 @@ public class MessageServlet extends WebappServlet {
 	public static String encodeString(String s) {
 		// In principal we should be able to use % encoding here
 		// but tomcat seems to dislike % encoded / chars in a URL
-		// Safer to use Base64 ven though the data is always strings
+		// Safer to use Base64 even though the data is always strings
 		Base64.Encoder enc = Base64.getUrlEncoder().withoutPadding();
 		return enc.encodeToString(s.getBytes(StandardCharsets.UTF_8));
 		
@@ -123,7 +123,7 @@ public class MessageServlet extends WebappServlet {
 	}
 
 	public static String decodeString( String s) {
-		Base64.Decoder dec = Base64.getDecoder();
+		Base64.Decoder dec = Base64.getUrlDecoder();
 		return new String(dec.decode(s),StandardCharsets.UTF_8);
 
 	}
