@@ -37,8 +37,11 @@ public class MessageServlet extends WebappServlet {
 		// TODO Auto-generated constructor stub
 	}
 
-	/** Interface for plug-ins that modify the message path.
+	/** Interface for plug-ins that modify the message path. 
 	 * e.g. adding a signature or using the session to shorten the url.
+	 * For security there has to be at least one {@link PathReWriter} that ensures integrity of the 
+	 * data. Otherwise it might be possible to insert spoofed content (e.g. presenting a link
+	 * to approve an account as something else)
 	 * 
 	 */
 	public static interface PathReWriter{

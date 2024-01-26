@@ -19,6 +19,9 @@ package uk.ac.ed.epcc.webapp.model;
 import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.UIGenerator;
+import uk.ac.ed.epcc.webapp.content.UIProvider;
+import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionGenerator;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.*;
@@ -40,7 +43,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  * @author spb
  *
  */
-public class Dummy1 extends DataObject implements Removable {
+public class Dummy1 extends DataObject implements Removable, UIProvider {
 	private static final String DUMMY_CONFIG_TAG = "Dummy";
 
 	public static final String NAME = "Name";
@@ -320,5 +323,10 @@ public class Dummy1 extends DataObject implements Removable {
 	public void remove() throws DataException {
 		delete();
 		
+	}
+
+	@Override
+	public UIGenerator getUIGenerator() {
+		return new ViewTransitionGenerator<Dummy1>(getContext(), ViewDummyTransitionProvider.DUMMY_TRANISTION_TAG, this,getName());
 	}
 }

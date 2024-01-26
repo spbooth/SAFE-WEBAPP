@@ -23,7 +23,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
  *
  */
 
-@HasObjectMapper(tag=FormResultMapper.CONSTRUCTION_TAG)
+
 public abstract class FormResultWrapper extends AbstractContexed implements XMLGenerator,UIGenerator {
 
 	@Override

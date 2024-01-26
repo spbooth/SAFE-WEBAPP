@@ -37,7 +37,12 @@ public class FormResultMapper extends AbstractContexed implements ObjectMapper<F
 			return null;
 		}
 		list.add(r.getProvider().getTargetName());
-		list.add(r.getTransition().toString());
+		Object key = r.getTransition();
+		if( key == null ) {
+			list.add("");
+		}else {
+			list.add(key.toString());
+		}
 		String text = target.text;
 		if( text == null) {
 			text="";
@@ -104,6 +109,9 @@ public class FormResultMapper extends AbstractContexed implements ObjectMapper<F
 			String tag = list.pop();
 			TransitionFactory fac = (TransitionFactory) new TransitionFactoryFinder(conn).getProviderFromName(tag);
 			String key = list.pop();
+			if( key.isEmpty()) {
+				key=null;
+			}
 			String text = list.pop();
 			if( text.isEmpty()) {
 				text = null;
@@ -131,6 +139,9 @@ public class FormResultMapper extends AbstractContexed implements ObjectMapper<F
 
 	@Override
 	public boolean allowAccess(SessionService sess, FormResultWrapper target) {
+		if( sess == null || ! sess.haveCurrentUser()) {
+			return false;
+		}
 		if( target.result instanceof ChainedTransitionResult) {
 			return ((ChainedTransitionResult)target.result).allow(sess);
 		}
@@ -139,7 +150,9 @@ public class FormResultMapper extends AbstractContexed implements ObjectMapper<F
 
 	@Override
 	public boolean isMine(Object target) {
-		return (target != null) && ( target instanceof Link || target instanceof Button) ;
+		return (target != null) && 
+				( target instanceof Link || target instanceof Button) &&
+				((FormResultWrapper)target).result instanceof ChainedTransitionResult;
 	}
 
 }

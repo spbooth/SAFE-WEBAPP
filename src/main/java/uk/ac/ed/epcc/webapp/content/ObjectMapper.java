@@ -6,7 +6,10 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** An object that encodes rules for mapping a target to and
  * from a sequence of string values. This is intended for encoding objects
- * within URLs etc so also supports access control
+ * within URLs etc so also supports access control. Ideally we would use the access control to ensure the
+ * objects are safe to use. However in practice we are usually only able to ensure the user
+ * has permission to use (which is not the same) so we usually need some other mechanism to ensure the
+ * integrity of the URL
  * 
  * @param <X> type of target
  */

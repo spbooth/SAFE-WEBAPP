@@ -22,7 +22,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
  *
  */
 
-
+@HasObjectMapper(tag=FormResultMapper.CONSTRUCTION_TAG)
 public class Link extends FormResultWrapper implements XMLGenerator,UIGenerator {
 
 	
