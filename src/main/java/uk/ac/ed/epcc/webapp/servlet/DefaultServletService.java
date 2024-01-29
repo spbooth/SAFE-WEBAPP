@@ -107,7 +107,7 @@ public class DefaultServletService implements ServletService{
 
 	public static final Feature EXTERNAL_AUTH_VIA_LOGIN_FEATURE = new Feature("external_auth.use_login",false,"Mandatory external auth with only login.jsp protected externally");
 
-	public static final Feature ALLOW_INSECURE = new Feature("session.allow_insecure",false,"Allow insecure connections to use tokes");
+	public static final Feature ALLOW_INSECURE = new Feature("session.allow_insecure",false,"Allow insecure connections to use tokens");
 
 	public static final Feature REPORT_URL_MODIFY = new Feature("session.report_url_modify",true,"Report urls with extra spaces to make them un-clickable but readable");
 	
