@@ -20,6 +20,8 @@ import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** A servlet for displaying messages via a redirect.
  * 
  * This works for both unauthenticated and authenticated users.
@@ -141,39 +143,46 @@ public class MessageServlet extends WebappServlet {
 		if( ! MAP_MESSAGE.isEnabled(conn)) {
 			return null;
 		}
-		LinkedList<String> args = new LinkedList<>();
-		args.add(mr.getMessage());
-		for(Object a : mr.getArgs()) {
-			if( a instanceof UIGenerator || a instanceof UIProvider) {
-				UIGenerator g;
-				if( a instanceof UIGenerator) {
-					g = (UIGenerator) a;
-				}else {
-					g = ((UIProvider)a).getUIGenerator();
+		try {
+			LinkedList<String> args = new LinkedList<>();
+			args.add(mr.getMessage());
+			for(Object a : mr.getArgs()) {
+				if( a instanceof UIGenerator || a instanceof UIProvider) {
+					UIGenerator g;
+					if( a instanceof UIGenerator) {
+						g = (UIGenerator) a;
+					}else {
+						g = ((UIProvider)a).getUIGenerator();
+					}
+					String v = ObjectMapper.map(conn, g);
+					if( v == null ) {
+						// Unsupported UIGenerator type safer to show inline
+						// than assume string representation is sufficient
+						return null;
+					}else {
+						a = v;
+					}
 				}
-				String v = ObjectMapper.map(conn, g);
-				if( v == null ) {
-					// Unsupported UIGenerator type safer to show inline
-					// than assume string representation is sufficient
-					return null;
-				}else {
-					a = v;
-				}
+				// ok to just convert to string.
+				args.add(MessageServlet.encodeArg(conn, a));
 			}
-			// ok to just convert to string.
-			args.add(MessageServlet.encodeArg(conn, a));
+			for(PathReWriter w : getReWriters(conn)) {
+				args = w.encode(args);
+			}
+
+			StringBuilder url = new StringBuilder();
+			url.append(MessageServlet.MESSAGE_PATH);
+			for(String p : args) {
+				url.append(p);
+				url.append("/");
+			}
+			return new RedirectResult(url.toString());
+		}catch(Throwable t) {
+			if( conn != null) {
+				Logger.getLogger(conn, MessageServlet.class).error("Error mapping message result",t);
+			}
+			return null;
 		}
-		for(PathReWriter w : getReWriters(conn)) {
-			args = w.encode(args);
-		}
-		
-		StringBuilder url = new StringBuilder();
-		url.append(MessageServlet.MESSAGE_PATH);
-		for(String p : args) {
-			url.append(p);
-			url.append("/");
-		}
-		return new RedirectResult(url.toString());
 	}
 	
 	/** Decode an element of the path into a message argument
