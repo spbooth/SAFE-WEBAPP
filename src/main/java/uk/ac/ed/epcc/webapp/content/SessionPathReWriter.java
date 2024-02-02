@@ -49,8 +49,20 @@ public class SessionPathReWriter extends AbstractContexed implements PathReWrite
 
 	@Override
 	public LinkedList<String> decode(LinkedList<String> encoded) {
-		int id = Integer.parseInt(encoded.getFirst());
-		return new LinkedList<String>( (LinkedList<String>)session_service.getAttribute(getTag()+_DATA+id));
+		if( encoded != null && ! encoded.isEmpty()) {
+			try {
+				int id = Integer.parseInt(encoded.getFirst());
+				LinkedList<String> ll = (LinkedList<String>)session_service.getAttribute(getTag()+_DATA+id);
+				if( ll != null ) {
+					return new LinkedList<String>( ll);
+				}
+			}catch(Exception e) {
+				getLogger().error("Error parsing message from session",e);
+			}
+		}
+		LinkedList<String> err_msg = new LinkedList<String>();
+		err_msg.add("session_expired");
+		return err_msg;
 	}
 
 }
