@@ -20,9 +20,6 @@ import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.IndexedTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 
@@ -41,8 +38,7 @@ public abstract class AbstractIndexedTransitionProvider<T extends Indexed,K>  ex
 	private final IndexedProducer<? extends T> fac;
     private final String target_name;
     
-    
-
+  
 	public AbstractIndexedTransitionProvider(AppContext c,IndexedProducer<? extends T> fac,String target_name){
 		super(c);
 		this.fac=fac;
