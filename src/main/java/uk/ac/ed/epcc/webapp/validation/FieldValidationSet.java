@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory.DataObjectFieldValidator;
 /** A Set of {@link FieldValidator}s
  * 
@@ -101,6 +102,15 @@ public class FieldValidationSet<T> extends LinkedHashSet<FieldValidator<T>> {
 		return a;
 		
 	}
+	/** Add a {@link FieldValidator} to a map of {@link FieldValidationSet}
+	 * This is intended as a convenience method for the {@link DataObjectFactory} getValidators method
+	 * 
+	 * @param <T>
+	 * @param map
+	 * @param name
+	 * @param val
+	 * @return
+	 */
 	public static <T> FieldValidationSet<T> add(Map<String,FieldValidationSet> map, String name, FieldValidator<T> val){
 		FieldValidationSet<T> prev = map.get(name);
 		if( prev == null) {
