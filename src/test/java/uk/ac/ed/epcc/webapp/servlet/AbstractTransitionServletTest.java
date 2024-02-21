@@ -416,7 +416,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		   
 		    ViewTransitionFactory provider = (ViewTransitionFactory) tp;
 		    SessionService session_service = getContext().getService(SessionService.class);
-		    assertTrue( provider.canView(target,session_service));
+		    assertTrue("View permission denied", provider.canView(target,session_service));
 		    
 		    
 

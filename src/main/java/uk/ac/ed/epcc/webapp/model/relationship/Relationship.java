@@ -277,4 +277,12 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		FilterDelete del = new FilterDelete(res);
 		del.delete(new SQLValueFilter(res, getLeftField(), user));
 	}
+
+	public void clearRelationships(B target) throws DataFault {
+		if( target == null) {
+			return;
+		}
+		FilterDelete del = new FilterDelete(res);
+		del.delete(new SQLValueFilter(res, getRightField(), target));
+	}
 }
