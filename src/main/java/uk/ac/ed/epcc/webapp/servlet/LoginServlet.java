@@ -293,7 +293,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 		// Don't use the ServletService method as the explicit login page
 		// may not be the default implementation. (may try Basic Auth for example)
 		res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
-				+ getLoginPage(conn)+"?error=login"));
+				+ getLoginPage(conn)+"?error=login&username="+username));
 	}
 
 	

@@ -148,6 +148,12 @@ This service is only available to pre-registered users.
 <h1><%=page_title %></h1>
 <%=conn.getExpandedProperty("login.welcome","Welcome to ${service.name}")%>
 <%=conn.getExpandedProperty("login.link","")%>
+<% 
+String username = request.getParameter("username"); 
+if(username == null){
+	username = "";
+}
+%>
 <% if("login".equals(request.getParameter("error"))) { %>
 <h3>Incorrect <%=fac.getNameLabel()%> or Password</h3>
 <p><b>please check your details and try again</b>
@@ -184,7 +190,7 @@ if( password_auth != null){
    <table class="form">
 	<tr>
 		<th><label class='required' for="username"><%=fac.getNameLabel() %>:</label></th>
-		<td><input id="username" type="text" class="input" name="username" autocomplete="username" required/></td>
+		<td><input id="username" type="text" class="input" name="username" autocomplete="username" value="<%=username%>" required/></td>
 		<td></td>
 	</tr>
 	<tr>
