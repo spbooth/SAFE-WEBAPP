@@ -1948,6 +1948,9 @@ public class Table<C, R> {
 			}
 		}
 	}
+	public boolean hasFooter() {
+		return footer != null && ! footer.isEmpty();
+	}
 	/**
 	 * Sort columns according to a specified comparator
 	 * 

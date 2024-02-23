@@ -275,6 +275,9 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 		return n;
 	}
     public  int addFooter(int nrow,Table<C,R> t){
+    	if( ! t.hasFooter()) {
+    		return nrow;
+    	}
 		if( table_sections){
 			hb.open("tfoot");
 			hb.clean("\n");
