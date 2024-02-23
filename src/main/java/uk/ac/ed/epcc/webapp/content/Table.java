@@ -760,12 +760,15 @@ public class Table<C, R> {
 	private LinkedList<R> row_keys = null; // order of the rows
 
 	private LinkedList<C> col_keys = null; // order of the cols
+	
+	
 
 	private String keyName = null; // if this is not null the row keys are shown
 	private Transform keyTransform = null; // Transform for printing the row
 											// keys;
 	private Set<R> warnings = null;
 	private Set<R> highlight = null;
+	private Set<R> footer = null; // place these rows in footer.
 	private boolean type_debug = false;
 	private boolean printHeadings = true;
 	private boolean printGroups = false;
@@ -896,6 +899,9 @@ public class Table<C, R> {
 			}
 			if( t.getWarning(row)){
 				setWarning(row, true);
+			}
+			if( t.isFooter(row)) {
+				setFooter(row, true);
 			}
 		}
 	}
@@ -1568,6 +1574,9 @@ public class Table<C, R> {
 		return (warnings != null && warnings.contains(row_key));
 	}
 
+	public boolean isFooter(R row_key) {
+		return (footer != null && footer.contains(row_key));
+	}
 	
 
 	public boolean hasCol(String string) {
@@ -1918,6 +1927,27 @@ public class Table<C, R> {
 		}
 	}
 
+	/**
+	 * mark a row to be included in footer. 
+	 * 
+	 * This may be ignored by some formatters so this should
+	 * not be used to ensure a row appears at the end of a table.
+	 * 
+	 * @param row_key
+	 * @param value
+	 */
+	public void setFooter(R row_key, boolean value) {
+		if (footer == null && value) {
+			footer = new HashSet<>();
+		}
+		if (value) {
+			footer.add(row_key);
+		} else {
+			if (footer != null) {
+				footer.remove(row_key);
+			}
+		}
+	}
 	/**
 	 * Sort columns according to a specified comparator
 	 * 
