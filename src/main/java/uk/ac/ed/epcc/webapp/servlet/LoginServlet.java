@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.email.Emailer;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
@@ -126,6 +127,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 			serv = new ServletSessionService(conn);
 			conn.setService(serv);
 		}
+		AppUserFactory<T> person_fac = serv.getLoginFactory();
 		try {
 			if (logout != null) {
 				log.debug("requesting logout");
@@ -174,7 +176,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				message(conn,req,res,"invalid_argument");
 				return;
 			}
-			AppUserFactory<T> person_fac = serv.getLoginFactory();
+			
 			PasswordAuthComposite<T> password_auth = person_fac.getComposite(PasswordAuthComposite.class);
 
 			if(  password_auth == null) {
@@ -292,8 +294,20 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 		// Go to the login page again - perhaps with polite message
 		// Don't use the ServletService method as the explicit login page
 		// may not be the default implementation. (may try Basic Auth for example)
-		res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
-				+ getLoginPage(conn)+"?error=login&username="+username));
+		if( username == null ) {
+			res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
+					+ getLoginPage(conn)+"?error=login"));
+		}else {
+			try {
+				// need to be a little careful here as usernames are 
+				person_fac.validateNameFormat(username);
+				res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
+						+ getLoginPage(conn)+"?error=login&username="+username));
+			}catch(ParseException e) {
+				res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
+						+ getLoginPage(conn)+"?error=login_name"));
+			}
+		}
 	}
 
 	

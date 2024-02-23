@@ -730,12 +730,12 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	@Override
 	public final T findByLoginNamePassword(String email, String password)
 			throws DataException {
-				return findByLoginNamePassword(email, password, true);
-				
-			}
-			@Override
-			public T findByLoginNamePassword(String email, String password,boolean check_fail_count)
-					throws DataException {
+		return findByLoginNamePassword(email, password, true);
+
+	}
+	@Override
+	public T findByLoginNamePassword(String email, String password,boolean check_fail_count)
+			throws DataException {
 				Logger log=getLogger();
 				AndFilter<T> fil = getFactory().getAndFilter();
 				SQLFilter<T> nameFilter = getLoginFilter(email);

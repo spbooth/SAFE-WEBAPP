@@ -1154,8 +1154,20 @@ Targetted<AU>
 	 */
 	@Override
 	public void validateNameFormat(String name) throws ParseException {
-		//TODO consider checking if single realm
-		
+		for( AppUserNameFinder finder : getRealms()) {
+			try {
+				if( finder.userVisible()) {
+					finder.validateNameFormat(name);
+					// valid in one realm
+					return;
+				}
+			}catch(ParseException e) {
+				
+			}
+		}
+		// Throw exception for the default realm
+		NameFinder<AU> def = getRealmFinder(getDefaultRealm());
+		def.validateNameFormat(name);
 	}
 	@Override
 	public BaseFilter<AU> hasRelationFilter(String role, AU user) {

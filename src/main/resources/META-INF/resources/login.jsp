@@ -158,6 +158,10 @@ if(username == null){
 <h3>Incorrect <%=fac.getNameLabel()%> or Password</h3>
 <p><b>please check your details and try again</b>
 </p>
+<% } %> <% if("login_name".equals(request.getParameter("login_name"))) { %>
+<h3>Incorrect format for <%=fac.getNameLabel()%></h3>
+<p><b>please check your details and try again</b>
+</p>
 <% } %> <% if("session".equals(request.getParameter("error"))) { %>
 <h3>Session invalid or expired</h3>
 <p><b>please login again</b></p>

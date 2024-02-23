@@ -177,7 +177,7 @@ public class LoginServletTest<A extends AppUser> extends AbstractLoginServletTes
 		SessionService<A> sess = ctx.getService(SessionService.class);
 		assertFalse(sess.haveCurrentUser());
 		
-		checkRedirect("/login.jsp?error=login");
+		checkRedirect("/login.jsp?error=login&username=fred@example.com");
 		
 	}
 	@Test
@@ -394,7 +394,7 @@ public class LoginServletTest<A extends AppUser> extends AbstractLoginServletTes
 		addParam("username", "bill@example.com");
 		addParam("password", "FredIsDead");
 		doPost();
-		checkRedirect("/login.jsp?error=login");
+		checkRedirect("/login.jsp?error=login&username=bill@example.com");
 	
 		
 	}
@@ -412,10 +412,27 @@ public class LoginServletTest<A extends AppUser> extends AbstractLoginServletTes
 		addParam("username", "fred@example.com");
 		addParam("password", "FredIsAlive");
 		doPost();
-		checkRedirect("/login.jsp?error=login");
+		checkRedirect("/login.jsp?error=login&username=fred@example.com");
 		checkDiff("/cleanup.xsl", "password_fail.xml");
 		
 		
+	}
+	
+	@Test
+	public void testBadNameFormat() throws Exception{
+		AppUserFactory<A> fac =  ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		
+		takeBaseline();
+		addParam("username", "Gloria the happy cow");
+		addParam("password", "FredIsAlive");
+		doPost();
+		checkRedirect("/login.jsp?error=login_name");
+		checkUnchanged();
 	}
 	@Test
 	public void testBadPasswordBasic() throws Exception{
