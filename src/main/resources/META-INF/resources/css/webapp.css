@@ -461,7 +461,7 @@ div td, div table.auto td form , div.block td ul, div.block td ol{
         background-color: #ffffff;
         padding: var(--cell-padding);
 }
-td.numeric, td[numeric] ,  td.numeric input {
+td.numeric, td[numeric] ,  td.numeric input, table.dataTable tfoot td[numeric]  {
 text-align: right;
 white-space: nowrap;
 }
