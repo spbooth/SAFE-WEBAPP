@@ -20,7 +20,8 @@ public interface ObjectMapper<X> extends Tagged{
 	public String[] encode(X target);
 	
 	
-	/**
+	/** Decode a string list into the target object.
+	 * return null on error
 	 * 
 	 * @param args
 	 * @return
