@@ -20,6 +20,7 @@ import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
+import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** A servlet for displaying messages via a redirect.
@@ -175,6 +176,11 @@ public class MessageServlet extends WebappServlet {
 			for(String p : args) {
 				url.append(p);
 				url.append("/");
+			}
+			// Ensure transaction is flushed as we are redirecting the browser which will make a new connection
+			DatabaseService db = conn.getService(DatabaseService.class);
+			if( db != null ) {
+				db.commitTransaction();
 			}
 			return new RedirectResult(url.toString());
 		}catch(Throwable t) {
