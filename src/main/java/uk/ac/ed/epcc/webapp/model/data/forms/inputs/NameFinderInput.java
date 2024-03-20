@@ -24,7 +24,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
  * @author spb
  *
  */
-public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>> extends AbstractDataObjectInput<T> implements AutoCompleteListInput<Integer, T>, PreSelectInput<Integer, T>, FormatHintInput{
+public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>> extends AbstractDataObjectInput<T> implements AutoCompleteListInput<Integer, T>, PreSelectInput<Integer, T>, ModifiableFormatHintInput{
 	protected final ParseFactory<T> finder; // in most cases this will aslo be the factory but not always
 	
 	/** Possible operating modes.

@@ -31,12 +31,13 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  */
 
 
-public class ElapsedSecondInput extends ParseAbstractInput<Number> implements FormatHintInput{
+public class ElapsedSecondInput extends ParseAbstractInput<Number> {
 
 	public ElapsedSecondInput() {
 		super();
 		setBoxWidth(10);
 		setSingle(true);
+		setFormatHint("HH:MM:SS");
 		addValidator(new FieldValidator<Number>() {
 			
 			@Override
@@ -89,10 +90,4 @@ public class ElapsedSecondInput extends ParseAbstractInput<Number> implements Fo
 		total = total/60;
 		return total+":"+min+":"+seconds;
 	}
-
-	@Override
-	public String getFormatHint() {
-		return "HH:MM:SS";
-	}
-
 }

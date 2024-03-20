@@ -222,5 +222,8 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 	public String getFieldHelp(String field) {
 		return getFieldHelp().get(field);
 	}
-
+	@Override
+	public String getFieldHint(String field) {
+		return null;
+	}
 }
