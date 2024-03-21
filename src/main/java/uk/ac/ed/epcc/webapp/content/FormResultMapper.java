@@ -121,7 +121,11 @@ public class FormResultMapper extends AbstractContexed implements ObjectMapper<F
 				title = null;
 			}
 			Object o =  fac.accept(new DecodeVisitor(list));
-			ChainedTransitionResult r = new ChainedTransitionResult(fac, o, fac.lookupTransition(o, key));
+			Object k = null;
+			if( key != null) {
+				k = fac.lookupTransition(o, key);
+			}
+			ChainedTransitionResult r = new ChainedTransitionResult(fac, o, k);
 					
 			if( type.equals("L")) {
 				Link l = new Link(getContext(), text, title,r);
