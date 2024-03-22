@@ -136,9 +136,18 @@ public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed i
 		if( name.startsWith(NULL_FIELD_PREFIX)) {
 			String field = name.substring(NULL_FIELD_PREFIX.length());
 			Repository res = fac.res;
+			boolean optional = false;
+			if( field.endsWith("?")) {
+				optional=true;
+				field = field.substring(0,field.length()-1);
+			}
 			if( res.hasField(field)) {
 				return new NullFieldFilter<>(res, field, true);
 			}else {
+				if( optional) {
+					// optional field
+					return new GenericBinaryFilter<>(true);
+				}
 				getLogger().error("Bad null field filter "+field);
 				return null;
 			}
