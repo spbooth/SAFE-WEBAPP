@@ -33,7 +33,7 @@ public class AuthTypeComposite<BDO extends DataObject> extends Composite<BDO, Au
 	public static final String REQUIRE_MFA = "RequireMFA";
 	public static final String REQUIRE_AUTH = "RequireAuthType";
 	
-	protected AuthTypeComposite(DataObjectFactory<BDO> fac, String composite_tag) {
+	public AuthTypeComposite(DataObjectFactory<BDO> fac, String composite_tag) {
 		super(fac, composite_tag);
 	}
 
