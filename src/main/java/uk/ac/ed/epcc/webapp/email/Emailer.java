@@ -549,13 +549,13 @@ public class Emailer implements Contexed{
 	 * @throws DataFault 
 	 */
 	public void doSend(MimeMessage m) throws MessagingException, DataFault{
-		if( EMAIL_DEFERRED_SEND.isEnabled(getContext()) && getContext().getService(DatabaseService.class).inTransaction()) {
+		if( EMAIL_DEFERRED_SEND.isEnabled(getContext())) {
 		   CleanupService cleanup = getContext().getService(CleanupService.class);
 		   if( cleanup != null) {
 			   SendAction a = new SendAction(this,m);
 			   cleanup.add(a);
 			   DatabaseService db = getContext().getService(DatabaseService.class);
-			   if( db != null) {
+			   if( db != null && db.inTransaction()) {
 				   // If we are in a transaction cancel this if transaction is rolled back
 				   db.addCleanup(a);
 			   }

@@ -81,6 +81,15 @@ public class TableSpecification {
 	public TableSpecification(){
 		this("PrimaryRecordID");
 	}
+	/** Set a configuration tag.
+	 * The {@link TableSpecification} will remember the currently active configuration tag
+	 * for each field added. This allows a tag to be specified by a composite or superclass
+	 * for the fields it defines so property driven configuration can use the same parameters
+	 * for all instances or sub-classes 
+	 * 
+	 * @param tag
+	 * @return
+	 */
 	public String setCurrentTag(String tag) {
 		String prev = current_tag;
 		current_tag=tag;
