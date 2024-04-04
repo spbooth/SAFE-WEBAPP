@@ -290,6 +290,7 @@ public A getSuperPerson(){
 public void setCurrentPerson(A person) {
 	
 	setCurrentPersonNoWtmp(person);
+	force_no_person=false;
 	if( use_session) {
 		try {
 			WtmpManager man = getWtmpManager();

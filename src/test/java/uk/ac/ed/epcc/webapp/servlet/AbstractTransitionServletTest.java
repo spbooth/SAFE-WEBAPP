@@ -212,7 +212,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		// Setup the transition for next operation
 		// we don't call resetRequest as
 		Map<String,Object> multi_stage = (Map<String, Object>) req.getAttribute(BaseHTMLForm.FORM_STATE_ATTR);
-		resetRequest();
+		
 		setTransition(fac, key, target);
 		if( multi_stage != null) {
 			// copy over the current form state 
