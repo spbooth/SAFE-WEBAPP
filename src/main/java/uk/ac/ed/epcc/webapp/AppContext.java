@@ -996,13 +996,18 @@ public final class AppContext {
 	private static final class ObjectCacheKey{
 		
 
+		
+		/**
+		 * @param tag
+		 */
+		public ObjectCacheKey(String tag) {
+			super();
+			this.tag = tag;
+		}
+		private final String tag;
 		@Override
 		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((path == null) ? 0 : path.hashCode());
-			result = prime * result + ((tag == null) ? 0 : tag.hashCode());
-			return result;
+			return tag.hashCode();
 		}
 		@Override
 		public boolean equals(Object obj) {
@@ -1013,11 +1018,6 @@ public final class AppContext {
 			if (getClass() != obj.getClass())
 				return false;
 			ObjectCacheKey other = (ObjectCacheKey) obj;
-			if (path == null) {
-				if (other.path != null)
-					return false;
-			} else if (!path.equals(other.path))
-				return false;
 			if (tag == null) {
 				if (other.tag != null)
 					return false;
@@ -1025,17 +1025,6 @@ public final class AppContext {
 				return false;
 			return true;
 		}
-		/**
-		 * @param path
-		 * @param tag
-		 */
-		public ObjectCacheKey(String path, String tag) {
-			super();
-			this.path = path;
-			this.tag = tag;
-		}
-		private final String path;
-		private final String tag;
 	}
 	/** Construct an object identified by a string tag and an optional qualifier string.
 	 * <p>
@@ -1082,7 +1071,7 @@ public final class AppContext {
 		T result=null;
 		ObjectCacheKey key = null;
 		if( tag != null  && ContextCached.class.isAssignableFrom(clazz)&&CONTEXT_CACHE_FEATURE.isEnabled(this)) {
-			key = new ObjectCacheKey(path, tag);
+			key = new ObjectCacheKey(tag);
 			Object o = getAttribute(key);
 			if( o != null) {
 				if( clazz.isAssignableFrom(o.getClass())) {
@@ -1097,7 +1086,7 @@ public final class AppContext {
 		Class<? extends T> target = getPropertyClass(clazz,default_class,tag);
 		// now consider if only the resolved class implements ContexedCached
 		if( key == null && target != null && tag != null  && ContextCached.class.isAssignableFrom(target)&&CONTEXT_CACHE_FEATURE.isEnabled(this) ) {
-			key = new ObjectCacheKey(path, tag);
+			key = new ObjectCacheKey(tag);
 			Object o = getAttribute(key);
 			if( o != null) {
 				if( target.isAssignableFrom(o.getClass())) {
@@ -1437,8 +1426,8 @@ public final class AppContext {
 	}
 	
 
-	public final void removeCached(String path,String tag) {
-		removeAttribute(new ObjectCacheKey(path, tag));
+	public final void removeCached(String tag) {
+		removeAttribute(new ObjectCacheKey(tag));
 	}
 	private static final ThreadLocal<AppContext> local_ctx = new ThreadLocal<AppContext>();
 	/** Save a thread-local AppContext
