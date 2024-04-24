@@ -437,6 +437,12 @@ public abstract class ServletTest extends WebappTestBase{
 		deferredActions();
 
 	}
+	
+	protected final void doPut() throws ServletException, IOException{
+		servlet.doPut(req, res);
+		deferredActions();
+
+	}
 	protected final void doPostDeferredEmail() throws ServletException, IOException{
 		servlet.doPost(req, res);
 		deferredEmails();
