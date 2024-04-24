@@ -61,7 +61,7 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 		Boolean b = (Boolean) conn.getAttribute(this);
 		if (b == null) {
 			
-			b = new Boolean(defaultSetting(conn));
+			b = Boolean.valueOf(defaultSetting(conn));
 			SessionService sess = conn.getService(SessionService.class);
 			if( ! sess.isAuthenticated()) {
 				// This ensures that preferences don't trigger authentication

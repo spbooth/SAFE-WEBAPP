@@ -125,4 +125,8 @@ public interface FieldConstraint<D> {
 		}
 		return new MultiFieldConstraint<D>(a, b);
 	}
+	public static <D> Map<String,FieldConstraint> add(Map<String,FieldConstraint> map,String field,FieldConstraint<D> c){
+		map.put(field, add(map.get(field),c));
+		return map;
+	}
 }

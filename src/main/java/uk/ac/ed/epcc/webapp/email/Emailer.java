@@ -43,6 +43,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.TemplateFinder;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
 import uk.ac.ed.epcc.webapp.session.*;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest;
@@ -105,7 +106,7 @@ public class Emailer implements Contexed{
 	public static final String EMAIL_FORCE_ADDRESS = "email.force.address";
 	public static final String EMAIL_BYPASS_FORCE_ADDRESS = "email.bypass_force.address";
 	public static final Feature EMAILS_FEATURE = new Feature("emails",true,"emails enabled");
-	public static final Feature EMAIL_FORCE_QUEUE_FEATURE = new Feature("emails.force_queue",false,"All emails are queued to the database first");
+	public static final Feature EMAIL_FORCE_QUEUE_FEATURE = new Preference("emails.force_queue",false,"All emails are queued to the database first",SessionService.ADMIN_ROLE);
 	public static final Feature EMAIL_QUEUE_FAILS_FEATURE = new Feature("emails.queue_fails",true,"Failed sends are queued to the database first");
 
 	public static final Feature PASSWORD_RESET_SERVLET = new Feature("password_reset.servlet",false,"Send reset url in reset email");
@@ -127,7 +128,7 @@ public class Emailer implements Contexed{
 
 	private static final int MAX_REPORTS = 10;
 
-	public static final Feature DEBUG_SEND = new Feature("email.send.debug", false, "Log send internal operations");
+	public static final Feature DEBUG_SEND = new Preference("email.send.debug", false, "Log send internal operations",SessionService.ADMIN_ROLE);
 	AppContext ctx;
 	private final Pattern dont_send_pattern;
 	private TemplateFinder finder=null;

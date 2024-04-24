@@ -1645,8 +1645,28 @@ public class Table<C, R> {
 	public boolean printGroups() {
 		return column_groups != null && ! column_groups.isEmpty() && printGroups;
 	}
-	
-	
+	/** Add an object to the table.
+	 * If the value is null this is ignored.
+	 * 
+	 * @param col_key
+	 * @param row_key
+	 * @param value
+	 * @return
+	 */
+	public Object putOptional(C col_key,R row_key, Object value) {
+		if( value == null ) {
+			return null;
+		}
+		return put(col_key,row_key,value);
+	}
+	/** Add an object to the table.
+	 * This will create the specified column.
+	 * 
+	 * @param col_key
+	 * @param row_key
+	 * @param value
+	 * @return
+	 */
 	public Object put(C col_key, R row_key, Object value) {
 		Object ret = null;
 		Col col = getCol(col_key);
