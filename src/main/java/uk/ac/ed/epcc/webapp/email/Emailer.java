@@ -111,7 +111,7 @@ public class Emailer implements Contexed{
 
 	public static final Feature PASSWORD_RESET_SERVLET = new Feature("password_reset.servlet",false,"Send reset url in reset email");
 	public static final Feature EMAIL_DEFERRED_SEND = new Feature("email.deferred_send",true,"Use cleanup service to defer send till end of transaction");
-    public static final Feature HTML_ALTERNATIVE = new Feature("email.html_alternative",true,"Look for a tempalte region conatining html alternative content");
+    public static final Feature HTML_ALTERNATIVE = new Feature("email.html_alternative",true,"Look for a template region containing html alternative content");
 	private static final String MAIL_SMTP_HOST = "mail.smtp.host";
 
 	private static final String ERROR_EMAIL_FROM_ADDRESS = "error.email_from_address";
@@ -1306,15 +1306,16 @@ public class Emailer implements Contexed{
 	public void errorEmail(Logger log,Throwable e,
 			Map props, String additional_info) throws Exception {
 		AppContext conn = getContext();
+		if( conn == null || conn.getInitParameter(ERROR_EMAIL_NOTIFY_ADDRESS) == null ){
+			// abort early if no notify address set.
+			return;
+		}
 		if( EMAIL_FORCE_QUEUE_FEATURE.isEnabled(conn)) {
 			// Error emails are never queued. so suppress them if queueing is forced
 			return;
 		}
 	
-		if( conn == null || conn.getInitParameter(ERROR_EMAIL_NOTIFY_ADDRESS) == null ){
-			// abort early if no notify address set.
-			return;
-		}
+		
 		String subject="An Error occurred";
 		String body="";
 		// Show stack trace

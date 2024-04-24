@@ -64,7 +64,7 @@ public class ErrorFilterTest {
 		assertTrue("emails sent" ,count > 0);
 		Message first = MockTansport.getMessage(0);
 		String subject = first.getSubject();
-		assertEquals("test Error Report Need to specify class name in environment or system property, or", subject);
+		assertEquals("test Error Report No Database connection", subject);
 		
 	}
 	

@@ -61,7 +61,7 @@ public class Feature extends AbstractSetting<Boolean> {
 		// Feature queries may occur often so cache the result in the context
 		Boolean b = (Boolean) conn.getAttribute(this);
 		if (b == null) {
-			b = new Boolean(getConfigValue(conn));
+			b = Boolean.valueOf(getConfigValue(conn));
 			conn.setAttribute(this, b);
 		}
 		return b.booleanValue();

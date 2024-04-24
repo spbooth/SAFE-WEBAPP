@@ -27,6 +27,9 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extends AbstractUserSettingFactory<Boolean, Boolean, S> {
 
+	public static final String DEFAULT_TABLE = "UserSettings";
+
+
 	public static class UserSetting extends AbstractUserSettingFactory.UserSetting<Boolean>{
 
 		/**
@@ -46,9 +49,11 @@ public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extend
 		}
 	}
 
-	
+	public static UserSettingFactory getFactory(AppContext conn) {
+		return conn.makeObject(UserSettingFactory.class, DEFAULT_TABLE);
+	}
 	public UserSettingFactory(AppContext conn){
-		super(conn, "UserSettings");
+		super(conn, DEFAULT_TABLE);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
