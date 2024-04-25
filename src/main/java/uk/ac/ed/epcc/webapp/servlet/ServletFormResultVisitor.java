@@ -103,15 +103,7 @@ public class ServletFormResultVisitor extends AbstractContexed implements WebFor
 		   return;
 	}
 	public void visitMessageResult(MessageResult mr) throws ServletException, IOException {
-		 // If we can use MessageServlet on modifying post/put to avoid re-submit
-		 String method = req.getMethod();
-		 if( (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT")) && ! WebappServlet.isNonModifying(req)) {
-			 RedirectResult r = MessageServlet.mapResult(conn, mr);
-			 if( r != null) {
-				 visitRedirectResult(r);
-				 return;
-			 }
-		 }
+		
 		 WebappServlet.messageWithArgs(conn, req, res, mr.getMessage(),mr.getArgs());
 		 return;
 	}

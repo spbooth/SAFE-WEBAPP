@@ -137,35 +137,38 @@ public class MessageServlet extends WebappServlet {
 	 * If the mapping is not supported then return null;
 	 * 
 	 * @param conn
-	 * @param mr
+	 * @param message
+	 * @param input_args
 	 * @return RedirectResult or null
 	 */
-	public static RedirectResult mapResult(AppContext conn,MessageResult  mr) {
+	public static String mapMessageToRedirect(AppContext conn,String message, Object input_args[]) {
 		if( ! MAP_MESSAGE.isEnabled(conn)) {
 			return null;
 		}
 		try {
 			LinkedList<String> args = new LinkedList<>();
-			args.add(mr.getMessage());
-			for(Object a : mr.getArgs()) {
-				if( a instanceof UIGenerator || a instanceof UIProvider) {
-					UIGenerator g;
-					if( a instanceof UIGenerator) {
-						g = (UIGenerator) a;
-					}else {
-						g = ((UIProvider)a).getUIGenerator();
+			args.add(message);
+			if( input_args != null) {
+				for(Object a : input_args) {
+					if( a instanceof UIGenerator || a instanceof UIProvider) {
+						UIGenerator g;
+						if( a instanceof UIGenerator) {
+							g = (UIGenerator) a;
+						}else {
+							g = ((UIProvider)a).getUIGenerator();
+						}
+						String v = ObjectMapper.map(conn, g);
+						if( v == null ) {
+							// Unsupported UIGenerator type safer to show inline
+							// than assume string representation is sufficient
+							return null;
+						}else {
+							a = v;
+						}
 					}
-					String v = ObjectMapper.map(conn, g);
-					if( v == null ) {
-						// Unsupported UIGenerator type safer to show inline
-						// than assume string representation is sufficient
-						return null;
-					}else {
-						a = v;
-					}
+					// ok to just convert to string.
+					args.add(MessageServlet.encodeArg(conn, a));
 				}
-				// ok to just convert to string.
-				args.add(MessageServlet.encodeArg(conn, a));
 			}
 			for(PathReWriter w : getReWriters(conn)) {
 				args = w.encode(args);
@@ -182,7 +185,7 @@ public class MessageServlet extends WebappServlet {
 			if( db != null ) {
 				db.commitTransaction();
 			}
-			return new RedirectResult(url.toString());
+			return url.toString();
 		}catch(Throwable t) {
 			if( conn != null) {
 				Logger.getLogger(conn, MessageServlet.class).error("Error mapping message result",t);
@@ -208,5 +211,13 @@ public class MessageServlet extends WebappServlet {
 		}
 
 		return path;
+	}
+
+	public static RedirectResult mapResult(AppContext ctx, MessageResult r) {
+		String url = mapMessageToRedirect(ctx, r.getMessage(), r.getArgs());
+		if( url != null) {
+			return new RedirectResult(url);
+		}
+		return null;
 	}
 }

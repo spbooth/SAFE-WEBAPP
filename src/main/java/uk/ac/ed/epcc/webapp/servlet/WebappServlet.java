@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -284,6 +285,15 @@ public abstract class WebappServlet extends HttpServlet {
 				HttpServletResponse res, String message_type, Object args[])
 				throws ServletException, IOException {
 		Logger log = context.getService(LoggerService.class).getLogger(context.getClass());
+		 // If we can use MessageServlet on modifying post/put to avoid re-submit
+		 String method = req.getMethod();
+		 if( (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT")) && ! WebappServlet.isNonModifying(req)) {
+			 String r = MessageServlet.mapMessageToRedirect(context, message_type,args);
+			 if( r != null) {
+				 context.getService(ServletService.class).redirect(r);
+				 return;
+			 }
+		 }
 		log.debug("sending message " + message_type);
 		// verify the message is valid
 		try {
