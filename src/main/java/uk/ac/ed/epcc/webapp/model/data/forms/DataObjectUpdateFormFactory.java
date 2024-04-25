@@ -107,7 +107,7 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	public final void buildUpdateForm(Form f, BDO dat, SessionService<?> operator)
 			throws DataFault {
 				
-			    boolean complete = buildForm(f,getFixtures(dat), dat == null ? getCreationDefaults(): dat.getMap());
+			    boolean complete = buildForm(f,getFixtures(dat), dat == null ? getCreationDefaults(): getUpdateDefaults(dat));
 			
 			    // set values before customise as it is common
 				// for the customise methods to lock fields
@@ -128,6 +128,16 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 				
 				
 			}
+
+	/** Get a set of default values for the form fields 
+	 * 
+	 * By default, this is all the existing values of the object, but can be over-ridden
+	 * if you are adding additional Fields 
+	 * @return Map of defaults
+	 */
+	protected Map<String, Object> getUpdateDefaults(BDO dat) {
+		return dat.getMap();
+	}
 
 	/** Similar to {@link #customiseUpdateForm(Form, DataObject)} but only called when the form is complete
 	 * 
