@@ -29,7 +29,7 @@ public class QueuedMessageTag extends TagSupport implements Tag {
         		QueuedMessages fac = QueuedMessages.getFactory(conn);
         		long count = fac.getQueuedMessageCount();
         		if( count > 0L) {
-        			setValue("QueuedCount", count);
+        			pageContext.setAttribute("QueuedCount", count);
         			return EVAL_BODY_INCLUDE;
         		}
         	}
