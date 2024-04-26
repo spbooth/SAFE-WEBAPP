@@ -528,7 +528,7 @@ public class Emailer implements Contexed{
 		@Override
 		public void run() {
 			try {
-				postSend(es.send(m));
+				postSend(es.send(m,false));
 			} catch (Exception e) {
 				es.getLogger().error("Error sending message", e);
 			}
@@ -575,12 +575,20 @@ public class Emailer implements Contexed{
 	 * @throws DataFault 
 	 */
 	public MimeMessage doSendNow(MimeMessage m) throws MessagingException, DataFault{
+		try {
+			return doSendNow(m, false);
+		} catch (QueuedMessageException e) {
+			getLogger().error("Impossible exception !!",e);
+			return m;
+		}
+	}	
+	public MimeMessage doSendNow(MimeMessage m,boolean exception_on_queue) throws MessagingException, DataFault, QueuedMessageException{	
 		if( m == null ){
 			return null;
 		}
 		
 		
-		m = send(m);
+		m = send(m,exception_on_queue);
 		return m;
 	}
 
@@ -614,15 +622,16 @@ public class Emailer implements Contexed{
 	}
 	/** Actually send the {@link MimeMessage}
 	 * @param m {@link MimeMessage}
-	 * 
+	 * @param exception_on_queue
 	 * Note this will return null if message sending is disabled.
 
 	 * @return sent {@link MimeMessage}
 	 * @throws MessagingException
 	 * @throws AddressException
 	 * @throws DataFault 
+	 * @throws QueuedMessageException 
 	 */
-	private MimeMessage send(MimeMessage m) throws MessagingException, AddressException, DataFault {
+	private MimeMessage send(MimeMessage m, boolean exception_on_queue) throws MessagingException, AddressException, DataFault, QueuedMessageException {
 		if( m == null ){
 			return null;
 		}
@@ -722,6 +731,9 @@ public class Emailer implements Contexed{
 				}catch(MessagingException me) {
 					if( EMAIL_QUEUE_FAILS_FEATURE.isEnabled(conn)) {
 						QueuedMessages.getFactory(conn).queueMessage(m);
+						if( exception_on_queue) {
+							throw new QueuedMessageException("Send failed, message queued for later resend", me);
+						}
 					}else {
 						throw me;
 					}

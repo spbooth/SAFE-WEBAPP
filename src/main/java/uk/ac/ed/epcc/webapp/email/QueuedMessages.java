@@ -151,9 +151,19 @@ public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends Data
 			t.put("Subject", m, m.getSubject());
 			t.put("Recipients", m, m.getRecipients());
 			t.put("Sent", m, m.getSentDate());
+			t.put("RetryCount", m, m.getRetry());
+			t.put("LastRetry", m, m.getLastRetry());
 			t.put("Download", m, new Button(getContext(), "download", new ServeDataResult(this, Integer.toString(m.getID()))));
 		}
 		return t;
+	}
+	public long getQueuedMessageCount() {
+		try {
+			return getCount(null);
+		} catch (DataException e) {
+			getLogger().error("Error counting queued messages",e);
+			return 0L;
+		}
 	}
 	public void delete(int id) throws DataFault {
 		FilterDelete<Q> del = new FilterDelete<>(res);
