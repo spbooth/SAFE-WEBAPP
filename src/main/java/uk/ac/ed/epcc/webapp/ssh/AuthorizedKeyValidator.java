@@ -333,6 +333,23 @@ public class AuthorizedKeyValidator extends AbstractContexed implements FieldVal
 	   }
 	   return key.substring(base64_m.end());
    }
+   public String getAlgorithm(String key) {
+	   if( key == null || key.isEmpty()) {
+		   return null;
+	   }
+	   key=key.trim();
+	   Matcher prefix_m = PREFIX_PATTERN.matcher(key);
+	   if( prefix_m.lookingAt() ) {
+		   key = key.substring(prefix_m.end());
+	   }
+	   Matcher alg_m= ALG_PATTERN.matcher(key);
+	   if( ! alg_m.lookingAt()) {
+		   // unrecognised algorithm
+		   return null;
+	   }
+	   return alg_m.group(1);
+	   
+   }
    
    /** Extension point validator.
     * This can add additional restrictions on the algorithm or the key itself
