@@ -121,6 +121,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 		String username = req.getParameter("username");
 		String password = req.getParameter("password");
 		String authtype = req.getParameter("authtype");
+		LoggerService ls = conn.getService(LoggerService.class);
 		Logger log = getLogger(conn);
 		SessionService<T> serv = conn.getService(SessionService.class);
 		if( serv == null ){
@@ -218,7 +219,9 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 							message(conn, req, res, "new_password_failed");
 							return;
 						}
-						
+						Map attr = new HashMap();
+						attr.put("user",user.getIdentifier());
+						ls.securityEvent("new_password_requested", sess,attr);
 						password_auth.newPassword(user);
 					}catch(Exception t){
 						getLogger(conn).error("Error getting registered user or sending new password",t);
@@ -285,7 +288,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 			throw new ServletException(e);
 		}
 
-		LoggerService ls = conn.getService(LoggerService.class);
+		
 		Map attr = new HashMap();
 		attr.put("user", username);
 		ls.securityEvent("LoginFailed",serv, attr);

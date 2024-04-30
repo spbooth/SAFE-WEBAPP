@@ -17,6 +17,8 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
@@ -35,6 +37,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -91,9 +94,16 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 		public void complete() throws DataException{
 			AppUser user = getUser();
 			AppUserNameFinder finder = user_fac.getRealmFinder(EmailNameFinder.EMAIL);
-			finder.setName(user, record.getStringProperty(NEW_EMAIL));
+			String old_email = finder.getCanonicalName(user);
+			String new_email = record.getStringProperty(NEW_EMAIL);
+			finder.setName(user, new_email);
 			finder.verified(user); // email address verified
 			user.commit();
+			LoggerService ls = getContext().getService(LoggerService.class);
+			Map attr = new HashMap();
+			attr.put("new_email", new_email);
+			attr.put("old_email",old_email);
+			ls.securityEvent("EmailUpdated", getContext().getService(SessionService.class), attr);
 			delete();
 		}
 		
@@ -125,9 +135,16 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 		public FormResult action(Form f) throws ActionException {
 			try {
 				
-				EmailChangeRequest req = createRequest(user,(String)f.get(EmailNameFinder.EMAIL));
+				String new_email = (String)f.get(EmailNameFinder.EMAIL);
+				EmailChangeRequest req = createRequest(user,new_email);
+				String old_email=user.getEmail();
 				Emailer em= Emailer.getFactory(getContext());
 				em.newEmailRequest(user, req);
+				LoggerService ls = getContext().getService(LoggerService.class);
+				Map attr = new HashMap();
+				attr.put("new_email", new_email);
+				attr.put("old_email",old_email);
+				ls.securityEvent("EmailChangeRequested", getContext().getService(SessionService.class), attr);
 				return new MessageResult("email_change_request_made");
 			} catch (Exception e) {
 				getLogger().error("Error making EmailChangeRequest",e);

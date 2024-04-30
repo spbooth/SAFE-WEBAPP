@@ -20,6 +20,8 @@ import java.net.URLEncoder;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -42,6 +44,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
 import uk.ac.ed.epcc.webapp.jdbc.table.*;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -306,6 +309,10 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 					setSecret(user, (String)f.get(KEY));
 					clearFailCount(user);
 					user.commit();
+					LoggerService ls = getContext().getService(LoggerService.class);
+					Map attr = new HashMap();
+					attr.put("account",user.getIdentifier());
+					ls.securityEvent("WebsiteMFASet", getContext().getService(SessionService.class), attr);
 				} catch (DataFault e) {
 					throw new ActionException("Error setting key", e);
 				}
@@ -398,6 +405,10 @@ public abstract class AbstractTotpCodeAuthComposite<A extends AppUser,F extends 
 			try {
 			clearSecret(target);
 			target.commit();
+			LoggerService ls = getContext().getService(LoggerService.class);
+			Map attr = new HashMap();
+			attr.put("account",target.getIdentifier());
+			ls.securityEvent("WebsiteMFACleared", getContext().getService(SessionService.class), attr);
 			resetNavigation();
 			return prov.new ViewResult(target);
 			}catch(Exception t) {
