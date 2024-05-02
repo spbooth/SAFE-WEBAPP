@@ -27,7 +27,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 
 
-public class MonthInput extends ParseAbstractInput<Date> implements FormatHintInput, HTML5Input {
+public class MonthInput extends ParseAbstractInput<Date> implements HTML5Input {
     private static final String DEFAULT_FORMAT = "yyyy-MM";
 	DateFormat df;
  
@@ -43,6 +43,7 @@ public class MonthInput extends ParseAbstractInput<Date> implements FormatHintIn
 		df.setCalendar(cal);
 		df.setLenient(false);
 		this.resolution = resolution;
+		setFormatHint(DEFAULT_FORMAT.toUpperCase());
 	}
 	
 
@@ -93,11 +94,6 @@ public class MonthInput extends ParseAbstractInput<Date> implements FormatHintIn
 			return null;
 
 		return df.format(date);
-	}
-
-	@Override
-	public String getFormatHint() {
-		return DEFAULT_FORMAT.toUpperCase();
 	}
 
 	@Override

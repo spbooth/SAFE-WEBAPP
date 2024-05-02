@@ -14,6 +14,7 @@ public abstract class AbstractFormTextGenerator extends AbstractContexed impleme
 	private ResourceBundle form_content=null;
 	public static final String FORM_LABEL_SUFFIX = ".label";
 	public static final String FORM_HELP_TEXT_SUFFIX = ".help_text";
+	public static final String FORM_HINT_SUFFIX = ".hint";
 	
 	public AbstractFormTextGenerator(AppContext conn) {
 		super(conn);
@@ -29,6 +30,14 @@ public abstract class AbstractFormTextGenerator extends AbstractContexed impleme
 	}
 	public static String getHelpTextFromConfig(AppContext conn, ResourceBundle form_content, String qualifier, String field) {
 		String key = qualifier+"."+field+FORM_HELP_TEXT_SUFFIX;
+		if(  form_content != null && form_content.containsKey(key)) {
+			return form_content.getString(key);
+		}
+		// fall back to global config this also allows parameter expansion
+		return conn.getExpandedProperty(key);
+	}
+	public static String getHintFromConfig(AppContext conn, ResourceBundle form_content, String qualifier, String field) {
+		String key = qualifier+"."+field+FORM_HINT_SUFFIX;
 		if(  form_content != null && form_content.containsKey(key)) {
 			return form_content.getString(key);
 		}

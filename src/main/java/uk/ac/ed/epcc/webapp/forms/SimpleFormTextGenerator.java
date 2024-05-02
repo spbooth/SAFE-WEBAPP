@@ -42,4 +42,15 @@ public class SimpleFormTextGenerator extends AbstractFormTextGenerator {
 		return null;
 	}
 
+	@Override
+	public String getFieldHint(String field) {
+		for(String p : prefix) {
+			String help = getHintFromConfig(getContext(), getFormContent(), p, field);
+			if( help != null) {
+				return help;
+			}
+		}
+		return null;
+	}
+
 }

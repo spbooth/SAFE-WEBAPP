@@ -23,7 +23,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
  * @author Stephen Booth
  *
  */
-public class StorageUnitTextInput extends NumberInput<Long> implements FormatHintInput{
+public class StorageUnitTextInput extends NumberInput<Long> {
 
 	/**
 	 * 
@@ -31,6 +31,7 @@ public class StorageUnitTextInput extends NumberInput<Long> implements FormatHin
 	public StorageUnitTextInput() {
 		setMin(1L);
 		setNumberFormat(new UnitFormat());
+		setFormatHint("500"+Units.KiB.toString());
 	}
 
 	
@@ -81,17 +82,5 @@ public class StorageUnitTextInput extends NumberInput<Long> implements FormatHin
 	public String getType() {
 		// can't be a html5 number input with custom format browser may not show
 		return null;
-	}
-
-
-
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput#getFormatHint()
-	 */
-	@Override
-	public String getFormatHint() {
-
-		return "500"+Units.KiB.toString();
 	}
 }

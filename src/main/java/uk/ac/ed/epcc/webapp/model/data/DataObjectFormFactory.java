@@ -323,6 +323,9 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 		return true;
 	}
 	public static Input<?> getInputFromType(AppContext conn, Repository res,  Repository.FieldInfo info) {
+		if(info == null) {
+			return null;
+		}
 		int sql_type = info.getType();
 		// build default based on type
 		switch (sql_type) {

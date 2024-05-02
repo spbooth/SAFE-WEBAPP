@@ -27,14 +27,14 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * 
  */
 public abstract class ParseAbstractInput<V> extends AbstractInput<V> implements
-		 LengthInput<V> {
+		 LengthInput<V>, ModifiableFormatHintInput {
 
 	// input width
 	int maxwid = 64;
 
 	boolean force_single = false;
 
-	
+	private String format_hint=null;
 
 	
 	@Override
@@ -79,5 +79,13 @@ public abstract class ParseAbstractInput<V> extends AbstractInput<V> implements
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitLengthInput(this);
+	}
+
+	public void setFormatHint(String hint) {
+		format_hint=hint;
+	}
+	@Override
+	public String getFormatHint() {
+		return format_hint;
 	}
 }

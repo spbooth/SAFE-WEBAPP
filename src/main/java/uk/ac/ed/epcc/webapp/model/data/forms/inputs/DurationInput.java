@@ -35,7 +35,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  */
 
 
-public class DurationInput extends ParseAbstractInput<Duration> implements FormatHintInput{
+public class DurationInput extends ParseAbstractInput<Duration> {
 
 	private final long resolution;
 	public DurationInput(){
@@ -49,6 +49,7 @@ public class DurationInput extends ParseAbstractInput<Duration> implements Forma
 		super();
 		setBoxWidth(10);
 		setSingle(true);
+		setFormatHint("HH:MM:SS");
 		this.resolution=resolution;
 		addValidator(new FieldValidator<Duration>() {
 			
@@ -102,9 +103,6 @@ public class DurationInput extends ParseAbstractInput<Duration> implements Forma
 		return total+":"+min+":"+seconds;
 	}
 
-	public String getFormatHint() {
-		return "HH:MM:SS";
-	}
 	@Override
 	public Duration convert(Object v) throws TypeException {
 		if( v == null ){

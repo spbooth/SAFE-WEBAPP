@@ -648,7 +648,7 @@ Targetted<AU>
 		}
 		return sb.toString();
 	}
-	public static class  AppUserNameInput<A extends AppUser> extends NameFinderInput<A, AppUserFactory<A>> implements HTML5Input, FormatHintInput{
+	public static class  AppUserNameInput<A extends AppUser> extends NameFinderInput<A, AppUserFactory<A>> implements HTML5Input{
 
 		
 
@@ -657,6 +657,7 @@ Targetted<AU>
 			super(factory, finder, restrict, autocomplete);
 			if( useEmail()) {
 				setBoxWidth(EmailInput.defaultBoxWidth(getContext()));
+				setFormatHint("name@example.com");
 			}
 			
 		}
@@ -666,6 +667,7 @@ Targetted<AU>
 			super(factory, finder, create, restrict, autocomplete);
 			if( useEmail()) {
 				setBoxWidth(EmailInput.defaultBoxWidth(getContext()));
+				setFormatHint("name@example.com");
 			}
 		}
 
@@ -674,18 +676,8 @@ Targetted<AU>
 			super(factory, finder, options, restrict, autocomplete);
 			if( useEmail()) {
 				setBoxWidth(EmailInput.defaultBoxWidth(getContext()));
+				setFormatHint("name@example.com");
 			}
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput#getFormatHint()
-		 */
-		@Override
-		public String getFormatHint() {
-			if( useEmail()){
-				return "name@example.com";
-			}
-			return null;
 		}
 
 		/**

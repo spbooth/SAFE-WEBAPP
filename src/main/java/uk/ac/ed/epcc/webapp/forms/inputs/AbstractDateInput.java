@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  * @author spb
  *
  */
-public abstract class AbstractDateInput extends ParseAbstractInput<Date> implements BoundedDateInput, FormatHintInput {
+public abstract class AbstractDateInput extends ParseAbstractInput<Date> implements BoundedDateInput {
 //	public static final Date DEFAULT_MAX_DATE;
 //	static {
 //		Calendar c = Calendar.getInstance();
@@ -65,6 +65,9 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 
 		}
 		setBoxWidth(length);
+		//With html5 enabled this shows as a placeholder so if the browser overrides
+		// format to show a date picker this is hidden.
+		setFormatHint(getFormats()[getHintIndex()].toLowerCase());
 	
 	}
 	protected void decorate(FieldException e) throws FieldException{
@@ -139,13 +142,6 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 	 */
 	protected int getHintIndex(){
 		return 0;
-	}
-
-	@Override
-	public String getFormatHint() {
-		//With html5 enabled this shows as a placeholder so if the browser overrides
-		// format to show a date picker this is hidden.
-		return getFormats()[getHintIndex()].toLowerCase();
 	}
 
 	@Override

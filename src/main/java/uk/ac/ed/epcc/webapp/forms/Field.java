@@ -44,8 +44,8 @@ public final class Field<I> {
 	 * 
 	 */
 	private String label;
-	
 	private String tooltip;
+	private String hint;
 	private boolean optional=false;
 	
 
@@ -64,6 +64,7 @@ public final class Field<I> {
 		}
 		this.sel = sel;
 		this.sel.setKey(key);
+		setInput(sel);
 	}
 	/** Convert the Input to an UnmodifiedInput
 	 * by wrapping it in a LockedInput
@@ -136,10 +137,16 @@ public final class Field<I> {
     	sel=i;
     	if( key != null ){
     	  sel.setKey(key);
+		  if(sel instanceof ModifiableFormatHintInput) {
+			  String hint = getInputHint();
+			  if(hint != null) {
+				  ((ModifiableFormatHintInput) sel).setFormatHint(hint);
+    		  }
+    	  }
     	}
     }
     
-	/**
+    /**
 	 * get the key associated with this field
 	 * 
 	 * @return Object
@@ -247,6 +254,19 @@ public final class Field<I> {
 	public void setTooltip(String tooltip) {
 		this.tooltip = tooltip;
 	}
+	public String getInputHint() {
+		if( hint != null) {
+			return hint;
+		}
+		FormTextGenerator gen = f.getFormTextGenerator();
+		if( gen != null) {
+			return gen.getFieldHint(getKey());
+		}
+		return null;
+	}
+	public void setHint(String hint) {
+		this.hint = hint;
+	}
 	public Form getForm() {
 		return f;
 	}
@@ -256,5 +276,4 @@ public final class Field<I> {
 	public void setOptional(boolean optional) {
 		this.optional = optional;
 	}
-
 }
