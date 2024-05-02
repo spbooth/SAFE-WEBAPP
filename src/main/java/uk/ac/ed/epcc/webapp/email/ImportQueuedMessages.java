@@ -33,7 +33,7 @@ public class ImportQueuedMessages implements Command {
     	this.conn=conn;
     }
 	public String description() {
-			return "Query Config Properties";
+			return "Import queued messages from file";
 	}
 
 	public String help() {

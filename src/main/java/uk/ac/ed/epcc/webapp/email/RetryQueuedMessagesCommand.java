@@ -25,31 +25,27 @@ import uk.ac.ed.epcc.webapp.apps.CommandLauncher;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 
 
-public class ExportQueuedMessages implements Command {
+public class RetryQueuedMessagesCommand implements Command {
     private final AppContext conn;
-    public ExportQueuedMessages(AppContext conn){
+    public RetryQueuedMessagesCommand(AppContext conn){
     	this.conn=conn;
     }
 	public String description() {
-			return "Export queued messages to file";
+			return "Retry Queud messages";
 	}
 
 	public String help() {
-		return " export-filename";
+		return "no arguments";
 	}
 
 	public void run(LinkedList<String> args) {
-		if( args.size() != 1 ) {
-			CommandLauncher.die("Expecting file-name");
-		}
-		String file = args.getFirst();
+		
 		try {
-			FileOutputStream os = new FileOutputStream(file);
+
 			QueuedMessages fac = QueuedMessages.getFactory(getContext());
-			StreamData sd = fac.exportMessages();
-			sd.write(os);
-			os.close();
-			
+			long q = fac.getCount(null);
+			int count = fac.retry();
+			System.out.println("There were "+q+" queud messages, "+count+" were sent");
 		}catch(Exception e) {
 			getLogger().error("Error exporting messages", e);
 		}

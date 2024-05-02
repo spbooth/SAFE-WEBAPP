@@ -170,22 +170,23 @@ public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends Data
 		del.delete(new SQLIdFilter<>(res, id));
 	}
 	
-	public void retry() {
+	public int retry() {
 		if( Emailer.EMAIL_FORCE_QUEUE_FEATURE.isEnabled(getContext())) {
-			return;
+			return 0;
 		}
 		try {
 			// Shortcut check. Don't take the lock unless there seem to be some
 			// records to process.
 			if( ! exists(null)) {
-				return;
+				return 0;
 			}
 		} catch (DataException e) {
 			getLogger().error("Error checking for any queued emails",e);
-			return;
+			return 0;
 		}
 		Emailer em = Emailer.getFactory(getContext());
 		LockFactory locks = LockFactory.getFactory(getContext());
+		int count=0;
 		try(Lock lock = locks.makeFromString(QUEUED_EMAILS_RETRY_LOCK)){
 			if( lock.takeLock()) {
 				// Get list of ids as we will be doing deletes
@@ -195,12 +196,15 @@ public class QueuedMessages<Q extends QueuedMessages.QueuedMessage> extends Data
 				}
 				for(Integer id : ids) {
 					Q m = find(id);
-					em.retry(m);
+					if(em.retry(m)) {
+						count++;
+					}
 				}
 			}
 		} catch (Exception e) {
 			getLogger().error("Error retrying queued emails", e);
 		}
+		return count;
 	}
 	/** Copy all pending emails to a {@link StreamData} and remove from queue
 	 * 

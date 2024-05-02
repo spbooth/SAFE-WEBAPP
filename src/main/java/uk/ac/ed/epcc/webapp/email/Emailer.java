@@ -598,19 +598,19 @@ public class Emailer implements Contexed{
 	 * @param qm
 	 * @throws DataFault 
 	 */
-	public void retry(QueuedMessage qm) throws DataFault {
+	public boolean retry(QueuedMessage qm) throws DataFault {
 		if( ! EMAILS_FEATURE.isEnabled(getContext())) {
-			return;
+			return false;
 		}
 		String force = getContext().getInitParameter(EMAIL_FORCE_ADDRESS);
 		if( force != null ) {
-			return;
+			return false;
 		}
 		try {
 			MimeMessage m = qm.getMessage();
 			Transport.send(m);
 			qm.delete();
-			return;
+			return true;
 		}catch(SendFailedException me) {
 			getLogger().error("Send fail of queued message",me);
 			qm.delete();
@@ -618,7 +618,7 @@ public class Emailer implements Contexed{
 			getLogger().warn("Email retry failed", me);
 		}
 		qm.recordRetry();
-		
+		return false;
 	}
 	/** Actually send the {@link MimeMessage}
 	 * @param m {@link MimeMessage}
