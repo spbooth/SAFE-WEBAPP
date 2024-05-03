@@ -279,11 +279,7 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		addParam(RealNameComposite.FIRSTNAME,"Albert");
 		addParam(RealNameComposite.LASTNAME,"Spangler");
 		addParam(CertificateComposite.PERSONAL_CERTIFICATE,"/c=UK/o=eScience/ou=Edinburgh/l=NeSC/cn=stephen booth");
-		addParam(PublicKeyComposite.PUBLIC_KEY,"ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQSfRc3/A1cy\n"+
-				"D8NV/gxINRNhMIVkIofUexxtLfAfmNRf666SSei/w2kPX9ndOJ32y2OUUKkijJvEdeMEuFido9Kifc79\n"+
-				"p0q1KcOhAdRNmmE+LriqsbhJJVQz0OeOKw7wPN9KNYfTevZleQAJBRKr99rBgyRrtrXBhnjYu3yb8E/l\n"+
-				"f4g8MiBuLGcezzi310RwKMFnamr6MTbA3KBvgvFrPmsjVyedn1IyMdgQ0x8OZMQbr6hesvnR8HuKYfFt\n"+
-				"m4Vjx7bS+Dyqn+PlPrWH/fjs1957fe57gtZ9eM2S0lsv5cagcWghPAZP rsa-key-20110308");
+		
 		runTransition();
 		if( return_page != null ) {
 			checkRedirect(return_page);
@@ -297,37 +293,7 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		}
 		checkDiff("/cleanup.xsl", "details.xml");
 	}
-	@Test
-	@ConfigFixtures("require_update2.properties")
-	@DataBaseFixtures("details.xml")
-	public void testRemoveKey() throws Exception {
-		MockTansport.clear();
-		takeBaseline();
-		setTime(2021, Calendar.MARCH, 1, 9, 0); // so update not forced.
-		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
-		A user =  fac.findByEmail("fred@example.com");
-		
-		SessionService<A> sess = ctx.getService(SessionService.class);
-		sess.setCurrentPerson(user);
-		assertTrue(sess.haveCurrentUser());
-		AppUserTransitionProvider prov = (AppUserTransitionProvider) TransitionServlet.getProviderFromName(ctx, "Person");
-		setTransition(prov, AppUserTransitionProvider.UPDATE, user);
-		
-		
-		
-		checkFormContent(null, "details_form2.xml");
-		
-		addParam(PublicKeyComposite.PUBLIC_KEY+".Text","");
-		runTransition();
 	
-			AppUserTransitionProvider<A> provider = AppUserTransitionProvider.getInstance(getContext());
-			if( provider != null) {
-				checkViewRedirect(provider, user);
-			}else{
-				checkMessage("object_updated");
-			}
-		checkDiff("/cleanup.xsl", "details2.xml");
-	}
 	@Test
 	@DataBaseFixtures("details.xml")
 	@ConfigFixtures("require_update.properties")

@@ -2,11 +2,9 @@
 <Email null='true'/><Salt></Salt>
 <Alg>5</Alg>
 <Password>Locked</Password>
-<Firstname null='true'/><Lastname null='true'/><PublicKey></PublicKey>
-<PersonalCertificate></PersonalCertificate>
+<Firstname null='true'/><Lastname null='true'/><PersonalCertificate></PersonalCertificate>
 </Person>
 <PersonHistory id='1'>
-<EndTime>1234567890</EndTime>
 <Email null='true'/><Firstname null='true'/><Lastname null='true'/></PersonHistory>
 <Person id='2'>
 <Email>bill@example.com</Email>
@@ -16,10 +14,9 @@
 <Alg>0</Alg>
 <Password>locked</Password>
 </Person>
-<PersonHistory id="2">
-<EndTime>1234567890</EndTime>
+<PersonHistory id='2'>
 <PeerID>1</PeerID>
-<PublicKey/>
-<StartTime>1234567890</StartTime>
+<StartTime>1614589200</StartTime>
+<EndTime>1614589200</EndTime>
 </PersonHistory>
 </Diff>
