@@ -524,6 +524,14 @@ public final class AppContext {
 		}
 		return res;
 	}
+	
+	public String[] getStringArrayParam(String name, String def[]) {
+		String param  = getInitParameter(name);
+		if( param == null) {
+			return def;
+		}
+		return param.split("\\s*,\\s*");
+	}
 
 	/**
 	 * Query environmental parameter.
