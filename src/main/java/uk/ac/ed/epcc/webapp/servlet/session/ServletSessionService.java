@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.servlet.session;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -84,6 +85,7 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 	// also used to supress access to an invalidated session on logout
 	private boolean use_session=true;
 	private ServletService ss;
+	private Map<String,Object> no_session_attr=null;
 	private HttpServletRequest request;
 	private String log_name = null;
   public ServletSessionService(AppContext c){
@@ -143,6 +145,11 @@ public void setAttribute(String key, Object value) {
 	}
 	if( sess != null ){
 		sess.setAttribute(key, value);
+	}else {
+		if( no_session_attr == null) {
+			no_session_attr=new HashMap<String, Object>();
+		}
+		no_session_attr.put(key, value);
 	}
 	
 }
@@ -154,8 +161,9 @@ public void removeAttribute(String key) {
 		sess = ((DefaultServletService)ss).getSession();
 	}
 	if( sess != null ){
-		sess.removeAttribute(key);
-		
+		sess.removeAttribute(key);	
+	}else if( no_session_attr != null) {
+		no_session_attr.remove(key);
 	}
 }
 
@@ -167,6 +175,8 @@ public Object getAttribute(String key) {
 	}
 	if( sess != null ){
 		return sess.getAttribute(key);
+	}else if( no_session_attr != null) {
+		return no_session_attr.get(key);
 	}
 	return null;
 }
@@ -278,6 +288,7 @@ public void logOut(){
 	}
 	// session is invalid may throw exception if accessed now
 	use_session=false;
+	no_session_attr=null;
 }
 public A getSuperPerson(){
 	Integer super_person_id = (Integer) getAttribute(SUPER_PERSON_ID_ATTR);
