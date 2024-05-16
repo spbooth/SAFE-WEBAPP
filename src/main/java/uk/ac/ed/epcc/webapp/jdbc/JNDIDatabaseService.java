@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -42,10 +43,11 @@ public class JNDIDatabaseService extends DefaultDataBaseService {
 		if( tag == null){
 			String pool_resource = prop.getProperty("connection.pool");
 			if (pool_resource != null && pool_resource.trim().length() > 0) {
-				// if we are using resource pooling get a connection now
-				// otherwise wait until we actually need it.
-				String lookup = "java:comp/env/" + pool_resource;
 				try {
+					// if we are using resource pooling get a connection now
+					// otherwise wait until we actually need it.
+					String lookup = "java:comp/env/" + pool_resource;
+
 					Context ct = new InitialContext();
 
 					DataSource ds = (DataSource) ct.lookup(lookup);
@@ -55,8 +57,8 @@ public class JNDIDatabaseService extends DefaultDataBaseService {
 						return new PostgresqlSQLContext(getContext(),this,conn);
 					}
 					return new MysqlSQLContext(getContext(),this,conn);
-				} catch (Exception e) {
-					getLogger().error("error attaching to connection pool " + lookup, e);
+				}catch(NamingException ne) {
+					throw new SQLException("Bad connection pool", ne);
 				}
 			}
 		}

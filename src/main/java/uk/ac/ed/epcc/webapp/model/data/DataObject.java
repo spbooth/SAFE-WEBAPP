@@ -201,6 +201,7 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 			return super.equals(o);
 		}
 		if ((o instanceof DataObject)
+				&& getContext() == ((DataObject) o).getContext()
 				&& (getFactoryTag().equals(((DataObject) o).getFactoryTag()))
 				&& (getID() == ((DataObject) o).getID())) {
 			return true;

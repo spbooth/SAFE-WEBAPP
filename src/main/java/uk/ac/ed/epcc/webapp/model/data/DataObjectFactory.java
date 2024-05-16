@@ -1490,6 +1490,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		if( o == null){
 			return false;
 		}
+		if( getContext() != o.getContext()) {
+			return false;
+		}
 		return getTag().equals(o.getFactoryTag());
 	}
 

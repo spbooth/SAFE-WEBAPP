@@ -3459,6 +3459,9 @@ public final class Repository extends AbstractContexed implements AppContextClea
 		if (getClass() != obj.getClass())
 			return false;
 		Repository other = (Repository) obj;
+		if( other.conn != conn) {
+			return false;
+		}
 		if (tag_name == null) {
 			if (other.tag_name != null)
 				return false;
