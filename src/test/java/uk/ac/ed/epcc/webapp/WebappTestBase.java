@@ -35,6 +35,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
@@ -49,6 +50,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.RuleChain;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import uk.ac.ed.epcc.webapp.config.ConfigService;
@@ -190,6 +192,17 @@ public abstract class WebappTestBase implements ContextHolder{
 		// we may have inserted properties into DB
 		ctx.getService(ConfigService.class).clearServiceProperties();
 
+	}
+	/** Read additional fixtures during a test
+	 * 
+	 * @param fixtures
+	 * @throws DataFault
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	protected void readFixtures(String ... fixtures) throws DataFault, ParserConfigurationException, SAXException, IOException {
+		utils.readFixtures(getClass(), fixtures);
 	}
 	
 	public String readFileAsString(String name) throws IOException {
