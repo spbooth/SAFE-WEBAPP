@@ -250,17 +250,23 @@ public abstract class ServletTest extends WebappTestBase{
 		assertNull("redirect not forward ",res.redirect);
 		assertEquals("Wrong redirect", url, res.forward);
 	}
-	
 	public void checkRequestAuth(String page) {
+		checkRequestAuth(page, null);
+	}
+	public void checkRequestAuth(String page,String username) {
 		HttpSession session = req.getSession(false);
 		assertNotNull(session);
 		RedirectResult result = (RedirectResult) LoginServlet.getSavedResult(ctx.getService(SessionService.class));
 		assertNotNull(result);
 		assertEquals(page, result.getURL());
+		String loginPage = LoginServlet.getLoginPage(ctx);
+		if( username != null ) {
+			loginPage = loginPage+"?username="+username;
+		}
 		if( DefaultServletService.REDIRECT_TO_LOGIN_FEATURE.isEnabled(ctx)) {
-			checkRedirect(LoginServlet.getLoginPage(ctx));
+			checkRedirect(loginPage);
 		}else{
-			checkForward(LoginServlet.getLoginPage(ctx));
+			checkForward(loginPage);
 		}
 	}
 	/** Assert form error reported with a specific error reported on one of the parameters
