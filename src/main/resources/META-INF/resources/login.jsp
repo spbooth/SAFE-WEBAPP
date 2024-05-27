@@ -152,6 +152,14 @@ This service is only available to pre-registered users.
 String username = request.getParameter("username"); 
 if(username == null){
 	username = "";
+}else{
+	try{
+		fac.validateNameFormat(username);
+	}catch(Exception e){
+		username = "";
+	}
+	// Avoid any potential XSS as this is added to form
+	username = HtmlBuilder.strip(username);
 }
 %>
 <% if("login".equals(request.getParameter("error"))) { %>
