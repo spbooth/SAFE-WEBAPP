@@ -116,7 +116,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 		Date d = dateFieldType.getDefault();
 		if( d != null ){
 			sb.append(" DEFAULT ?");
-			args.add(dateFieldType.getDefault().getTime()/1000);
+			args.add(dateFieldType.getDefault().getTime()/Repository.DEFAULT_RESOLUTION);
 		}
 	}
 	
@@ -148,6 +148,8 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 			sb.append(" DEFAULT NULL");
 		}
 	}
+	
+
 	public void visitStringFieldType(StringFieldType stringFieldType) {
 		int len = stringFieldType.getMaxLEngth();
 		if( len < 256 ){

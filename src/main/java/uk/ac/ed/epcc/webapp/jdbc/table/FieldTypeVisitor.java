@@ -29,6 +29,10 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
 public interface FieldTypeVisitor {
 	public void visitStringFieldType(StringFieldType stringFieldType);
 	public <N extends Number> void visitNumberFieldType(NumberFieldType<N> numberFieldType);
+	default public void visitReferenceFieldType(ReferenceFieldType refType) {
+		// In most cases can just treat as a number
+		visitNumberFieldType(refType);
+	}
 	public void visitDateFieldType(DateFieldType dateFieldType);
     public void visitBooleanFieldType(BooleanFieldType booleanFieldType);
     public void visitBlobType(BlobType blobType);

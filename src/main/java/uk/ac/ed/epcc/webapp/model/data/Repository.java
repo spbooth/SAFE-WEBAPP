@@ -209,7 +209,7 @@ public final class Repository extends AbstractContexed implements AppContextClea
 
 	public static final String CACHE_FEATURE_PREFIX = "cache.";
 
-	private static final int DEFAULT_RESOLUTION = 1000;
+	public static final int DEFAULT_RESOLUTION = 1000;
 
 	public static final Feature REQUIRE_ID_KEY = new Feature("require.id_key", true, "Require all tables to have an integer primary key");
 	// This seems to serialise in the database affecting performance.
@@ -3508,13 +3508,18 @@ public final class Repository extends AbstractContexed implements AppContextClea
     	case(Types.DATE): return "Date";
     	case(Types.TIME): return "Time";
     	case(Types.FLOAT): return "Float";
+    	case(Types.REAL): return "Real";
     	case(Types.DOUBLE): return "Double";
+    	case(Types.NUMERIC): return "Numeric";
+    	case(Types.DECIMAL): return "Decimal";
     	case(Types.CHAR): return "Char";
     	case(Types.VARCHAR): return "Varchar";
     	case(Types.LONGVARCHAR): return "LongVarChar";
     	case(Types.BLOB): return "Blob";
-    	case(Types.VARBINARY): return "VarBianry";
+    	case(Types.VARBINARY): return "VarBinary";
     	case(Types.LONGVARBINARY): return "LongVarBinary";
+    	case(Types.TINYINT): return "TinyInt";
+    	case(Types.BIT): return "Bit";
     	default: return "Unknown";
     	}
     }

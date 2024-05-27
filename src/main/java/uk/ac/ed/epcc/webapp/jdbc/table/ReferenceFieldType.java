@@ -53,4 +53,9 @@ public class ReferenceFieldType extends IntegerFieldType {
    public boolean wantForeighKey() {
 	   return want_fk;
    }
+   @Override
+   public void accept(FieldTypeVisitor vis) {
+
+	   vis.visitReferenceFieldType(this);
+   }
 }
