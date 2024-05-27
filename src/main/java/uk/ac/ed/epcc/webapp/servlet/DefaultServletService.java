@@ -595,7 +595,7 @@ public class DefaultServletService implements ServletService{
 	}
 
 
-	public <A extends AppUser> void requestLogin(SessionService<A> sess, String page)
+	public <A extends AppUser> void requestLogin(SessionService<A> sess, String username, String page)
 			throws IOException, ServletException {
 		// Need to remember page and redirect to login
 		if( page !=null&& ! page.isEmpty()) {
@@ -620,6 +620,14 @@ public class DefaultServletService implements ServletService{
 		// standard login page supports both custom password login and self-register for external-auth
 		// If built_in login is off we might change the login page to an external auth servlet url.
 		String login_page=LoginServlet.getLoginPage(getContext());
+		if( username != null && ! username.isEmpty()) {
+			try {
+				sess.getLoginFactory().validateNameFormat(username);
+				login_page = login_page+"?username="+username;
+			}catch(Exception e) {
+				
+			}
+		}
 				
 		if( EXTERNAL_AUTH_VIA_LOGIN_FEATURE.isEnabled(getContext()) || REDIRECT_TO_LOGIN_FEATURE.isEnabled(getContext()) || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
 			// A non encoding redirect to make sure there is no session in the url

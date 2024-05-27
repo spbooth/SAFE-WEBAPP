@@ -166,7 +166,7 @@ if(username == null){
 <h3>Incorrect <%=fac.getNameLabel()%> or Password</h3>
 <p><b>please check your details and try again</b>
 </p>
-<% } %> <% if("login_name".equals(request.getParameter("login_name"))) { %>
+<% } %> <% if("login_name".equals(request.getParameter("error"))) { %>
 <h3>Incorrect format for <%=fac.getNameLabel()%></h3>
 <p><b>please check your details and try again</b>
 </p>
