@@ -241,7 +241,7 @@ public abstract class MessageDataObject extends DataObject implements
 			}
 			DataBaseHandlerService serv = c.getService(DataBaseHandlerService.class);
 			if( serv != null ){
-				if( ! serv.tableExists(MESSAGE)) {
+				if( ! serv.tableExists(table)) {
 					return;
 				}
 			}
