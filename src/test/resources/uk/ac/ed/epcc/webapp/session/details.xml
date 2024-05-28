@@ -29,7 +29,7 @@
 <PersonalCertificate>/c=UK/o=eScience/ou=Edinburgh/l=NeSC/cn=stephen booth</PersonalCertificate>
 </Person>
 <TableSpecification name='PersonHistory'>
-<PeerID reference='Person'/>
+<PeerID reference='Person' nullable='false'/>
 <StartTime type='Long' nullable='true'/>
 <EndTime type='Long' nullable='true'/>
 <Email type='String' nullable='true' max='254'/>

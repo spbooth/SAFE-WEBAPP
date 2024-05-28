@@ -37,7 +37,7 @@
 <Role>Admin</Role>
 </role_table>
 <TableSpecification name='Wtmp'>
-<PersonID reference='Person'/>
+<PersonID reference='Person' nullable='false'/>
 <StartTime type='Long' nullable='true'/>
 <EndTime type='Long' nullable='true'/>
 <Browser type='String' nullable='true' max='5592405'/>

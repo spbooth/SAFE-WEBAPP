@@ -319,8 +319,10 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 			String type = arg3.getValue(Dumper.TYPE_ATTR);
 			String ref = arg3.getValue(Dumper.REFERENCE_ATTR);
 			String def = arg3.getValue(Dumper.DEFAULT_ATTR);
+			String nullable_value = arg3.getValue(Dumper.NULLABLE_ATTR);
 			if( ref != null ){
-				spec.setField(name,new ReferenceFieldType(ref));
+				boolean nullable= nullable_value == null || Boolean.parseBoolean(nullable_value);
+				spec.setField(name,new ReferenceFieldType(nullable,ref));
 			}else if( type.equals(Dumper.INDEX_TYPE)){
 				boolean unique = arg3.getValue(Dumper.UNIQUE_ATTR).equalsIgnoreCase("true");
 				state = State.SchemaIndex;
@@ -334,7 +336,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 					getLogger().error("Error making index", e);
 				}
 			}else{
-				boolean nullable= Boolean.parseBoolean(arg3.getValue(Dumper.NULLABLE_ATTR));
+				boolean nullable= Boolean.parseBoolean(nullable_value);
 				
 				if( type.equals(Dumper.STRING_TYPE)){
 					int max;

@@ -61,8 +61,8 @@ public class DumperTestCase extends WebappTestBase {
 	
 	String expect ="<Dump>\n"+
 	"<TableSpecification name='LinkTest1Test2'>\n"+
-	"<Test1ID reference='Test'/>\n"+
-	"<Test2ID reference='Test2'/>\n"+
+	"<Test1ID reference='Test' nullable='false'/>\n"+
+	"<Test2ID reference='Test2' nullable='false'/>\n"+
 	"<Status type='String' nullable='false' max='1'/>\n"+
 	"<Link type='Index' unique='true'><Column name='Test1ID'/><Column name='Test2ID'/></Link>\n"+
 	"<LeftKey type='Index' unique='false'><Column name='Test1ID'/></LeftKey>\n"+
@@ -102,8 +102,8 @@ public class DumperTestCase extends WebappTestBase {
 
 	String expect_rename ="<Dump>\n"+
 			"<TableSpecification name='LinkTest1Test2'>\n"+
-			"<Test1ID reference='Test'/>\n"+
-			"<Test2ID reference='Test2'/>\n"+
+			"<Test1ID reference='Test' nullable='false'/>\n"+
+			"<Test2ID reference='Test2' nullable='false'/>\n"+
 			"<Status type='String' nullable='false' max='1'/>\n"+
 			"<Link type='Index' unique='true'><Column name='Test1ID'/><Column name='Test2ID'/></Link>\n"+
 			"<LeftKey type='Index' unique='false'><Column name='Test1ID'/></LeftKey>\n"+
