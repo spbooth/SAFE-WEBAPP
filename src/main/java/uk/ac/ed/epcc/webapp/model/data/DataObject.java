@@ -28,13 +28,17 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.ContextIndexed;
 import uk.ac.ed.epcc.webapp.Indexed;
+import uk.ac.ed.epcc.webapp.LazyObjectCreator;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 /**
@@ -252,14 +256,20 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 
 
 	/**
-	 * create Hashtable of contents of Object
+	 * create {@link Map} of contents of Object
 	 * 
-	 * @return Hashtable
+	 * @return {@link Map}
 	 */
 	public  Map<String,Object> getMap() {
-		return getMap(false);
+		return getMap(false,false);
 	}
-	public final Map<String,Object> getMap(boolean include_null) {
+	/** create {@link Map} of contents of Object
+	 * 
+	 * @param include_null record null values
+	 * @param use_ref return references as {@link IndexedReference} rather than {@link Number}
+	 * @return {@link Map}
+	 */
+	public final Map<String,Object> getMap(boolean include_null,boolean use_ref) {
 		Map<String,Object> h = new HashMap<>();
 		if (record != null) {
 			// Want to record values for all fields even if null
@@ -268,6 +278,28 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 				if (key != null) {
 					Object value = record.get(key);
 					if ((value != null) || include_null) {
+						if( use_ref) {
+							FieldInfo info = record.getRepository().getInfo(key);
+							if( info != null ) {
+								if( info.isSelfReference()) {
+									DataObjectFactory fac = getOwningFactory(this);
+									if( fac != null) {
+										value = fac.makeReference(((Number)value).intValue());
+									}
+								}else if( info.isReference()) {
+									TypeProducer prod = info.getTypeProducer();
+									if( prod != null) {
+										prod = LazyObjectCreator.unwrap(prod);
+										if( prod instanceof IndexedProducer ) {
+											if( value == null) {
+												value = 0;
+											}
+											value = ((IndexedProducer)prod).makeReference(((Number)value).intValue());
+										}
+									}
+								}
+							}
+						}
 						h.put(key, value);
 					}
 				}

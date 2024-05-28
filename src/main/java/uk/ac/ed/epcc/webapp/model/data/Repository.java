@@ -442,6 +442,13 @@ public final class Repository extends AbstractContexed implements AppContextClea
         public boolean isReference(){
         	return producer != null || references != null;
         }
+        /** Is this a reference to the hosting table.
+         * 
+         * @return
+         */
+        public boolean isSelfReference() {
+        	return references != null && ( references.equals(getTag()) || references.equals(tagToTable(getContext(),getTag())));
+        }
         /** method to dump the field value to a canonical text
          * representation.
          * 
@@ -2309,14 +2316,14 @@ public final class Repository extends AbstractContexed implements AppContextClea
 		}
 		if ( o instanceof Date) {
 			// assume unix date in seconds
-			return new Long(((Date) o).getTime()
+			return Long.valueOf(((Date) o).getTime()
 					/ getResolution());
 		}
 		if( o instanceof Indexed ){
-			return new Long(((Indexed)o).getID());
+			return Long.valueOf(((Indexed)o).getID());
 		}
 		if( o instanceof String){
-			return new Double((String)o );
+			return Double.valueOf((String)o );
 		}
 		return (Number) o;
 	}

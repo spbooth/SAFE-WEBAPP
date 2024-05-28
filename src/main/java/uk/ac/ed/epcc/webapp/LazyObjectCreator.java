@@ -78,5 +78,10 @@ public boolean equals(Object obj) {
 	}
 	return false;
 }
-  
+  public static <X> X unwrap(X o) {
+	  if( o instanceof LazyObjectCreator) {
+		  return ((LazyObjectCreator<X>) o).getInner();
+	  }
+	  return o;
+  }
 }
