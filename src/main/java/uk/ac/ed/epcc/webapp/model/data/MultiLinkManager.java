@@ -216,7 +216,7 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
   			String homeTable) {
 		 TableSpecification spec = new TableSpecification();
 		 for(Map.Entry<String,String> e : table_to_key.entrySet()) {
-			 spec.setField(e.getValue(), new ReferenceFieldType(e.getKey()));
+			 spec.setField(e.getValue(), new ReferenceFieldType(false,e.getKey(),true));
 		 }
 		 try {
 			Index m = spec.new Index("match_key", true, table_to_key.values().toArray(new String[table_to_key.size()]));
