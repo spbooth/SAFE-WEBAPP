@@ -325,17 +325,6 @@ public class TotpCodeAuthComposite<A extends AppUser> extends AbstractTotpCodeAu
 	}
 	
 
-
-	@Override
-	public ContentBuilder addExtra(ContentBuilder cb) {
-		cb = super.addExtra(cb);
-		PreDefinedContent extra = new PreDefinedContent(getContext(), true, PreDefinedContent.DEFAULT_BUNDLE, "two_factor.extra_content");
-		if( extra.hasContent()) {
-			cb.addObject(extra);
-		}
-		return cb;
-	}
-
 	@Override
 	public void anonymise(A target) {
 		if( ! REQUIRED_TWO_FACTOR.isEnabled(getContext())) {
