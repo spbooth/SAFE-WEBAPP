@@ -24,7 +24,6 @@ package uk.ac.ed.epcc.webapp;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
@@ -160,6 +159,7 @@ TargetType t = conn.makeObject(TargetType.class,"tag-name");
 public final class AppContext {
 	
 
+	
 	public static final String CLASSDEF_PROP_PREFIX = "classdef.";
 	public static final Feature CONTEXT_CACHE_FEATURE = new Feature("ContextCache",true,"cache objects that implement ContextCache in the AppContext");
 	public static final Feature DATABASE_FEATURE = new Feature("database",true,"use database");
@@ -169,9 +169,12 @@ public final class AppContext {
 	private Map<Object,Object> attributes = null;
 
     private LinkedHashMap<Class,AppContextService> services = null;
+    
+    private ClassLoader saved_classloader=null;
     // services known not to resolve
     private Set<Class> missing_services =null;
     private boolean disable_service_creation=false;
+    private boolean disable_attribute_creation=false;
  
     
     public AppContext(){
@@ -209,6 +212,9 @@ public final class AppContext {
 		disable_service_creation=true;
 		
 		if (attributes != null) {
+			// Clean-up and remove attributes before services.
+			// Repositories hold open preparedStatements for finding records
+			// and the we have a debug check that looks for unclosed statements.
 			for( Iterator<Entry<Object, Object>> it =attributes.entrySet().iterator();it.hasNext();) {
 				Map.Entry e = it.next();
 				Object o = e.getValue();
@@ -220,6 +226,7 @@ public final class AppContext {
 			attributes.clear();
 			attributes = null;
 		}
+		disable_attribute_creation=true;
 		if( services != null ){
 			Set<Class> keySet = services.keySet();
 			Class keys[] = keySet.toArray(new Class[keySet.size()]);
@@ -239,13 +246,12 @@ public final class AppContext {
 
 	/**
 	 * Report an application error.
-	 * 
-	 * @param e
-	 *            Exception generating error.
 	 * @param text
 	 *            Text of error.
+	 * @param e
+	 *            Exception generating error.
 	 */
-	public void error(Throwable e,String text){
+	void error(String text,Throwable e){
 		LoggerService serv = getService(LoggerService.class);
 		if( serv != null ){
 			Logger log = serv.getLogger(getClass());
@@ -513,10 +519,18 @@ public final class AppContext {
 		try {
 			res = Double.parseDouble(parm.trim());
 		} catch (NumberFormatException e) {
-			error(e, "badly fomatted parameter " + name + " value [" + parm
-					+ "]");
+			error("badly fomatted parameter " + name + " value [" + parm
+					+ "]", e);
 		}
 		return res;
+	}
+	
+	public String[] getStringArrayParam(String name, String def[]) {
+		String param  = getInitParameter(name);
+		if( param == null) {
+			return def;
+		}
+		return param.split("\\s*,\\s*");
 	}
 
 	/**
@@ -622,7 +636,7 @@ public final class AppContext {
 			enum_name=enum_name.trim();
 			return (E) Enum.valueOf(clazz, enum_name);
 		}catch(Exception t){
-			error(t,"Error getting EnumParameter "+clazz.getCanonicalName()+" "+enum_name);
+			error("Error getting EnumParameter "+clazz.getCanonicalName()+" "+enum_name,t);
 			return fallback;
 		}
 	}
@@ -663,8 +677,8 @@ public final class AppContext {
 		try {
 			res = Integer.parseInt(parm.trim());
 		} catch (NumberFormatException e) {
-			error(e, "badly fomatted parameter " + name + " value [" + parm
-					+ "]");
+			error("badly fomatted parameter " + name + " value [" + parm
+					+ "]", e);
 		}
 		return res;
 	}
@@ -677,8 +691,8 @@ public final class AppContext {
 		try {
 			res = Long.parseLong(parm.trim());
 		} catch (NumberFormatException e) {
-			error(e, "badly fomatted parameter " + name + " value [" + parm
-					+ "]");
+			error("badly fomatted parameter " + name + " value [" + parm
+					+ "]", e);
 		}
 		return res;
 	}
@@ -695,7 +709,7 @@ public final class AppContext {
     		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     		res = df.parse(param);
     	}catch(Exception e) {
-    		error(e,"badly formatted parameter "+name+" value ["+param+"]");
+    		error("badly formatted parameter "+name+" value ["+param+"]",e);
     	}
     	return res;
     }
@@ -990,13 +1004,18 @@ public final class AppContext {
 	private static final class ObjectCacheKey{
 		
 
+		
+		/**
+		 * @param tag
+		 */
+		public ObjectCacheKey(String tag) {
+			super();
+			this.tag = tag;
+		}
+		private final String tag;
 		@Override
 		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((path == null) ? 0 : path.hashCode());
-			result = prime * result + ((tag == null) ? 0 : tag.hashCode());
-			return result;
+			return tag.hashCode();
 		}
 		@Override
 		public boolean equals(Object obj) {
@@ -1007,11 +1026,6 @@ public final class AppContext {
 			if (getClass() != obj.getClass())
 				return false;
 			ObjectCacheKey other = (ObjectCacheKey) obj;
-			if (path == null) {
-				if (other.path != null)
-					return false;
-			} else if (!path.equals(other.path))
-				return false;
 			if (tag == null) {
 				if (other.tag != null)
 					return false;
@@ -1019,17 +1033,6 @@ public final class AppContext {
 				return false;
 			return true;
 		}
-		/**
-		 * @param path
-		 * @param tag
-		 */
-		public ObjectCacheKey(String path, String tag) {
-			super();
-			this.path = path;
-			this.tag = tag;
-		}
-		private final String path;
-		private final String tag;
 	}
 	/** Construct an object identified by a string tag and an optional qualifier string.
 	 * <p>
@@ -1076,7 +1079,7 @@ public final class AppContext {
 		T result=null;
 		ObjectCacheKey key = null;
 		if( tag != null  && ContextCached.class.isAssignableFrom(clazz)&&CONTEXT_CACHE_FEATURE.isEnabled(this)) {
-			key = new ObjectCacheKey(path, tag);
+			key = new ObjectCacheKey(tag);
 			Object o = getAttribute(key);
 			if( o != null) {
 				if( clazz.isAssignableFrom(o.getClass())) {
@@ -1091,7 +1094,7 @@ public final class AppContext {
 		Class<? extends T> target = getPropertyClass(clazz,default_class,tag);
 		// now consider if only the resolved class implements ContexedCached
 		if( key == null && target != null && tag != null  && ContextCached.class.isAssignableFrom(target)&&CONTEXT_CACHE_FEATURE.isEnabled(this) ) {
-			key = new ObjectCacheKey(path, tag);
+			key = new ObjectCacheKey(tag);
 			Object o = getAttribute(key);
 			if( o != null) {
 				if( target.isAssignableFrom(o.getClass())) {
@@ -1135,7 +1138,7 @@ public final class AppContext {
 			}
 			return result;
 		}catch(Exception e){
-			error(e,"Error making class "+target.getCanonicalName());
+			error("Error making class "+target.getCanonicalName(),e);
 			return null;
 		}finally{
 			if(timer != null ){
@@ -1353,7 +1356,7 @@ public final class AppContext {
 				try {
 					t = Class.forName(class_name);
 				} catch (Exception e) {
-					error(e,"Class "+class_name+" not found");
+					error("Class "+class_name+" not found",e);
 				}
 				if(t != null ){
 					// don't check for composites here as we want a
@@ -1414,6 +1417,9 @@ public final class AppContext {
 	 *            Object to be stored.
 	 */
 	public final void setAttribute(Object key, Object value) {
+		if( disable_attribute_creation) {
+			return;
+		}
 		if (attributes == null) {
 			attributes = new HashMap<>();
 		}
@@ -1428,15 +1434,22 @@ public final class AppContext {
 	}
 	
 
-	public final void removeCached(String path,String tag) {
-		removeAttribute(new ObjectCacheKey(path, tag));
+	public final void removeCached(String tag) {
+		removeAttribute(new ObjectCacheKey(tag));
 	}
 	private static final ThreadLocal<AppContext> local_ctx = new ThreadLocal<AppContext>();
 	/** Save a thread-local AppContext
-	 * 
-	 * @param c
+	 * Also set the Thread savedClassloader to the AppContext classloader if different.
+	 * @param c {@link AppContext}
 	 */
 	public static void setContext(AppContext c) {
+		Thread thread = Thread.currentThread();
+		ClassLoader thread_cl = thread.getContextClassLoader();
+		ClassLoader app_cl = c.getClass().getClassLoader();
+		if( thread_cl != app_cl) {
+			thread.setContextClassLoader(app_cl);
+			c.saved_classloader = thread_cl;
+		}
 		local_ctx.set(c);
 	}
 	/** Retrieve a thread-local {@link AppContext} previously set using {@link #setContext(AppContext)}
@@ -1447,9 +1460,17 @@ public final class AppContext {
 		return local_ctx.get();
 	}
 	/** Clear the thread-local reference to the {@link AppContext}
+	 * reverses the opertion of {@link #setContext(AppContext)}
 	 * 
 	 */
 	public static void clearContext() {
+		AppContext c = getContext();
+		if(  c != null ) {
+			if( c.saved_classloader != null ) {
+				Thread.currentThread().setContextClassLoader(c.saved_classloader);
+				c.saved_classloader=null;
+			}
+		}
 		local_ctx.remove();
 	}
 	

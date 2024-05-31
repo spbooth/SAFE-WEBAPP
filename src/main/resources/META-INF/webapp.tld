@@ -169,4 +169,9 @@
 		</attribute>
 		<tag-class>uk.ac.ed.epcc.webapp.tags.WebappMessage</tag-class>
 	</tag>
+	<tag>
+		<name>QueuedMessages</name>
+		<tag-class>uk.ac.ed.epcc.webapp.tags.QueuedMessageTag</tag-class>
+		<body-content>JSP</body-content>
+	</tag>
 </taglib>

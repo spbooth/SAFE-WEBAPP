@@ -1,6 +1,7 @@
 <%@page import="uk.ac.ed.epcc.webapp.config.FilteredProperties"%>
 <%@page import="uk.ac.ed.epcc.webapp.config.ConfigService" %>
 <%@page import="uk.ac.ed.epcc.webapp.content.*" %>
+<%@ page session="false"%>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:ServiceInit/>
 <%

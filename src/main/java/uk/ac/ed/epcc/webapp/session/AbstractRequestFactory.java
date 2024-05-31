@@ -154,16 +154,17 @@ public abstract class AbstractRequestFactory<R extends AbstractRequestFactory.Ab
 			log.debug("output is"+output.toString());
 			return output.toString();
 		} catch (NoSuchAlgorithmException e) {
-			getContext().error(e,"Error making digest");
+			getLogger().error("Error making digest",e);
 			return input.toString();
 		}
 	}
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table) {
 		TableSpecification spec = new TableSpecification();
-		
+		spec.setCurrentTag("AbstractRequestFactory");
 		spec.setField(EXPIRES, new DateFieldType(true, null));
 		spec.setField(TAG, new StringFieldType(false, "", 256));
+		spec.clearCurrentTag();
 		return spec;
 	}
 

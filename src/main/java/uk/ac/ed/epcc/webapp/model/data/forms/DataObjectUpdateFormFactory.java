@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.jfree.data.xy.DefaultTableXYDataset;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
@@ -105,21 +107,13 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	public final void buildUpdateForm(Form f, BDO dat, SessionService<?> operator)
 			throws DataFault {
 				
-			    boolean complete = buildForm(f,getFixtures(dat));
-				//customiseForm(f);
-			    
+			    boolean complete = buildForm(f,getFixtures(dat), dat == null ? getCreationDefaults(): getUpdateDefaults(dat));
+			
 			    // set values before customise as it is common
 				// for the customise methods to lock fields
 				// and the values need to be in place before then.
 			    //
-			    // if buildForm is creating a multi-stage form then some of
-			    // the fields may already be locked and should NOT
-			    // be updated by the following
-				f.setContents(getDefaults());
-				if( dat != null ){
-					//this should never be called with dat null except from a unit test
-				   f.setContents(dat.getMap());
-				}
+			   
 				for(TableStructureContributer<BDO> contrib : factory.getTableStructureContributers()){
 					contrib.customiseUpdateForm(f, dat, operator);
 				}
@@ -134,6 +128,16 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 				
 				
 			}
+
+	/** Get a set of default values for the form fields 
+	 * 
+	 * By default, this is all the existing values of the object, but can be over-ridden
+	 * if you are adding additional Fields 
+	 * @return Map of defaults
+	 */
+	protected Map<String, Object> getUpdateDefaults(BDO dat) {
+		return dat.getMap();
+	}
 
 	/** Similar to {@link #customiseUpdateForm(Form, DataObject)} but only called when the form is complete
 	 * 

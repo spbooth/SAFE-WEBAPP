@@ -49,6 +49,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintWrapper;
+import uk.ac.ed.epcc.webapp.logging.sanitise.SanitisingLoggerService;
 import uk.ac.ed.epcc.webapp.model.datastore.DataStoreResourceService;
 import uk.ac.ed.epcc.webapp.servlet.config.ServletContextConfigService;
 import uk.ac.ed.epcc.webapp.servlet.logging.ServletWrapper;
@@ -80,6 +81,8 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 @WebFilter(filterName="FaultFilter", urlPatterns = {"/*"} )
 public class ErrorFilter implements Filter {
+	public static final String CONTENT_SECURITY_POLICY_REPORT_ONLY_HEADER = "Content-Security-Policy-Report-Only";
+	public static final String CONTENT_SECURITY_POLICY_HEADER = "Content-Security-Policy";
 	public static final String REQUEST_START = "RequestStart";
 	private static final Feature SESSION_STEALING_CHECK_FEATURE = new Feature("session-stealing-check",false,"reset session if ip address changes");
 	private static final Feature CONTEXT_CONFIG_FEATURE = new Feature("context.configuration",false,"Allow additional properties files based on the application Context");
@@ -88,7 +91,7 @@ public class ErrorFilter implements Filter {
 	public static final Feature CONNECTION_STATUS_FEATURE = new Feature("database.connection_status",false,"Track active database connections");
 	public static final Feature TIMER_FEATURE = new Feature("Timer",false,"gather timing information for performance analyis");
 	public static final Feature DATASTORE_RESOURCE_FEATURE = new Feature("resource_service.use_datastore",true,"Use datastore table to hold resources");
-	
+	public static final Feature SANITISE_LOGS_FEATURE = new Feature("logging.sanitise",true,"Sanitise strings added to logs");
 	private static final String LAST_ADDR_ATTR = "LastAddr";
 	public static final String APP_CONTEXT_ATTR = "AppContext";
 	public static final String SERVLET_CONTEXT_ATTR = "ServletContext";
@@ -167,6 +170,19 @@ public class ErrorFilter implements Filter {
 		}
 		
    }
+   /** Query the servlet config with fallback
+    * 
+    * @param name
+    * @param def
+    * @return
+    */
+    public String getConfig(String name, String def) {
+    	String val = ctx.getInitParameter(name);
+    	if( val != null ) {
+    		return val;
+    	}
+    	return def;
+    }
 	public final void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws ServletException, java.io.IOException {
 
@@ -181,17 +197,24 @@ public class ErrorFilter implements Filter {
 			
 			// standard static security headers
 			// want to do this without creating an AppContext
-			res.setHeader("X-XSS-Protection", "1;mode-block");
-			res.setHeader("X-Content-Type-Options", "nosniff");
-			res.setHeader("X-Frame-Options","DENY");
-			res.setHeader("Referrer-Policy", "same-origin");
+			// so any parameterisation should be from the servlet context
+			// 
+			res.setHeader("X-XSS-Protection", getConfig("XSSProtectionHeader","1;mode-block"));
+			res.setHeader("X-Content-Type-Options", getConfig("ContentTypeOptionsHeader","nosniff"));
+			res.setHeader("X-Frame-Options",getConfig("FrameOptionsHeader","SAMEORIGIN"));
+			res.setHeader("Referrer-Policy", getConfig("ReferrerPolicyHeader","same-origin"));
 			String csp = ctx.getInitParameter("ContentSecurityPolicy");
 			if( csp != null ) {
 				String base_url = req.getScheme()+"://"+req.getServerName()+":"+req.getLocalPort()+req.getContextPath();
 				csp = csp.replace("{base-url}", base_url);
-				res.setHeader("Content-Security-Policy", csp);
+				res.setHeader(CONTENT_SECURITY_POLICY_HEADER, csp);
 			}
-		
+			String report = ctx.getInitParameter("ContentSecurityPolicyReport");
+			if( report != null ) {
+				String base_url = req.getScheme()+"://"+req.getServerName()+":"+req.getLocalPort()+req.getContextPath();
+				report = report.replace("{base-url}", base_url);
+				res.setHeader(CONTENT_SECURITY_POLICY_REPORT_ONLY_HEADER, csp);
+			}
 		}
 		
 		
@@ -448,12 +471,16 @@ public class ErrorFilter implements Filter {
 				conn = makeContext(servlet_ctx);
 				// report error logs by email with page info need to replace this within closer
 				conn.setService( new ServletEmailLoggerService(conn));
-				request.setAttribute(APP_CONTEXT_ATTR, conn);
-				
-				
+				if( SANITISE_LOGS_FEATURE.isEnabled(conn)) {
+					conn.setService(new SanitisingLoggerService(conn));
+				}
+				if( request != null ) {
+					request.setAttribute(APP_CONTEXT_ATTR, conn);
+				}
 				// Now for request specific customisation
 				//
 				if( request != null && response != null ){
+					
 					// null request/response means this is a dummy context generated for
 					// a context listener
 					Class<? extends ServletService> clazz = conn.getPropertyClass(ServletService.class,DefaultServletService.class,  "servlet.service");

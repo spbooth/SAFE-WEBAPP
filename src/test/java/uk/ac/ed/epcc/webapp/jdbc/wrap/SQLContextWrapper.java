@@ -114,8 +114,8 @@ public abstract class SQLContextWrapper implements SQLContext {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.SQLContext#getCreateVisitor(java.lang.StringBuilder, java.util.List)
 	 */
 	@Override
-	public FieldTypeVisitor getCreateVisitor(StringBuilder sb, List<Object> args) {
-		return nested.getCreateVisitor(sb, args);
+	public FieldTypeVisitor getCreateVisitor(String config_tag,StringBuilder sb, List<Object> args) {
+		return nested.getCreateVisitor(config_tag,sb, args);
 	}
 
 	/* (non-Javadoc)

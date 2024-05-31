@@ -47,8 +47,8 @@ public class SignupDateComposite<BDO extends AppUser> extends CreateComposite<BD
 	/**
 	 * @param fac
 	 */
-	public SignupDateComposite(DataObjectFactory<BDO> fac) {
-		super(fac);
+	public SignupDateComposite(DataObjectFactory<BDO> fac,String tag) {
+		super(fac,tag);
 		
 	}
 

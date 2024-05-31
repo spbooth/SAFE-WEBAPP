@@ -313,6 +313,9 @@ public class Dumper extends AbstractContexed{
 			String ref = field.getReferencedTable();
 			if(ref != null ){
 				sb.attr(REFERENCE_ATTR, normaliseTag(ref));
+				if( ! field.getNullable()) {
+					sb.attr(NULLABLE_ATTR,Boolean.toString(field.getNullable()));
+				}
 			}else{
 				if( field.isString()){
 					sb.attr(TYPE_ATTR,STRING_TYPE);

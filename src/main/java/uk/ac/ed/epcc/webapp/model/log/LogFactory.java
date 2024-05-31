@@ -222,7 +222,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 					Number n = record.getNumberProperty(OPERATOR_ID);
 					return (AppUser) item_factory.user_factory.find(n);
 				} catch (Exception  e) {
-				    getContext().error(e,"Error making operator");
+				    getLogger().error("Error making operator",e);
 				    return null;
 				}
 		}
@@ -267,7 +267,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		public final void remove() throws Exception {
 			try{
 				L data = getLink();
-				if (data != null && data instanceof Removable) {
+				if (data != null && data instanceof Removable && shouldRemove(data)) {
 					((Removable) data).remove();
 				}
 			}catch(DataNotFoundException e){
@@ -276,6 +276,14 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 				getLogger().error("Link not found",e);
 			}
 			delete();
+		}
+		/** Should the linked object be removed then the item is removed. 
+		 * 
+		 * @param link
+		 * @return
+		 */
+		public boolean shouldRemove(L link) {
+			return true;
 		}
 
 		/**
@@ -478,10 +486,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		AppContext ctx = fac.getContext();
 		use_type=new ItemType<>(getStaticItemType());
 		if( DataObjectFactory.AUTO_CREATE_TABLES_FEATURE.isEnabled(ctx)){
-    		if( setContextWithMake(ctx, table,getDefaultTableSpecification(ctx,fac,uf,table))){
-    			// table created
-    			setupItems(ctx, table);
-    		}
+    		setContextWithMake(ctx, table,()->getDefaultTableSpecification(ctx,fac,uf,table));
     	}else{
     		setContext(ctx, table);
     	}
@@ -489,29 +494,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		user_factory = uf;
 		use_type.lock();
 	}
-	/** create LogItem tables that don't have factories.
-	 * 
-	 * @param c
-	 * @param table
-	 */
-	protected void setupItems(AppContext c,String table){
-		Map<String,TableSpecification> prereq=getPrereqTables();
 	
-		DataBaseHandlerService serv = c.getService(DataBaseHandlerService.class);
-		if( serv != null ){
-			for(String tab : prereq.keySet()){
-				if( ! serv.tableExists(tab)){
-					try {
-						serv.createTable(tab, prereq.get(tab));
-					} catch (DataFault e) {
-						c.error(e,"Error making prereq table");
-					}
-				}
-			}
-		}
-		
-		
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#observeComposite(uk.ac.ed.epcc.webapp.model.data.Composite)
 	 */
@@ -523,11 +506,10 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		}
 		
 	}
-	protected Map<String,TableSpecification> getPrereqTables(){
-		return new HashMap<>();
-	}
+	
 	protected TableSpecification getDefaultTableSpecification(AppContext c,LogOwner<O> fac,AppUserFactory<?>uf,String homeTable){
 		TableSpecification spec = new TableSpecification("LogID");
+		spec.setCurrentTag("LogFactory");
 		spec.setField(DATE, new DateFieldType(true, null));
 		spec.setField(OWNER_ID, new ReferenceFieldType(fac.getTag()));
 		spec.setField(OPERATOR_ID, new ReferenceFieldType(uf.getTag()));
@@ -537,6 +519,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		} catch (InvalidArgument e) {
 			getLogger().error("Error making key",e);
 		}
+		spec.clearCurrentTag();
 		return spec;
 	}
 	
@@ -642,7 +625,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 * @param q
 	 * @throws DataFault 
 	 */
-	public final void purge(O q) throws DataFault{
+	public void purge(O q) throws DataFault{
 		try(CloseableIterator<T> it = getLog(q)){
 			while(it.hasNext()) {
 
@@ -652,7 +635,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		}catch(DataFault e) {
 			throw e;
 		} catch (Exception e) {
-			throw new DataFault("Error in close", e);
+			throw new DataFault("Error in purge", e);
 		}
 
 	}

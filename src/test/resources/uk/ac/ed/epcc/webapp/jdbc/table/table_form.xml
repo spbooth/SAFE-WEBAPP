@@ -1,34 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?><transition_page>
-<Form>
-<table class="form">
-<tr class="even">
-<th>
-<label for="transition_table" class="required">Table</label>
-</th>
-<td>
-<select id="transition_table" name="table" class="input" required="required">
-<option value="BadKeys">BadKeys: BadKeyFactory</option>
-<option value="DataStore">DataStore: DataStore</option>
-<option value="Locks">Locks: LockFactory</option>
-<option value="Person">Person: AppUserFactory</option>
-<option value="PersonHistory">PersonHistory: PersonHistoryFactory</option>
-<option value="TableTest">TableTest: TableStructureTestFactory</option>
-<option value="Test">Test: Factory</option>
-<option value="Test2">Test2: Factory</option>
-<option value="Test3">Test3: Factory</option>
-<option value="TestClassification">TestClassification: ClassificationFactory</option>
-<option value="TestClassification2">TestClassification2: ClassificationFactory</option>
-<option value="TestForms">TestForms: DynamicFormManager</option>
-<option value="TestMessage">TestMessage: TestingMessageHandlerFactory</option>
-<option value="TestPasswordAuthAppUser">TestPasswordAuthAppUser: AppUserFactory</option>
-<option value="TestRelationship">TestRelationship: Relationship</option>
-<option value="TestResponse">TestResponse: PersonalResponseManager</option>
-</select>
-</td>
-</tr>
-</table>
-<fieldset class="action_buttons">
-<input class="input_button" type="submit" name="View" value="View"/>
-</fieldset>
-</Form>
-</transition_page>
+<transition_page><Form><table class='form'><tr class='even'><th><label for='transition_table' class='required'>Table</label></th><td><select id='transition_table' name='table' class='input' required='required'><option value='DataStore'>DataStore: DataStore</option>
+<option value='Locks'>Locks: LockFactory</option>
+<option value='Person'>Person: AppUserFactory</option>
+<option value='PersonHistory'>PersonHistory: PersonHistoryFactory</option>
+<option value='QueuedMessages'>QueuedMessages: QueuedMessages</option>
+<option value='TableTest'>TableTest: TableStructureTestFactory</option>
+<option value='Test'>Test: Factory</option>
+<option value='Test2'>Test2: Factory</option>
+<option value='Test3'>Test3: Factory</option>
+<option value='TestClassification'>TestClassification: ClassificationFactory</option>
+<option value='TestClassification2'>TestClassification2: ClassificationFactory</option>
+<option value='TestMessage'>TestMessage: TestingMessageHandlerFactory</option>
+<option value='TestPasswordAuthAppUser'>TestPasswordAuthAppUser: AppUserFactory</option>
+<option value='TestRelationship'>TestRelationship: Relationship</option>
+</select></td></tr>
+</table><fieldset class='action_buttons'><input class='input_button' type='submit' name='View' value='View'/></fieldset></Form></transition_page>

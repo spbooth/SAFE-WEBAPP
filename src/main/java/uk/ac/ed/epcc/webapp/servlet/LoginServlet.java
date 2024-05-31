@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.email.Emailer;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
@@ -120,12 +121,14 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 		String username = req.getParameter("username");
 		String password = req.getParameter("password");
 		String authtype = req.getParameter("authtype");
+		LoggerService ls = conn.getService(LoggerService.class);
 		Logger log = getLogger(conn);
 		SessionService<T> serv = conn.getService(SessionService.class);
 		if( serv == null ){
 			serv = new ServletSessionService(conn);
 			conn.setService(serv);
 		}
+		AppUserFactory<T> person_fac = serv.getLoginFactory();
 		try {
 			if (logout != null) {
 				log.debug("requesting logout");
@@ -174,7 +177,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				message(conn,req,res,"invalid_argument");
 				return;
 			}
-			AppUserFactory<T> person_fac = serv.getLoginFactory();
+			
 			PasswordAuthComposite<T> password_auth = person_fac.getComposite(PasswordAuthComposite.class);
 
 			if(  password_auth == null) {
@@ -216,7 +219,9 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 							message(conn, req, res, "new_password_failed");
 							return;
 						}
-						
+						Map attr = new HashMap();
+						attr.put("user",user.getIdentifier());
+						ls.securityEvent("new_password_requested", sess,attr);
 						password_auth.newPassword(user);
 					}catch(Exception t){
 						getLogger(conn).error("Error getting registered user or sending new password",t);
@@ -283,7 +288,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 			throw new ServletException(e);
 		}
 
-		LoggerService ls = conn.getService(LoggerService.class);
+		
 		Map attr = new HashMap();
 		attr.put("user", username);
 		ls.securityEvent("LoginFailed",serv, attr);
@@ -292,8 +297,20 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 		// Go to the login page again - perhaps with polite message
 		// Don't use the ServletService method as the explicit login page
 		// may not be the default implementation. (may try Basic Auth for example)
-		res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
-				+ getLoginPage(conn)+"?error=login"));
+		if( username == null ) {
+			res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
+					+ getLoginPage(conn)+"?error=login"));
+		}else {
+			try {
+				// need to be a little careful here as usernames are 
+				person_fac.validateNameFormat(username);
+				res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
+						+ getLoginPage(conn)+"?error=login&username="+username));
+			}catch(ParseException e) {
+				res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
+						+ getLoginPage(conn)+"?error=login_name"));
+			}
+		}
 	}
 
 	

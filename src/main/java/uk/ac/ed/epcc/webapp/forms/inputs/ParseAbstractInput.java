@@ -27,23 +27,14 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * 
  */
 public abstract class ParseAbstractInput<V> extends AbstractInput<V> implements
-		 LengthInput<V> {
-	// maximum text length
-	int len = 64;
+		 LengthInput<V>, ModifiableFormatHintInput {
 
 	// input width
 	int maxwid = 64;
 
 	boolean force_single = false;
 
-	/** Get the maximum permitted value for this input
-	 *  A zero or -ve value implies no limit.
-	 * 
-	 */
-	@Override
-	public int getMaxResultLength() {
-		return len;
-	}
+	private String format_hint=null;
 
 	
 	@Override
@@ -61,17 +52,7 @@ public abstract class ParseAbstractInput<V> extends AbstractInput<V> implements
 		return force_single;
 	}
 
-	/**
-	 * set the input length for this parameter as a text box.
-	 * A zeroor -ve value imples no limit.
-	 * 
-	 * @param l
-	 *            int input_length
-	 */
-	@Override
-	public void setMaxResultLength(int l) {
-		len = l;
-	}
+	
 
 	/**
 	 * set the input width for this parameter as a text box.
@@ -98,5 +79,13 @@ public abstract class ParseAbstractInput<V> extends AbstractInput<V> implements
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitLengthInput(this);
+	}
+
+	public void setFormatHint(String hint) {
+		format_hint=hint;
+	}
+	@Override
+	public String getFormatHint() {
+		return format_hint;
 	}
 }

@@ -148,8 +148,26 @@ This service is only available to pre-registered users.
 <h1><%=page_title %></h1>
 <%=conn.getExpandedProperty("login.welcome","Welcome to ${service.name}")%>
 <%=conn.getExpandedProperty("login.link","")%>
+<% 
+String username = request.getParameter("username"); 
+if(username == null){
+	username = "";
+}else{
+	try{
+		fac.validateNameFormat(username);
+	}catch(Exception e){
+		username = "";
+	}
+	// Avoid any potential XSS as this is added to form
+	username = HtmlBuilder.strip(username);
+}
+%>
 <% if("login".equals(request.getParameter("error"))) { %>
 <h3>Incorrect <%=fac.getNameLabel()%> or Password</h3>
+<p><b>please check your details and try again</b>
+</p>
+<% } %> <% if("login_name".equals(request.getParameter("error"))) { %>
+<h3>Incorrect format for <%=fac.getNameLabel()%></h3>
 <p><b>please check your details and try again</b>
 </p>
 <% } %> <% if("session".equals(request.getParameter("error"))) { %>
@@ -184,13 +202,13 @@ if( password_auth != null){
    <table class="form">
 	<tr>
 		<th><label class='required' for="username"><%=fac.getNameLabel() %>:</label></th>
-		<td><input id="username" type="text" class="input" name="username" required/></td>
+		<td><input id="username" type="text" class="input" name="username" autocomplete="username" value="<%=username%>" required/></td>
 		<td></td>
 	</tr>
 	<tr>
 
 		<th><label <%= use_reset_page ? "class='required'":""%> for="password">Password</label></th>
-		<td><input id="password" type="password" class="input" name="password" <%= use_reset_page ? "required" :"" %>/></td>
+		<td><input id="password" type="password" autocomplete="current-password" class="input" name="password" <%= use_reset_page ? "required" :"" %>/></td>
 		<td>
 		    <input class="input_button login" type="submit" title="Login using password" value="Login" />
 		    <% if( password_auth.canResetPassword(null) && use_reset_page){ %>

@@ -14,9 +14,6 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /** Input for a list of tags that must 
@@ -26,43 +23,6 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
  *
  */
 public class ObjectListInput extends TextInput {
-	/**
-	 * @author Stephen Booth
-	 *
-	 */
-	public final class ObjectListValidator implements FieldValidator<String> {
-		/**
-		 * 
-		 */
-		private final AppContext conn;
-		/**
-		 * 
-		 */
-		private final Class<?> target;
-
-		/**
-		 * @param conn
-		 * @param target
-		 */
-		public ObjectListValidator(AppContext conn, Class<?> target) {
-			this.conn = conn;
-			this.target = target;
-		}
-
-		@Override
-		public void validate(String list) throws FieldException {
-			if( list != null && list.trim().length() > 0){
-				for(String n : list.split("\\s*,\\s*")){
-					if( conn.makeObjectWithDefault(target,null, n)==null){
-						throw new ValidateException("tag "+n+" not a "+target.getCanonicalName());
-					}
-				}
-			}
-			
-		}
-	}
-
-	
 	public ObjectListInput(AppContext conn,Class<?> target) {
 		super();
 		setSingle(true);

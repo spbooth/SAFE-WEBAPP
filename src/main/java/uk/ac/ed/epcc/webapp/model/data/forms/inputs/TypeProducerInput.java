@@ -20,15 +20,17 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.*;
+import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.SimpleListInput;
 import uk.ac.ed.epcc.webapp.model.data.convert.EnumeratingTypeConverter;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 
 
-public class TypeProducerInput<T> extends AbstractInput<String> implements PreSelectInput<String,T>, OptionalListInput<String, T> {
+public class TypeProducerInput<T> extends SimpleListInput<T> implements PreSelectInput<String,T>, OptionalListInput<String, T> {
     private final EnumeratingTypeConverter<T,String> t;
     private Set<T> item_set=null;
     private String unselected_text=null;
@@ -71,7 +73,7 @@ public class TypeProducerInput<T> extends AbstractInput<String> implements PreSe
     	return t;
     }
 	@Override
-	public T getItembyValue(String value) {
+	public T getItemByTag(String value) {
 
 		try {
 			return t.find(value);
@@ -106,11 +108,6 @@ public class TypeProducerInput<T> extends AbstractInput<String> implements PreSe
 	}
 
 	@Override
-	public String getTagByValue(String value) {
-		return value;
-	}
-
-	@Override
 	public String getText(T item) {
 		if( item == null) {
 			return null;
@@ -128,22 +125,10 @@ public class TypeProducerInput<T> extends AbstractInput<String> implements PreSe
 	}
 
 	@Override
-	public void setItem(T item) {
-		try {
-			setValue(getTagByItem(item));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
-	}
-	@Override
 	public String getPrettyString(String val) {
 		return getText(getItembyValue(val));
 	}
 	
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput#getUnselectedText()
 	 */
@@ -194,5 +179,7 @@ public class TypeProducerInput<T> extends AbstractInput<String> implements PreSe
 		}
 		return false;
 	}
+	
+	
 
 }

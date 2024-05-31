@@ -20,10 +20,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-/** Form result that displays a message from the message catalogue
+/** Form result that displays a message from the message catalogue.
+ * 
+ * Messages that could be presented as a pop-up rather than a new page should use {@link WarningMessageResult}.
  * 
  * @author spb
- *
+ * @see WarningMessageResult
  */
 
 

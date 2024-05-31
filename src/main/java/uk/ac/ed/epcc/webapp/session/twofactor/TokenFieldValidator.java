@@ -13,12 +13,12 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session.twofactor;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.session.AppUser;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
-/**
+/** A {@link FieldValidator} for MFA tokens
  * @author Stephen Booth
  *
  */
@@ -27,7 +27,7 @@ public class TokenFieldValidator<A extends AppUser, T> implements FieldValidator
 	/**
 	 * @param comp
 	 */
-	public TokenFieldValidator(CodeAuthComposite<A, T> comp,A user) {
+	public TokenFieldValidator(CodeAuthComposite<A,?, T> comp,A user) {
 		super();
 		this.comp = comp;
 		this.user=user;
@@ -40,8 +40,8 @@ public class TokenFieldValidator<A extends AppUser, T> implements FieldValidator
 		// Try to prevent brute-forcing by
 		// simultaneously posting multiple codes to the form.
 		synchronized (getClass()) {
-
-			boolean ok = comp.verify(user, data);
+            StringBuilder notes = new StringBuilder();
+			boolean ok = comp.verify(user, data,notes);
 			if( ! ok ) {
 				try {
 					long delay = comp.getContext().getLongParameter("twofactor.auth-delay", 500);
@@ -51,11 +51,14 @@ public class TokenFieldValidator<A extends AppUser, T> implements FieldValidator
 				} catch (InterruptedException e) {
 
 				}
+				if( notes.length() > 0) {
+					throw new ValidateException(notes.toString());
+				}
 				throw new ValidateException("Incorrect");
 			}
 			comp.authenticated();
 		}
 	}
-	private final CodeAuthComposite<A, T> comp;
+	private final CodeAuthComposite<A,?, T> comp;
 	private final A user;
 }

@@ -32,11 +32,14 @@ import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 /** A Text input for XML nodes.
  * 
  * @author spb
@@ -51,7 +54,7 @@ public class NodeInput extends TextInput implements ItemInput<String,Node>{
 	public NodeInput(AppContext conn,Document doc,TransformerFactory fac,Schema schema) throws TransformerConfigurationException {
 		super();
 		setSingle(false);
-		setMaxResultLength(1<<24);
+		addValidator(new MaxLengthValidator(1<<24));
 		this.conn=conn;
 		this.doc=doc;
 		this.schema=schema;
@@ -97,15 +100,15 @@ public class NodeInput extends TextInput implements ItemInput<String,Node>{
 		}
 	}
 
-	
-	public void setItem(Node item) {
+	@Override
+	public String getValueByItem(Node item) throws TypeException {
 		DOMSource source = new DOMSource(item);
 		StreamResult output = new StreamResult(new StringWriter());
 		try{
 			transformer.transform(source, output);
-			setValue(output.getWriter().toString());
+			return output.getWriter().toString();
 		}catch(Exception e){
-			conn.error(e,"error setting Node as item");
+			throw new TypeException(e);
 		}
 	}
 

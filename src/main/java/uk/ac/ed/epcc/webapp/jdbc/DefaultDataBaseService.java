@@ -25,9 +25,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.PreRequisiteService;
+import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
@@ -54,8 +52,9 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.TransientDataFault;
  * @author spb
  *
  */
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
-@PreRequisiteService(ConfigService.class)
+@PreRequisiteService({ConfigService.class,CleanupService.class})
 public class DefaultDataBaseService implements DatabaseService {
 	public static final Feature TRANSACTIONS_FEATURE = new Feature("database_transactions",true,"Database transactions are supported");
 	public static final Feature TRANSACTIONS_SERIALIZE_FEATURE = new Feature("database_transactions.serialized",true,"Database transactions use serialized isolation (locks)");
@@ -77,6 +76,7 @@ public class DefaultDataBaseService implements DatabaseService {
     private int stage_count=0;
     private final int desired_isolation_level;
 	private Set<AutoCloseable> closes=null;
+	private Set<Runnable> cleanups=null;
     public DefaultDataBaseService(AppContext ctx){
     	this.ctx=ctx;
     	force_rollback= TRANSACTIONS_ROLLBACK_TRANSIENT_ERRORS.isEnabled(ctx);
@@ -341,6 +341,14 @@ public class DefaultDataBaseService implements DatabaseService {
 	public void rollbackTransaction() {
 		if( in_transaction &&  TRANSACTIONS_FEATURE.isEnabled(getContext())){
 			try {
+				if( cleanups != null) {
+					CleanupService cus = getContext().getService(CleanupService.class);
+					for(Runnable r : cleanups) {
+						cus.remove(r);
+					}
+					cleanups.clear();
+					cleanups= null;
+				}
 				Connection connection = getSQLContext().getConnection();
 				connection.rollback();
 				in_transaction = ! connection.getAutoCommit();
@@ -357,6 +365,9 @@ public class DefaultDataBaseService implements DatabaseService {
 	@Override
 	public void commitTransaction() {
 		if( in_transaction && TRANSACTIONS_FEATURE.isEnabled(getContext())){
+			if( cleanups != null) {
+				cleanups=null;
+			}
 			try {
 				getSQLContext().getConnection().commit();
 				stage_count++;
@@ -378,6 +389,9 @@ public class DefaultDataBaseService implements DatabaseService {
 				throw new ConsistencyError("orphan call to stopTransaction");
 			}
 			try {
+				if( cleanups != null) {
+					cleanups=null;
+				}
 				Connection connection = getSQLContext().getConnection();
 				connection.commit();
 				connection.setAutoCommit(true);
@@ -513,5 +527,16 @@ public class DefaultDataBaseService implements DatabaseService {
         }
 		
 		return map;
+	}
+	
+	@Override
+	public void addCleanup(Runnable r) {
+		if( ! in_transaction) {
+			return;
+		}
+		if( cleanups == null ) {
+			cleanups = new HashSet<>();
+		}
+		cleanups.add(r);
 	}
 }

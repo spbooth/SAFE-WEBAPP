@@ -18,7 +18,6 @@ package uk.ac.ed.epcc.webapp.model.data.transition;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** General purpose key class used to key transitions.
  * Transitions can be keyed by any class and enums are often used for this.
@@ -79,6 +78,6 @@ public class TransitionKey<T> implements HelpText{
 	}
 	
 	protected final Logger getLogger(AppContext conn){
-		return conn.getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(conn,getClass());
 	}
 }

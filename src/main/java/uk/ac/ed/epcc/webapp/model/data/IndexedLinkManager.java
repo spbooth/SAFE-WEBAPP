@@ -24,13 +24,19 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
@@ -149,7 +155,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 						// cast to avoid generic problems as we don't know the real link type here
 						((LinkHistoryHandler) manager.getHistoryHandler()).update(this);
 					} catch (Exception e) {
-						getContext().error(e, "Error updating Link History");
+						getLogger().error("Error updating Link History", e);
 					}
 				}
 			}
@@ -478,12 +484,12 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		this.right_field = right_field;
 		if( DataObjectFactory.AUTO_CREATE_TABLES_FEATURE.isEnabled(c)){
 			setComposites(c, table);
-			setContextWithMake(c, table,getFinalTableSpecification(c,table,left_fac,left_field,right_fac,right_field));
+			setContextWithMake(c, table,()->getFinalTableSpecification(c,table,left_fac,left_field,right_fac,right_field));
 		}else{
 			setContext(c, table,false);
 		}
-		res.addTypeProducer(new IndexedTypeProducer<>(c,left_field, left_fac));
-		res.addTypeProducer(new IndexedTypeProducer<>(c,right_field, right_fac));
+		registerTypeProducer(new IndexedTypeProducer<>(c,left_field, left_fac));
+		registerTypeProducer(new IndexedTypeProducer<>(c,right_field, right_fac));
 	}
 
 	// make final to stop people overriding the wrong method.
@@ -496,19 +502,19 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			IndexedProducer<R> rightFac, String rightField) {
 		TableSpecification s = new TableSpecification();
 		if( leftFac instanceof DataObjectFactory){
-			s.setField(leftField, ((DataObjectFactory)leftFac).getReferenceFieldType(false));
+			s.setField(leftField, ((DataObjectFactory)leftFac).getReferenceFieldType(false,true));
 		}else{
 			s.setField(leftField, new IntegerFieldType(false,null));
 		}
 		if( rightFac instanceof DataObjectFactory){
-			s.setField(rightField, ((DataObjectFactory)rightFac).getReferenceFieldType(false));
+			s.setField(rightField, ((DataObjectFactory)rightFac).getReferenceFieldType(false,true));
 		}else{
 			s.setField(rightField, new IntegerFieldType(false,null));
 		}
 		try {
 			s.new Index("Link", true, leftField, rightField);
 		} catch (InvalidArgument e) {
-			getContext().error(e,"Error making index");
+			getLogger().error("Error making index",e);
 		}
 		return s;
 	}
@@ -806,13 +812,48 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			supress.add(right_field);
 			return supress;
 		}
+		@Override
+		public FormResult getResult(T dat, Form f) {
+			// TODO Auto-generated method stub
+			// pass the link ends explicitly so MEssageServlet can link to them
+			try {
+				return new MessageResult("link_updated",getTypeName(),dat.getLeft(),dat.getRight());
+			} catch (DataException e) {
+				getLogger().error("Error getting update link result", e);
+				return new MessageResult("object_updated", getTypeName(),dat.getIdentifier());
+			}
+		}
 	}
+	
 	@Override
 	public FormUpdate<T> getFormUpdate(AppContext c) {
 		return new LinkUpdater();
 	}
 	
+	public class LinkCreator extends Creator<T>{
+
+		
+
+		public LinkCreator() {
+			super(IndexedLinkManager.this);
+		}
+		@Override
+		public FormResult getResult(T dat, Form f) {
+			// TODO Auto-generated method stub
+			// pass the link ends explicitly so MEssageServlet can link to them
+			try {
+				return new MessageResult("link_created",getTypeName(),dat.getLeft(),dat.getRight());
+			} catch (DataException e) {
+				getLogger().error("Error getting update link result", e);
+				return new MessageResult("object_created", getTypeName(),dat.getIdentifier());
+			}
+		}
+	}
 	
+	@Override
+	public FormCreator getFormCreator(AppContext c) {
+		return new LinkCreator();
+	}
 	
 	/**
 	 * Do we automatically update the history as part of commit. 
@@ -829,7 +870,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 				h.update(val);
 			}
 		} catch (Exception e) {
-		    getContext().error(e,"Error updating history");
+		    getLogger().error("Error updating history",e);
 		}
 	}
 

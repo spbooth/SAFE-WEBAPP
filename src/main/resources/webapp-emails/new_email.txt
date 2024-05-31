@@ -14,6 +14,10 @@ To complete this request you must visit the following URL.
 
 %%service.saf.url%%/EmailChangeRequestServlet/%%request.tag%%
 
+You need to be logged in to visit this link. If you are not already logged in
+then you will automatically be redirected to the login page fist. If you are prompted for your email address 
+during this login, provide your old email address.
+
 Regards
 
   The %%service.name%% Team

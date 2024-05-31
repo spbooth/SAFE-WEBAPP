@@ -14,15 +14,12 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 
-
-public class CalendarFieldInput extends IntegerSetInput {
+public class CalendarFieldInput extends IntegerSetInput implements MinMaxInput<Integer>{
   private static final Integer[] field_list=new Integer[]{Calendar.SECOND,Calendar.MINUTE,Calendar.HOUR,Calendar.DAY_OF_MONTH,Calendar.WEEK_OF_YEAR,Calendar.MONTH,Calendar.YEAR};
   public CalendarFieldInput(){
 	  super(field_list);
@@ -51,22 +48,7 @@ public String getText(Integer item) {
 	}
 }
 
-@Override
-public void parse(String v) throws ParseException {
-	try{
-		super.parse(v);
-	}catch(ParseException e){
-		// check text forms 
-		for(Iterator<Integer> it =getItems(); it.hasNext();){
-			Integer item = it.next();
-			if( getText(item).equalsIgnoreCase(v)){
-				setItem(item);
-				return;
-			}
-		}
-		throw e;
-	}
-}
+
 private static Set<Integer> getSet(int max){
 	LinkedHashSet<Integer> result = new LinkedHashSet<>(field_list.length);
 	for(Integer i : field_list){
@@ -75,5 +57,22 @@ private static Set<Integer> getSet(int max){
 		}
 	}
 	return result;
+}
+@Override
+public Integer getValueByTag(String tag) {
+	// Also want to accept tag names, in particular when parsing report
+	// parameter specifications.
+	tag = tag.toLowerCase();
+	switch(tag) {
+	case "seconds": return Calendar.SECOND;
+	case "minutes": return Calendar.MINUTE;
+	case "hours": return Calendar.HOUR;
+	case "days": return Calendar.DAY_OF_MONTH;
+	case "weeks": return Calendar.WEEK_OF_YEAR;
+	case "months": return Calendar.MONTH;
+	case "years": return Calendar.YEAR;
+	default:
+		return super.getValueByTag(tag);
+	}
 }
 }

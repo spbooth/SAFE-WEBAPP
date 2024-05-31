@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
  * @author Stephen Booth
  *
  */
-public class BoundedInputInterfaceTestImpl<T,I extends BoundedInput<T>,X extends BoundedInputDataProvider<T, I>> implements BoundedInputInterfaceTest<T,I,X>{
+public class BoundedInputInterfaceTestImpl<T extends Comparable<T>,I extends BoundedInput<T>,X extends BoundedInputDataProvider<T, I>> implements BoundedInputInterfaceTest<T,I,X>{
 
 	/**
 	 * @param target
@@ -45,13 +45,9 @@ public class BoundedInputInterfaceTestImpl<T,I extends BoundedInput<T>,X extends
 	
     public void testMin() throws Exception {
 		I input = target.getInput();
-		T old = input.getMin();
-		T prev = input.setMin(target.getLowBound());
-		if( old == null ) {
-			assertNull(prev);
-		}else {
-			assertEquals(old, prev);
-		}
+		
+		input.setMin(target.getLowBound());
+		
 		assertEquals(target.getLowBound(),input.getMin());
 		Set<T> good = new HashSet<>();
 		good.addAll(target.getGoodData());
@@ -74,13 +70,9 @@ public class BoundedInputInterfaceTestImpl<T,I extends BoundedInput<T>,X extends
 	
     public void testMax() throws Exception {
 		I input = target.getInput();
-		T old = input.getMax();
-		T prev = input.setMax(target.getHighBound());
-		if( old == null ) {
-			assertNull(prev);
-		}else {
-			assertEquals(old, prev);
-		}
+		
+		input.setMax(target.getHighBound());
+		
 		assertEquals(target.getHighBound(),input.getMax());
 		Set<T> good = new HashSet<>();
 		good.addAll(target.getGoodData());

@@ -40,6 +40,7 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.exceptions.MissingResourceException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -94,7 +95,11 @@ public class XMLDataUtils extends AbstractContexed{
 			
 			InputStream stm = clazz.getResourceAsStream(fixture_name);
 			if( stm != null ){
+				try {
 				r.parse(new InputSource(stm));
+				}catch(Throwable e) {
+					throw new DataFault("Error loading "+fixture_name, e);
+				}
 			}else{
 				throw new DataFault("Resource not found "+fixture_name);
 			}
@@ -226,7 +231,7 @@ public class XMLDataUtils extends AbstractContexed{
 		StringBuffer fileData = new StringBuffer(1000);
 		InputStream stream = clazz.getResourceAsStream(name);
 		if( stream == null) {
-			throw new IOException("Resource "+name+" not found by "+clazz.getCanonicalName());
+			throw new MissingResourceException("Resource "+name+" not found by "+clazz.getCanonicalName());
 		}
 		InputStreamReader reader = new InputStreamReader(stream);
 		char[] buf = new char[1024];
@@ -315,7 +320,7 @@ public class XMLDataUtils extends AbstractContexed{
 				}
 			}
 		}catch(Exception t){
-			c.error(t,"Error in dropAllTables");
+			getLogger().error("Error in dropAllTables",t);
 		}finally{
 			if( timer != null ){ timer.stopTimer("dropAllTables");}
 		}

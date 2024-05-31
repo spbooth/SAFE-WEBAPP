@@ -82,7 +82,6 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 		IntegerInput bare = new IntegerInput();
 		bare.setMin(1);
 		bare.setBoxWidth(2);
-		bare.setMaxResultLength(3);
 		if( fixed_blocks <= 0 ){
 			bare.setInteger(1);
 			count=bare;
@@ -95,7 +94,6 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 		splits = new IntegerInput();
 		splits.setMin(1);
 		splits.setBoxWidth(2);
-		splits.setMaxResultLength(3);
 		splits.setMax(RegularPeriodInput.PERIOD_INPUT_MAX_SPLITS);
 		splits.setInteger(1);
 		addInput("start", "From ", start);

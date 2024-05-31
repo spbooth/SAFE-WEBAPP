@@ -18,7 +18,7 @@ import java.util.Calendar;
 
 
 
-public class CalendarMonthInput extends IntegerSetInput {
+public class CalendarMonthInput extends IntegerSetInput implements MinMaxInput<Integer> {
 	static final String names[]={"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	
 	private final Calendar c;

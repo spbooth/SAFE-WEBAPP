@@ -23,17 +23,16 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import uk.ac.ed.epcc.webapp.*;
-import uk.ac.ed.epcc.webapp.content.Labeller;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.factory.*;
-import uk.ac.ed.epcc.webapp.forms.inputs.*;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.*;
 import uk.ac.ed.epcc.webapp.jdbc.filter.*;
@@ -41,8 +40,6 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -54,14 +51,16 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
-import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemParseInput;
-import uk.ac.ed.epcc.webapp.model.data.iterator.EmptyIterator;
 import uk.ac.ed.epcc.webapp.model.data.iterator.SortingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationVisitor;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /**
  * Factory object for producing DataObjects.
@@ -170,325 +169,125 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 
    
 
-	/** A basic form Input for selecting objects using their ID value as text.
-     * Only use this where the table is too large to support a pull-down.
-     * 
-     * To make text forms easier to use the input will attempt to look up the target by name
-     * if the parent factory implements {@link NameFinder}.
+    /** A {@link FieldValidator} that checks the reference belongs to
+     * a record that maches the filter
      * 
      */
-    public class DataObjectIntegerInput extends IntegerInput implements DataObjectItemInput<BDO> {
-
-        public DataObjectIntegerInput() {
+    public class DataObjectFieldValidator implements FieldValidator<Integer>{
+        public DataObjectFieldValidator(BaseFilter<BDO> fil) {
 			super();
-			setMin(1);
+			this.fil = fil;
 		}
-
+		private final BaseFilter<BDO> fil;
 		@Override
-		public BDO getItembyValue(Integer num) {
-            if (num == null) {
-                // must be optional
-                return null;
-            }
-            try {
-                return find(num.intValue());
-            } catch (DataException e) {
-                return null;
-            }
-        }
-
-        @Override
-		public void setItem(BDO o) {
-            if (o == null) {
-                setNull();
-            } else {
-            	
-                try {
-					setValue(new Integer(o.getID()));
-				} catch (TypeException e) {
-					throw new TypeError(e);
+		public void validate(Integer data) throws FieldException {
+			AndFilter<BDO> validate_fil = getValidateFilter(data);
+			try {
+				if( exists(validate_fil)){
+					return;
 				}
-            }
-        }
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public final Integer convert(Object v) throws TypeException {
-			if( v == null ){
-				return null;
-			}
-			if( v instanceof DataObject){
-				if( isMine(v)){
-					return Integer.valueOf(((BDO)v).getID());
-				}else{
-					throw new TypeException("DataObject "+v.getClass().getCanonicalName()+" passed to "+getClass().getCanonicalName());
-				}
-			}
-			if( v instanceof IndexedReference ){
-				if( isMyReference((IndexedReference) v)){
-					return Integer.valueOf(((IndexedReference)v).getID());
-				}else{
-					throw new TypeException("IndexedReference "+v.toString()+" passed to "+getClass().getCanonicalName());
-				}
-			}
-			return super.convert(v);
-		}
-
-		@Override
-		public void parse(String v) throws ParseException {
-			try{
-				super.parse(v);
-			}catch(ParseException e){
-				if( DataObjectFactory.this instanceof ParseFactory){
-					@SuppressWarnings("unchecked")
-					BDO value = ((ParseFactory<BDO>)DataObjectFactory.this).findFromString(v);
-					if( value != null){
-						setItem(value);
-						return;
-					}
-				}
-				throw e;
-			}
-
-		}
-    }
-    /** A form Input used to select objects produced by the owning factory.
-	 * 
-	 * @author spb
-	 *
-	 */
-	public abstract class AbstractDataObjectInput extends DataObjectIntegerInput implements PreSelectInput<Integer,BDO>{
-		private BaseFilter<BDO> fil;
-		private int max_identifier=DataObject.MAX_IDENTIFIER;
-        boolean restrict_parse=true;  // does filter apply to parse as well as offered choice
-        boolean allow_pre_select=true;
-        private Labeller<? super BDO, String> labeller=null;
-		public AbstractDataObjectInput(BaseFilter<BDO> f) {
-			this(f,true);
-		}
-		public AbstractDataObjectInput(BaseFilter<BDO> f,boolean restrict_parse) {
-			try{ 
-				fil = FilterConverter.convert(f);
-			}catch(NoSQLFilterException e){
-				fil = f;
-			}
-			this.restrict_parse = restrict_parse;
-			AppContext con = getContext();
-			max_identifier = con.getIntegerParameter(getConfigTag()+".maxIdentifier", con.getIntegerParameter("DataObject.MaxIdentifier", DataObject.MAX_IDENTIFIER));
-			allow_pre_select = con.getBooleanParameter(getConfigTag()+".allowPreSelect", true);
-			addValidator(new FieldValidator<Integer>() {
+			} catch (DataNotFoundException e) {
 				
-				@Override
-				public void validate(Integer num) throws FieldException {
-					try {
-						
-						if (restrict_parse && fil != null ){
-							AndFilter<BDO> validate_fil = getValidateFilter(num);
-							if( exists(validate_fil)){
-								return;
-							}
-
-
-
-							throw new ValidateException("Invalid input does not match selection filter");
-						}else{
-							BDO o = getItembyValue(num.intValue());
-						}
-					} catch (DataNotFoundException e) {
-						
-						throw new ValidateException("Object does not exist with id "+getTag()+":"+num);
-					} catch (DataException e) {
-					    getContext().error(e,"Error in DataObjectInput");
-					    throw new ValidateException("Internal error", e);
-					}
-					
-				}
-			});
-		}
-
-		@Override
-		public BDO getItembyValue(Integer id) {
-			if (id == null || id.intValue() <= 0) {
-				// could be optional
-				return null;
-			}
-			if( fil == null || ! restrict_parse){
-				return find(id);
-			}
-			AndFilter<BDO> find_fil = getValidateFilter(id);
-			try {
-				// force filter to be honoured as well
-				return  find(find_fil,true);
+				throw new ValidateException("Object does not exist with id "+getTag()+":"+data);
 			} catch (DataException e) {
-				getContext().error(e,"Error in getItemByValue");
-				return null;
+			    getLogger().error("Error in DataObjectFieldValidator",e);
+			    throw new ValidateException("Internal error", e);
 			}
-			
-		}
 
-		@Override
-		public String getPrettyString(Integer val) {
-			// don't apply validation for getPrettyString
-			// we want to be able to format an invalid value for 
-			String res =  getText(find(val));
-			if( res == null ){
-				res = "Not Selected";
-			}
-			return res;
-		}
-      
-		@Override
-		public int getCount(){
-			try {
-				return (int) DataObjectFactory.this.getCount(fil);
-			} catch (DataException e) {
-				getLogger().error("Error counting items",e);
-				return 0;
-			}
-			
-		}
-		@Override
-		public Iterator<BDO> getItems() {
-			try {
-				return new FilterIterator(fil);
-			} catch (DataFault e) {
-				getLogger().error("Error making select Iterator",e);
-				return new EmptyIterator<>();
-			}
-		}
-  
-		
 
-		@Override
-		public String getTagByValue(Integer id) {
-			return id.toString();
-		}
 
-		@Override
-		public String getText(BDO obj) {
-			if( obj == null ){
-				return null;
-			}
-			if( labeller != null ) {
-				return labeller.getLabel(getContext(), obj);
-			}
-			String result = obj.getIdentifier(max_identifier);
-			
-			if ( result != null && result.length() > max_identifier) {
-				result = result.substring(0, max_identifier);
-			}
-			if( result == null || result.trim().length() == 0 ){
-				return "Un-named object "+obj.getID();
-			}
-			return result;
+			throw new ValidateException("Invalid input does not match selection filter");
 		}
-		
 		/** 
 		 * @param num
 		 * @return
 		 */
-		private AndFilter<BDO> getValidateFilter(Number num) {
-			return getAndFilter(fil, 
-					getMatchFilter(num.intValue()));
+		private AndFilter<BDO> getValidateFilter(Integer num) {
+			return getAndFilter(getFilter(), getMatchFilter(num));
 		}
-		/** get the Value from an Item
+		/** Method to convert the field value into a filter.
 		 * 
-		 * @param item
+		 * @param num
 		 * @return
 		 */
-		public abstract Integer getValueFromItem(BDO item);
-		
-		@Override
-		public String getTagByItem(BDO item) {
-			return Integer.toString(getValueFromItem(item));
+		public BaseFilter<BDO> getMatchFilter(int num) {
+			return new SQLIdFilter<>(res, num);
 		}
-		/** The filter that selects records by input id
+		public BaseFilter<BDO> getFilter(){
+			return fil;
+		}
+		/** Add this to a {@link FieldValidationSet} with merge
 		 * 
-		 * @param value
-		 * @return
+		 * @param set
 		 */
-		protected abstract BaseFilter<BDO> getMatchFilter(int value);
-		@Override
-		public <R> R accept(InputVisitor<R> vis) throws Exception {
-			return vis.visitListInput(this);
-		}
-		@Override
-		public boolean allowPreSelect() {
-			return allow_pre_select;
-		}
-		@Override
-		public void setPreSelect(boolean value) {
-			allow_pre_select=value;
-			
-		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
-		 */
-		@Override
-		public boolean isValid(BDO item) {
-			if(item == null) {
-				return false;
+		public void addTo(FieldValidationSet<Integer> set) {
+			AndFilter<BDO> fil = null;
+			for(FieldValidator<Integer> v : set) {
+				if( v instanceof DataObjectFactory.DataObjectFieldValidator) {
+					DataObjectFieldValidator dv = (DataObjectFactory<BDO>.DataObjectFieldValidator) v;
+					if( fil == null ) {
+						fil = getAndFilter(getFilter(),dv.getFilter());
+					}else {
+						fil.addFilter(dv.getFilter());
+					}
+				}
 			}
-			try {
-				return exists(getValidateFilter(item.getID()));
-			} catch (DataException e) {
-				return false;
+			if( fil == null ) {
+				set.add(this); // no merge
+			}else {
+				set.add(new DataObjectFieldValidator(fil)); // add merged
 			}
 		}
-		public int getMaxIdentifier() {
-			return max_identifier;
+		@Override
+		public <X> X accept(FieldValidationVisitor<X, Integer> vis) {
+			return vis.visitDataObjectFieldValidator(this);
 		}
-		public void setMaxIdentifier(int max_identifier) {
-			this.max_identifier = max_identifier;
-		}
-		public Labeller<? super BDO, String> getLabeller() {
-			return labeller;
-		}
-		public void setLabeller(Labeller<? super BDO, String> labeller) {
-			this.labeller = labeller;
-		}
-	}
-    /** A form Input used to select objects produced by the owning factory using the record id
+    	
+    }
+    /** A DataObjectFieldValidator that enforces a relationship with the selected object
+     * 
+     */
+    public class RelationshipFieldValidator extends DataObjectFieldValidator{
+    	public RelationshipFieldValidator(String relationship) throws UnknownRelationshipException {
+    		this(DataObjectFactory.this.getContext().getService(SessionService.class),relationship);
+    	}
+    	public RelationshipFieldValidator(String relationship,BaseFilter<BDO> fallback) {
+    		this(DataObjectFactory.this.getContext().getService(SessionService.class),relationship,fallback);
+    	}
+    	public RelationshipFieldValidator(SessionService sess,String relationship) throws UnknownRelationshipException {
+    		super(sess.getRelationshipRoleFilter(DataObjectFactory.this, relationship));
+    	}
+    	public RelationshipFieldValidator(SessionService sess,String relationship,BaseFilter<BDO> fallback) {
+    		super(sess.getRelationshipRoleFilter(DataObjectFactory.this, relationship,fallback));
+    	}
+    }
+	/** A form Input used to select objects produced by the owning factory using the record id
 	 * 
 	 * @author spb
 	 *
 	 */
-	public class DataObjectInput extends AbstractDataObjectInput {
+	public class DataObjectInput extends AbstractDataObjectInput<BDO> {
 
 		/**
-		 * @param f
-		 * @param restrict_parse
+		 * 
+		 * @param view_fil
+		 * @param restrict_fil
 		 */
-		public DataObjectInput(BaseFilter<BDO> f, boolean restrict_parse) {
-			super(f, restrict_parse);
+		public DataObjectInput(BaseFilter<BDO> view_fil, BaseFilter<BDO> restrict_fil) {
+			super(DataObjectFactory.this, view_fil, restrict_fil);
 		}
 
 		/**
 		 * @param f
 		 */
 		public DataObjectInput(BaseFilter<BDO> f) {
-			super(f);
+			super(DataObjectFactory.this, f);
 		}
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory.AbstractDataObjectInput#getMatchFilter(int)
-		 */
-		@Override
-		protected BaseFilter<BDO> getMatchFilter(int value) {
-			return new SQLIdFilter<>( res, value);
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory.AbstractDataObjectInput#getValueFromItem(uk.ac.ed.epcc.webapp.model.data.DataObject)
-		 */
-		@Override
-		public Integer getValueFromItem(BDO item) {
-			return item.getID();
-		}
 		
 	}
 
-	public class SortingDataObjectInput extends DataObjectInput implements DataObjectItemParseInput<BDO>{
+	public class SortingDataObjectInput extends DataObjectInput {
 		 Comparator<? super BDO> comp;
 		public SortingDataObjectInput( BaseFilter<BDO> f,Comparator<? super BDO> comp) {
 			super(f);
@@ -511,7 +310,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			};
 		}
 		public SortingDataObjectInput( BaseFilter<BDO> f,boolean restrict_parse,Comparator<? super BDO> comp) {
-			super(f,restrict_parse);
+			super(restrict_parse? null : f, restrict_parse ? f : null);
+			this.comp=comp;
+		}
+		public SortingDataObjectInput( BaseFilter<BDO> f,BaseFilter<BDO> restrict_fil,Comparator<? super BDO> comp) {
+			super(f,restrict_fil);
 			this.comp=comp;
 		}
 		@Override
@@ -911,6 +714,21 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     		observeComposite(c);
     	}
     }
+    /**  register a {@link TypeProducer} used by a sub-class.
+     * 
+     * Registering a static TypeProducer when a factory is constructed will
+     * automatically configure the appropriate input for automatic forms
+     * 
+     * The initial implementation just registers with the Repository but
+     * encapsulating this in a method makes later refactoring easier.
+     * 
+     * @param <T>
+     * @param <D>
+     * @param producer
+     */
+    protected final  <T,D>  void registerTypeProducer(TypeProducer<T , D> producer){
+    	res.addTypeProducer(producer);
+    }
     /** Observer {@link Composite}s as they are registered.
      * 
      * Note that as this can be called during factory construction no assumptions can be made about
@@ -999,7 +817,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	public void release(){
 		// make sure we are not cached before destroying state
-		getContext().removeCached(null,getTag());
+		getContext().removeCached(getTag());
 		res=null;
 		finder=null;
 		if( composites != null ){
@@ -1062,6 +880,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	@Override
 	public  BDO find(int id)
 			throws uk.ac.ed.epcc.webapp.jdbc.exception.DataException {
+		if( id <= 0) {
+			return null;
+		}
 		Repository.Record rec = res.new Record();
 		rec.setID(id);
 		// set the ID before making the object in case this is
@@ -1084,7 +905,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 	@Override
 	public final BDO find(Number id) {
-		if (id == null || id.intValue()==0) {
+		if (id == null || id.intValue()<=0) {
 			return null;
 		}
 		try {
@@ -1093,7 +914,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			// not necessarily an error
 			return null;
 		} catch (DataException e) {
-			getContext().error(e,"Error finding BDO");
+			getLogger().error("Error finding BDO",e);
 			return null;
 		}
 	}
@@ -1141,7 +962,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     						throw new MultipleResultException("Found multiple "+getTag()+" records expecting 1");
     					}else{
     						// just log
-    						getContext().getService(LoggerService.class).getLogger(getClass()).error("Multiple "+getTag()+" records expecting 1",new Exception());
+    						getLogger().error("Multiple "+getTag()+" records expecting 1",new Exception());
     					}
     				}
     				return result;
@@ -1292,7 +1113,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	@Override
 	public DataObjectItemInput<BDO> getInput() {
-		return getInput(getFinalSelectFilter(),restrictDefaultInput());
+		return getInput(getFinalSelectFilter(),restrictDefaultInput()? getFinalSelectFilter(): null);
 	}
 	
 	/** Create an {@link Input} from a filter.
@@ -1302,7 +1123,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return {@link DataObjectItemInput}
 	 */
 	public final DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil){
-		return getInput(fil,true);
+		return getInput(null,fil);
 	}
 	/** Generate the default input type. This is usually a {@link ListInput}
 	 * but can be overidden to return an auto-complete input.
@@ -1313,19 +1134,41 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param restrict boolean should filter restrict results
 	 * @return
 	 */
-	public DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,boolean restrict){
+	public final DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,boolean restrict){
+		if( restrict) {
+			return getInput(null, fil);
+		}else {
+			return getInput(fil,null);
+		}
+	}
+	/** Get an input
+	 * 
+	 * @param fil    {@link BaseFilter} to limit suggestions
+	 * @param restrict {@link BaseFilter} to restrict validation (also restricts suggestions)
+	 * @return
+	 */
+	public DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,BaseFilter<BDO> restrict){
 		return new DataObjectInput(fil,restrict);
 	}
 	public class FilterSelector implements DataObjectSelector<BDO>{
-		private final boolean restrict;
-		public FilterSelector(BaseFilter<BDO> fil,boolean restrict) {
+		
+		public FilterSelector(BaseFilter<BDO> fil,BaseFilter<BDO> restrict) {
 			super();
 			this.fil = fil;
 			this.restrict=restrict;
 		}
-
+		public FilterSelector(BaseFilter<BDO> fil,boolean use_restrict) {
+			super();
+			if( use_restrict) {
+				this.fil=null;
+				this.restrict=fil;
+			}else {
+				this.fil=fil;
+				this.restrict=null;
+			}
+		}
 		private final BaseFilter<BDO> fil;
-
+		private final BaseFilter<BDO>restrict;
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getInput()
 		 */
@@ -1334,16 +1177,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return DataObjectFactory.this.getInput(fil,restrict);
 		}
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectSelector#getSelector(uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter)
-		 */
+		
 		@Override
 		public DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> filter) {
 			return new FilterSelector(getAndFilter(fil, filter), restrict);
-		}
-		@Override
-		public DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> filter,boolean new_restrict) {
-			return new FilterSelector(getAndFilter(fil, filter), new_restrict);
 		}
 	}
 	/** create a {@link Selector} from a filter.
@@ -1353,19 +1190,23 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return {@link Selector}
 	 */
 	public final DataObjectSelector<BDO> getSelector(BaseFilter<BDO> fil){
-		return new FilterSelector(fil,true);
+		return getSelector(null, fil);
 	}
-	
+	/** create a {@link Selector} for a filter
+	 * 
+	 * @param sel  A {@link BaseFilter} to narrow suggestions
+	 * @param restrict A {@link BaseFilter} to restrict allowed values (also narrows selections)
+	 * @return
+	 */
+	public final DataObjectSelector<BDO> getSelector(BaseFilter<BDO> sel,BaseFilter<BDO> restrict){
+		return new FilterSelector(sel,restrict);
+	}
 	@Override
 	public final DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> fil){
 		// This should narrow the default selector of this class
-		return new FilterSelector(getAndFilter(getFinalSelectFilter(),fil),restrictDefaultInput());
+		return new FilterSelector(fil,getFinalSelectFilter());
 	}
-	@Override
-	public final DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> fil, boolean new_restrict){
-		// This should narrow the default selector of this class
-		return new FilterSelector(getAndFilter(getFinalSelectFilter(),fil),new_restrict);
-	}
+	
 	/** create a {@link Selector} from a filter.
 	 * 
 	 * @param fil      {@link BaseFilter} for selection
@@ -1373,7 +1214,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return {@link Selector}
 	 */
 	public final Selector<DataObjectItemInput<BDO>> getSelector(BaseFilter<BDO> fil,boolean restrict){
-		return new FilterSelector(fil,restrict);
+		if( restrict ) {
+			return new FilterSelector(null,fil);
+		}else {
+			return new FilterSelector(fil,null);
+		}
 	}
 	/** Create a {@link FilterResult} from a filter
 	 * 
@@ -1463,8 +1308,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * 
      * @return {@link Logger}
      */
-	protected Logger getLogger() {
-		return getContext().getService(LoggerService.class).getLogger(getClass());
+	public Logger getLogger() {
+		AppContext context = getContext();
+		if( context == null) {
+			context = AppContext.getContext();
+		}
+		return Logger.getLogger(context,getClass());
 	}
 
 	/** get the set of fields that can be null in the database.
@@ -1512,21 +1361,39 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param allow_null
 	 * @return ReferenceFieldType
 	 */
-	public ReferenceFieldType getReferenceFieldType(boolean allow_null){
-		return new ReferenceFieldType(allow_null,getTag());
+	public ReferenceFieldType getReferenceFieldType(boolean allow_null) {
+		return getReferenceFieldType(allow_null, false);
+	}
+	public ReferenceFieldType getReferenceFieldType(boolean allow_null,boolean want_fk){
+		return new ReferenceFieldType(allow_null,getTag(),want_fk);
 	}
 
 	/**
-	 * Get a Map of selectors to use for forms of this type.
+	 * Get a Map of {@link Selector}s to use for forms of this type.
 	 * 
 	 * This method provides a class specific set of defaults but the specific form classes can
 	 * override this.
+	 * 
+	 * While this is necessary in some cases it is better to encode customisation as {@link FieldValidator}s
+	 * as these are composable. 
+	 * 
 	 * @return Map
 	 * @see DataObjectFormFactory
 	 */
 	protected Map<String,Selector> getSelectors() {
 
 		return new HashMap<>();
+	}
+	/** Get a {@link Map} of {@link FieldValidationSet}s to enforce for this type.
+	 * These will be applied when generating create/update forms but could also be applied
+	 * more generally e.g. to validate APIs and should be considered as validating object state
+	 * rather than a particular piece of the UI
+	 * 
+	 * @return Map
+	 * @see DataObjectFormFactory
+	 */
+	protected Map<String,FieldValidationSet> getValidators(){
+		return new LinkedHashMap<>();
 	}
 	/**
 	 * generate the class specific set of suppressed fields to be used in form creation/update
@@ -1621,6 +1488,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	public final boolean isMine(DataObject o) {
 		if( o == null){
+			return false;
+		}
+		if( getContext() != o.getContext()) {
 			return false;
 		}
 		return getTag().equals(o.getFactoryTag());
@@ -1809,9 +1679,46 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	   setContext(ctx, homeTable, AUTO_CREATE_TABLES_FEATURE.isEnabled(ctx));
 	}
 	protected void postSetContext() {
+		for(Composite c : getComposites()) {
+			c.postSetContext();
+		}
 		
 	}
+	/** Set the AppContext optionally creating the table
+	 * 
+	 * @param ctx
+	 * @param homeTable
+	 * @param create
+	 * @return true if factory expected to be valid now
+	 */
 	protected final boolean setContext(AppContext ctx, String homeTable,boolean create) {
+		return setContextWithMake(ctx, homeTable, create ? ()->getFinalTableSpecification(ctx, homeTable) : null);
+	}
+	/** Initialise Repository with customised table creation.
+	 * This is called directly where the table specification depends on the constructor parameters, 
+	 * 
+	 * @param ctx
+	 * @param homeTable
+	 * @param spec {@link TableSpecification}
+	 * @return true if table created
+	 */
+	protected final boolean setContextWithMake(AppContext ctx, String homeTable,TableSpecification spec) {
+		return setContextWithMake(ctx, homeTable, spec == null ? null : ()->spec);
+	}
+	/** Initialise Repository with customised table creation.
+	 * 
+	 * If Table creation is to be attempted a {@link Supplier} is passed. (If the table already exists the
+	 * supplier is not called allowing specification generation to be avoided.
+	 * Also note that {@link #setComposites(AppContext, String)} is called by this routine which needs to happen
+	 * before the specification is generated
+	 * 
+	 * @param ctx
+	 * @param homeTable
+	 * @param specgen {@link Supplier} or null
+	 * @return true if table created
+	 */
+	protected final boolean setContextWithMake(AppContext ctx, String homeTable,Supplier<TableSpecification> specgen) {
+	
 		if (res != null  ){
 			getLogger().debug("Attempt to reset Repository");
 			return false;
@@ -1819,46 +1726,60 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		if (homeTable == null) {
 			throw new ConsistencyError("No table specified");
 		}
-		
+
 		TimerService timer = ctx.getService(TimerService.class);
 		if( timer != null ){ timer.startTimer("setContext"); timer.startTimer("setContext:"+homeTable);}
 		try{
-		// This sets the AppContext if not already set.
-		setComposites(ctx, homeTable);
-		
-		res = Repository.getInstance(ctx, homeTable);
-		if( create){
-			if( ! isValid()){
-				// Make sure we don't attempt this more than once per context
-				// Reference fields should trigger creation of targets and
-				// we need to worry about mutual cross references
-				String create_tag = "auto_create_"+homeTable;
-				if( ctx.getAttribute(create_tag) != null){
-					return false;
-				}
-				ctx.setAttribute(create_tag, Boolean.TRUE);
-				TableSpecification spec = getFinalTableSpecification(ctx,
-						homeTable);
-				if( spec != null ){
-					try {
-						if( ctx.getService(DatabaseService.class).getSQLContext().isReadOnly()) {
-							throw new DataError("Cannot create table, read-only connection");
+			// This sets the AppContext if not already set.
+			setComposites(ctx, homeTable);
+
+			res = Repository.getInstance(ctx, homeTable);
+			if( specgen != null ){
+				if( ! isValid()){
+					// Make sure we don't attempt this more than once per context
+					// Reference fields should trigger creation of targets and
+					// we need to worry about mutual cross references
+					String create_tag = "auto_create_"+homeTable;
+					if( ctx.getAttribute(create_tag) != null){
+						return false;
+					}
+					ctx.setAttribute(create_tag, Boolean.TRUE);
+					TableSpecification spec = specgen.get();
+					if( spec != null ){
+						try {
+							if( ctx.getService(DatabaseService.class).getSQLContext().isReadOnly()) {
+								throw new DataError("Cannot create table, read-only connection");
+							}
+						} catch (SQLException e) {
+							throw new FatalDataError("Cannot retreive SQLContext", e);
 						}
-					} catch (SQLException e) {
-						throw new FatalDataError("Cannot retreive SQLContext", e);
+						if( timer != null ){ timer.startTimer("makeTable"); timer.startTimer("makeTable:"+homeTable);}
+						try{
+							if( makeTable(ctx, homeTable, spec) ) {
+								postSetContext();
+								return true;
+							}else {
+								// failed to make table
+								return false;
+							}
+						}finally{
+							if( timer != null ){ timer.stopTimer("makeTable"); timer.stopTimer("makeTable:"+homeTable);}
+						}
 					}
-					if( timer != null ){ timer.startTimer("makeTable"); timer.startTimer("makeTable:"+homeTable);}
-					try{
-						return makeTable(ctx, homeTable, spec);
-					}finally{
-						if( timer != null ){ timer.stopTimer("makeTable"); timer.stopTimer("makeTable:"+homeTable);}
-					}
+				}else {
+					// table already exists
+					postSetContext();
+					return true;
+				}
+			}else {
+				// No table specification only works if table exists
+				if( isValid()) {
+					postSetContext();
+					return true;
 				}
 			}
-		}
 		}finally{
 			if( timer != null ){ timer.stopTimer("setContext:"+homeTable); timer.stopTimer("setContext");}
-			postSetContext();
 		}
 		return false;
 
@@ -1883,7 +1804,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		this.tag = homeTable;
 		String composite_list = ctx.getExpandedProperty(homeTable+COMPOSITES_SUFFIX);
 		// can't use getLogger as context not set yet
-		Logger logger = ctx.getService(LoggerService.class).getLogger(getClass());
+		Logger logger = getLogger();
 		
 		if( composite_list != null && composite_list.trim().length() > 0){
 			for(String comp : composite_list.split("\\s*,\\s*")){
@@ -1927,7 +1848,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		TableSpecification spec = getDefaultTableSpecification(ctx, homeTable);
 		if( spec != null ){
 			for(TableStructureContributer c : getTableStructureContributers()){
+				
+				spec.setCurrentTag(c.getConfigTag());
 				spec = c.modifyDefaultTableSpecification(spec, homeTable);
+				spec.clearCurrentTag();
 			}
 		}
 		return spec;
@@ -1953,22 +1877,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table){
 		return null;
 	}
-	/** Initialise Repository with customised table creation.
-	 * This is for use where the table specification depends on the constructor parameters,
-	 * or if we want to override the auto_create.tables feature
-	 * 
-	 * @param ctx
-	 * @param homeTable
-	 * @param spec
-	 * @return true if table created
-	 */
-	protected final boolean setContextWithMake(AppContext ctx, String homeTable,TableSpecification spec) {
-		setContext(ctx, homeTable,false);
-		if( ! isValid() && (spec != null)){
-			return makeTable(ctx, homeTable, spec);
-		}
-		return false;
-	}
+	
 	private boolean makeTable(AppContext ctx, String homeTable,TableSpecification spec){
 		DataBaseHandlerService dbh = ctx.getService(DataBaseHandlerService.class);
 		if( dbh != null ){
@@ -1977,11 +1886,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				// Create the table name repository tried to access before.
 				dbh.createTable(Repository.tagToTable(ctx, homeTable), spec);
 			    // repository should re-try to get metadata if failed previously
-				assert(isValid());
+				if( ! isValid()) {
+					throw new ConsistencyError("Failed to make table "+homeTable);
+				}
 				postCreateTableSetup(ctx,homeTable);
 				return true;
 			}catch(DataFault e){
-				ctx.error(e,"Error making table "+homeTable);
+				getLogger().error("Error making table "+homeTable,e);
 			}
 		}
 		return false;
@@ -2284,4 +2195,6 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public final SQLOrFilter<BDO> getSQLOrFilter(SQLFilter<? super BDO> ... filters){
 		return new SQLOrFilter<>(getTag(), filters);
 	}
+
+	
 }

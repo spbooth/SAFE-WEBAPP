@@ -35,6 +35,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
@@ -49,6 +50,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.RuleChain;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import uk.ac.ed.epcc.webapp.config.ConfigService;
@@ -58,6 +60,7 @@ import uk.ac.ed.epcc.webapp.content.XMLWriter;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.exceptions.MissingResourceException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.junit4.AppContextFixtureRule;
@@ -71,6 +74,7 @@ import uk.ac.ed.epcc.webapp.model.data.UnDumper;
 import uk.ac.ed.epcc.webapp.model.data.XMLDataUtils;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /** A base class for Junit4 tests that require an {@link AppContext}
@@ -130,7 +134,7 @@ public abstract class WebappTestBase implements ContextHolder{
 			builder.appendParent();
 			//w.close();
 		}catch(Exception t){
-			ctx.error(t,"Error dumping fixtures");
+			ctx.error("Error dumping fixtures",t);
 		}
 
 	}
@@ -161,7 +165,7 @@ public abstract class WebappTestBase implements ContextHolder{
 			builder.appendParent();
 			//w.close();
 		}catch(Exception t){
-			ctx.error(t,"Error dumping fixtures");
+			ctx.error("Error dumping fixtures",t);
 		}
 
 	}
@@ -188,6 +192,17 @@ public abstract class WebappTestBase implements ContextHolder{
 		// we may have inserted properties into DB
 		ctx.getService(ConfigService.class).clearServiceProperties();
 
+	}
+	/** Read additional fixtures during a test
+	 * 
+	 * @param fixtures
+	 * @throws DataFault
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	protected void readFixtures(String ... fixtures) throws DataFault, ParserConfigurationException, SAXException, IOException {
+		utils.readFixtures(getClass(), fixtures);
 	}
 	
 	public String readFileAsString(String name) throws IOException {
@@ -247,67 +262,82 @@ public abstract class WebappTestBase implements ContextHolder{
 	public final void checkDiff(String normalize_transform,String expected_xml) throws DataException, Exception{
 		XMLPrinter diff = new XMLPrinter();	
 		TimerService timer = ctx.getService(TimerService.class);
-		if( timer !=null){ timer.startTimer("diff"); }
-		diff.open("Diff");
-	    StringReader reader = new StringReader(baseline.toString());
-		utils.getDiff(diff, new InputSource(reader));
-		diff.close();
-		//System.out.println(diff.toString());
-		
-		String expected;
-		String raw=diff.toString();
-		String result;
-		expected_xml = ctx.expandText(expected_xml);
-		if( normalize_transform != null ) {
-			
-			String expected_text = XMLDataUtils.readResourceAsString(getClass(),expected_xml);
-			// Do a shortcut test in case the two are identical
-			if( expected_text.trim().equals(raw.trim())) {
-				System.out.println("@@@@@@ Shortcut Diff @@@@@@");
-				return;
-			}
-			
-			
-			//This is a XSL transform to edit the dates in the project log as these will depend on the time the test is run.
-			TransformerFactory tfac = TransformerFactory.newInstance();
-			
-			Source source = XMLDataUtils.readResourceAsSource(getClass(), normalize_transform);
-			if( timer !=null){ timer.stopTimer("diff"); }
-			assertNotNull(source);
-			Transformer t = tfac.newTransformer(source);
-			assertNotNull(t);
+		try(TimeClosable difft = new TimeClosable(timer, "diff")){
+			diff.open("Diff");
+			StringReader reader = new StringReader(baseline.toString());
+			utils.getDiff(diff, new InputSource(reader));
+			diff.close();
+			//System.out.println(diff.toString());
 
-			
-			expected = XMLDataUtils.transform(t,new StreamSource(new StringReader(expected_text)));
-			result = XMLDataUtils.transform(t, raw);
-		}else {
-			result = raw.trim();
-			expected = XMLDataUtils.readResourceAsString(getClass(), expected_xml);
-			expected.trim();
-			// Do a shortcut test in case the two are identical
-			if( expected.equals(result)) {
-				System.out.println("@@@@@@ Shortcut Diff @@@@@@");
-				return;
+			String expected;
+			String raw=diff.toString();
+			String result;
+			expected_xml = ctx.expandText(expected_xml);
+			if( normalize_transform != null ) {
+
+				String expected_text;
+				
+				try {
+					expected_text = XMLDataUtils.readResourceAsString(getClass(),expected_xml);
+					
+				}catch(MissingResourceException e) {
+					// log the raw text as we might want to make the resource
+					System.out.println("Raw:");
+					System.out.println(raw);
+					System.out.println("====================================================================");
+					throw e;
+				}
+				// Do a shortcut test in case the two are identical
+				if( expected_text.trim().equals(raw.trim())) {
+					System.out.println("@@@@@@ Shortcut Diff @@@@@@");
+					return;
+				}
+
+				if(timer != null )timer.startTimer("diff-normalize");
+				//This is a XSL transform to edit the dates in the project log as these will depend on the time the test is run.
+				TransformerFactory tfac = TransformerFactory.newInstance();
+
+				Source source = XMLDataUtils.readResourceAsSource(getClass(), normalize_transform);
+
+				assertNotNull(source);
+				Transformer t = tfac.newTransformer(source);
+				assertNotNull(t);
+
+
+				expected = XMLDataUtils.transform(t,new StreamSource(new StringReader(expected_text)));
+				result = XMLDataUtils.transform(t, raw);
+				if(timer != null )timer.stopTimer("diff-normalize");
+			}else {
+				result = raw.trim();
+				expected = XMLDataUtils.readResourceAsString(getClass(), expected_xml);
+				expected.trim();
+				// Do a shortcut test in case the two are identical
+				if( expected.equals(result)) {
+					System.out.println("@@@@@@ Shortcut Diff @@@@@@");
+					return;
+				}
 			}
+			//System.out.println(result);
+			if(timer != null )timer.startTimer("CheckDiff.diff");
+			String differ = TestDataHelper.diff(expected, result);
+			if(timer != null )timer.stopTimer("CheckDiff.diff");
+			boolean same = differ.trim().length()==0;
+			if( ! same){
+
+				//FileWriter w = new FileWriter(expected_xml);
+				//w.write(raw);
+				//w.close();
+
+
+				System.out.println("Got: "+result);
+				System.out.println("--------------------------------------------------------------------");
+				System.out.println("Expected: "+expected);
+				System.out.println("====================================================================");
+				System.out.println("Raw:");
+				System.out.println(raw);
+			}
+			assertEquals("Unexpected result:"+expected_xml+"\n"+differ,expected,result);
 		}
-		//System.out.println(result);
-		String differ = TestDataHelper.diff(expected, result);
-		boolean same = differ.trim().length()==0;
-		if( ! same){
-		
-			//FileWriter w = new FileWriter(expected_xml);
-			//w.write(raw);
-			//w.close();
-			
-			
-			System.out.println("Got: "+result);
-			System.out.println("--------------------------------------------------------------------");
-			System.out.println("Expected: "+expected);
-			System.out.println("====================================================================");
-			System.out.println("Raw:");
-			System.out.println(raw);
-		}
-		assertEquals("Unexpected result:"+expected_xml+"\n"+differ,expected,result);
 	}
 	/** Check database has not changed.
 	 * 
@@ -408,7 +438,7 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 	 */
 	public void checkContent(String normalize_transform, String expected_xml, String content)
 			throws TransformerFactoryConfigurationError, TransformerConfigurationException, TransformerException, IOException {
-		
+		expected_xml = ctx.expandText(expected_xml);
 		String expected_text = XMLDataUtils.readResourceAsString(getClass(), expected_xml);
 		// shortcut test
 		if( content.trim().equals(expected_text.trim())) {
@@ -486,6 +516,15 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 		ctx.setService(serv);
 		return cal.getTime();
     }
+   public Date addTime(int field, int count) {
+	   TestTimeService serv = (TestTimeService) ctx.getService(CurrentTimeService.class);
+	   Date d = serv.getCurrentTime();
+	   Calendar c = Calendar.getInstance();
+	   c.setTime(d);
+	   c.add(field, count);
+	   serv.setResult(c.getTime());
+	   return c.getTime();
+   }
    
    public void checkImageEqual(String expected,byte actual[]) throws IOException {
 	   checkImageEqual(expected, ImageIO.read(new ByteArrayInputStream(actual)));

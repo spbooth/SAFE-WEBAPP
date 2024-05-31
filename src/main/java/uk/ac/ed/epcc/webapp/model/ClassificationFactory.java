@@ -16,46 +16,38 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
-import uk.ac.ed.epcc.webapp.forms.inputs.CodeListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.NameInputProvider;
-import uk.ac.ed.epcc.webapp.forms.inputs.NoHtmlInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
-import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.*;
+import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
-import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
-import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectAlternateInput;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
-import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemParseInput;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput.Options;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
 
 /** Factory class for Classification objects.
  * 
@@ -66,23 +58,22 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
  */
 
 
-public class ClassificationFactory<T extends Classification> extends DataObjectFactory<T> implements Comparable<ClassificationFactory>, HistoryFieldContributor, NameFinder<T>,NameInputProvider<T>,FieldHandler{
+public class ClassificationFactory<T extends Classification> extends DataObjectFactory<T> implements Comparable<ClassificationFactory>, HistoryFieldContributor, NameFinder<T>,NameInputProvider<T>{
 	
-	/** Maximum size of pull-down menu in update form.
-	 * 
-	 */
-	private static final int CLASSIFICATION_MAX_MENU = 200;
+	
+
+	static final String CLASSIFICATION_CONFIG_TAG = "Classification";
+	
 	private static final Pattern WHITESPACE = Pattern.compile("\\s");
 	
 	private HistoryFactory<T,HistoryFactory.HistoryRecord<T>> hist_fac=null;
-	@ConfigTag("Classification")
+	
 	public static final String NAME = "Name";
-	@ConfigTag("Classification")
+
 	public static final String DESCRIPTION = "Description";
 	/**
 	 * 
 	 */
-	@ConfigTag("Classification")
 	public static final String SORT_ORDER = "SortOrder";
 	
 	
@@ -112,8 +103,8 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
     
     @Override
     public TableSpecification getDefaultTableSpecification(AppContext c,String homeTable){
-      TableSpecification spec = Classification.getTableSpecification(c,homeTable);
-	return spec;	
+    	TableSpecification spec = ClassificationFactory.getTableSpecification(c,homeTable);
+    	return spec;	
     }
     
 	
@@ -127,7 +118,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
     				T obj = makeFromString(name);
     				obj.commit();
     			}catch(Exception e){
-    				c.error(e,"Error in classification bootstrap "+table);
+    				getLogger().error("Error in classification bootstrap "+table,e);
     			}
     		}
     	}
@@ -148,7 +139,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		try {
 			return find(getStringFinderFilter(name),true);
 		} catch (DataException e) {
-			getContext().error(e,"Error in findByName");
+			getLogger().error("Error in findByName",e);
 			return null;
 		}
 	}
@@ -209,7 +200,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	protected boolean allowSpacesInName(){
 		return getContext().getBooleanParameter(getConfigTag()+".allow_space_in_name", false);
 	}
-	/**
+	/** A String valued {@link ItemInput} for {@link Classification}s that generates the classification name. 
 	 * @author Stephen Booth
 	 *
 	 */
@@ -224,16 +215,16 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 
 		private final BaseFilter<T> fil;
 		@Override
-		public T getItembyValue(String value) {
+		public T getItemByTag(String value) {
 			return findFromString(value);
 		}
-
+		
 		@Override
 		public Iterator<T> getItems() {
 			try {
 				return new FilterIterator(fil);
 			} catch (DataFault e) {
-				getContext().error(e,"Error getting item iterator");
+				getLogger().error("Error getting item iterator",e);
 				return null;
 			}
 		}
@@ -243,7 +234,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			try{
 				return (int) ClassificationFactory.this.getCount(fil);
 			}catch(Exception e){
-				getContext().error(e,"Error getting select count");
+				getLogger().error("Error getting select count",e);
 				return 0;
 			}
 		}
@@ -271,68 +262,13 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 
 		
 	}
-	/** An {@link DataObjectItemInput} that uses the {@link ParseFactory#findFromString(String)} method to locate
-	 * 
-	 * Note this is not constrained by the select filter so can be used to locate retired objects.
-	 * @author spb
-	 *
-	 */
-	public class NameItemInput extends ParseAbstractInput<Integer> implements DataObjectItemParseInput<T>{
-
-		/**
-		 * 
-		 */
-		public NameItemInput() {
-			super();
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
-		 */
-		@Override
-		public void setItem(T item) {
-			if( item == null ){
-				setNull();
-				return;
-			}
-			try {
-				setValue(item.getID());
-			} catch (TypeException e) {
-				// should never happend
-				throw new TypeError(e);
-			}
-			
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseInput#parse(java.lang.String)
-		 */
-		@Override
-		public void parse(String v) throws ParseException {
-			if( v == null || v.trim().length()==0){
-				setNull();
-				return;
-			}
-			setItem(findFromString(v));
-		}
-        @Override
-		public Integer parseValue(String v) throws ParseException {
-        	if( v == null || v.trim().length()==0){
-				return null;
-			}
-			T item = findFromString(v);
-			if( item != null) {
-				return item.getID();
-			}
-			return null;
-        }
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput#getDataObject()
-		 */
-		@Override
-		public T getItembyValue(Integer val) {
-			return find(val);
-		}	
+	
+	@Override
+	protected Map<String, FieldValidationSet> getValidators() {
+		Map<String, FieldValidationSet> validators = super.getValidators();
+		// Description is likely to be displayed to user so inhibit html by default
+		FieldValidationSet.add(validators, DESCRIPTION, new NoHtmlValidator());
+		return validators;
 	}
 	public  class ClassificationCreator extends Creator<T>{
 
@@ -340,43 +276,13 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			super(ClassificationFactory.this);
 		}
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory#getSelectors()
-		 */
+	
 		@Override
-		protected Map<String, Selector> getSelectors() {
-			Map<String,Selector> result = super.getSelectors();
-			
-			
-			result.put(ClassificationFactory.NAME, new Selector() {
-
-				@Override
-				public Input getInput() {
-					// done here as only the create form can check that the name does not exist
-					// the update form has to rely on the sql update generating an error.
-					UnusedNameInput<T> input = new UnusedNameInput<>(ClassificationFactory.this);
-					input.setMaxResultLength(res.getInfo(ClassificationFactory.NAME).getMax());
-					input.setTrim(true);
-					return input;
-				}
-				
-			});
-			
-			// Description is likely to be displayed to user so inhibit html by default
-			
-			result.put(ClassificationFactory.DESCRIPTION,new Selector() {
-
-				@Override
-				public Input getInput() {
-					NoHtmlInput desc_input = new NoHtmlInput();
-					if( res.hasField(ClassificationFactory.DESCRIPTION)){
-						desc_input.setMaxResultLength(res.getInfo(ClassificationFactory.DESCRIPTION).getMax());
-					}
-					return desc_input;
-				}
-				
-			});
-			return result;
+		protected Map<String, FieldValidationSet> getValidators() {
+			Map<String, FieldValidationSet> validators = super.getValidators();
+			// Name should not be in use.
+			FieldValidationSet.add(validators, NAME, new UnusedNameValidator<T>(ClassificationFactory.this, null));
+			return validators;
 		}
 		
 	}
@@ -448,8 +354,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			// don't allow edits to the name
 			super.customiseUpdateForm(f, o);
 			if( allow_name_change){
-				UnusedNameInput<C> input = new UnusedNameInput<>(getClassificationFactory(),o);
-				f.getField(ClassificationFactory.NAME).setInput(input);
+				f.getField(ClassificationFactory.NAME).addValidator(new UnusedNameValidator<C>(getClassificationFactory(), o));
 			}else{
 				f.getField(ClassificationFactory.NAME).lock();
 			}
@@ -460,29 +365,13 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		 */
 		@Override
 		public DataObjectItemInput<C> getSelectInput() {
-			try{
-				ClassificationFactory<C> cf = getClassificationFactory();
-				BaseFilter<C> finalSelectFilter = cf.getFinalSelectFilter();
-				if( cf.getCount(finalSelectFilter) < getContext().getIntegerParameter(cf.getConfigTag()+".max_autocomplete", CLASSIFICATION_MAX_MENU)){
 
-					if( cf.useAutoCompleteInput(finalSelectFilter)) {
-						return cf.getInput();
-					}
-					DataObjectAlternateInput<C, DataObjectItemParseInput<C>> input = new DataObjectAlternateInput<>();
-					input.addInput("Menu", "Select ", super.getSelectInput());
-					input.addInput("Name", " or specify name ", cf.new NameItemInput());
-					return input;
-				}
-			}catch(Exception e){
-				getLogger().error("Error making alt input", e);;
-			}
-			return getClassificationFactory().new NameItemInput();
+			// for update we want name inputs so we can access old entries.
+			// use auto-complete if sufficiently small
+			ClassificationFactory<C> cf = getClassificationFactory();
+			BaseFilter<C> finalSelectFilter = cf.getFinalSelectFilter();
+			return new NameFinderInput<C, ClassificationFactory<C>>(cf, cf, null, finalSelectFilter);
 		}
-
-		
-
-		
-		
 	}
 	@Override
 	public FormUpdate<T> getFormUpdate(AppContext c) {
@@ -524,7 +413,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	public String getCanonicalName(T object) {
 		return object.getName();
 	}
-	public final DataObjectItemInput<T> getAutocompleteInput(BaseFilter<T> fil,boolean create,boolean restrict){
+	public final DataObjectItemInput<T> getAutocompleteInput(BaseFilter<T> fil,boolean create,BaseFilter<T> restrict){
 		NameFinderInput<T, ClassificationFactory<T>> input = new NameFinderInput<>(this, this,create, restrict, fil);
 		return input;
 	}
@@ -541,26 +430,18 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		}
 	}
 	
-	public boolean useAutoCompleteInput(BaseFilter<T> fil) {
-		if( Feature.checkDynamicFeature(getContext(), getConfigTag()+".use_list_input", false)) {
-			return false;
-		}
-		try {
-			return getCount(fil) > getContext().getIntegerParameter(getConfigTag()+".max_pulldown", 100);
-		} catch (DataException e) {
-			getLogger().error("Error checking option count", e);
-			return false;
-		}
-	}
+	
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getInput()
 	 */
 	@Override
-	public DataObjectItemInput<T> getInput(BaseFilter<T> fil, boolean restrict) {
-		if( useAutoCompleteInput(fil)) {
-			return new NameFinderInput<>(this,this, false, restrict, fil);
-		}
-		return super.getInput(fil,restrict);
+	public DataObjectItemInput<T> getInput(BaseFilter<T> fil, BaseFilter<T> restrict) {
+		
+		return new NameFinderInput<>(this,this, defaultInputOptions(),restrict, fil);
+	}
+	protected NameFinderInput.Options defaultInputOptions(){
+		return Options.AUTO_COMPLETE;
 	}
 
 	/* (non-Javadoc)
@@ -576,5 +457,26 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 				spec.setField(field, ts.getField(field));
 			}
 		}
+	}
+	/** Generate a default {@link TableSpecification} for a Classification table
+	 * 
+	 * @param c
+	 * @return TableSpecification
+	 */
+	public static TableSpecification getTableSpecification(AppContext c,String table){
+		TableSpecification s = new TableSpecification();
+		String prev = s.setCurrentTag(ClassificationFactory.CLASSIFICATION_CONFIG_TAG);
+		s.setField(ClassificationFactory.NAME, new StringFieldType(false, null, c.getIntegerParameter(table+".name.length", c.getIntegerParameter("classifier.name.length", 32))));
+		if( c.getBooleanParameter(table+".use_description", true)){
+			s.setField(ClassificationFactory.DESCRIPTION, new StringFieldType(true, null, c.getIntegerParameter(table+".description.length", c.getIntegerParameter("classifier.description.length", 255))));
+		}
+		s.setOptionalField(ClassificationFactory.SORT_ORDER, new IntegerFieldType(false, 0));
+		try {
+			s.new Index("name_key",true,ClassificationFactory.NAME);
+		} catch (InvalidArgument e) {
+			Logger.getLogger(Classification.class).error("Error making classification key",e);
+		}
+		s.setCurrentTag(prev);
+		return s;
 	}
 }

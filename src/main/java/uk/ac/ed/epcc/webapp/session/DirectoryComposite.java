@@ -35,8 +35,8 @@ import uk.ac.ed.epcc.webapp.model.SummaryContributer;
  */
 public class DirectoryComposite<AU extends AppUser> extends AppUserComposite<AU,DirectoryComposite> implements SummaryContributer<AU> {
 
-	public DirectoryComposite(AppUserFactory fac) {
-		super(fac);
+	public DirectoryComposite(AppUserFactory fac,String tag) {
+		super(fac,tag);
 	}
 
 	@Override

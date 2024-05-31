@@ -17,12 +17,10 @@ import java.io.InputStream;
 
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimePart;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
@@ -39,12 +37,13 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
 public class MimeStreamDataVisitor extends AbstractVisitor{
 
 	public static final Feature USE_RFC822 = new Preference("email.serve_rfc822",false,"Always Serve email downloads to browsers as RFC822 so they display in an email client instead of as text");
+    public static final Feature USE_HTML = new Feature("email.serve_html",false,"Allow html mime parts from emails to be shown as html no plain text");
 	
 	private final Logger log;
 	private ByteArrayMimeStreamData data=null;
 	public MimeStreamDataVisitor(AppContext conn){
 		super(conn);
-		log = conn.getService(LoggerService.class).getLogger(getClass());
+		log = Logger.getLogger(conn,getClass());
 	}
 	public MimeStreamData getData(){
 		return data;
@@ -76,8 +75,12 @@ public class MimeStreamDataVisitor extends AbstractVisitor{
 		log.debug("serving text part");
 		
 		try {
-			data=new ByteArrayMimeStreamData(content.getBytes("UTF-8"));
-			data.setMimeType("text/plain; charset=UTF-8");
+			if( USE_HTML.isEnabled(getContext())) {
+				visitInputStream(parent, parent.getInputStream(), messageWalker);
+			}else {
+				data=new ByteArrayMimeStreamData(content.getBytes("UTF-8"));
+				data.setMimeType("text/plain; charset=UTF-8");
+			}
 		} catch (Exception e) {
 			throw new WalkerException(e);
 		}

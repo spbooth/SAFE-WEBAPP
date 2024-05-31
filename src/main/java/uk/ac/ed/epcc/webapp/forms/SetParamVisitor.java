@@ -35,6 +35,11 @@ import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
  *
  */
 public class SetParamVisitor implements InputVisitor<Object> {
+	@Override
+	public <V> Object visitLockedInput(LockedInput<V> l) throws Exception {
+		return l.getNested().accept(this);
+	}
+
 	private Map<String,Object> params;
 
 	public SetParamVisitor(Map<String,Object> params) {
@@ -42,12 +47,15 @@ public class SetParamVisitor implements InputVisitor<Object> {
 	}
 	@Override
 	public Object visitBinaryInput(BinaryInput checkBoxInput) throws Exception {
-		return visitBaseInput(checkBoxInput);
+		if( checkBoxInput.isChecked()) {
+			params.put(checkBoxInput.getKey(), checkBoxInput.getChecked());
+		}
+		return null;
 	}
 	@Override
 	public <V, I extends Input> Object visitParseMultiInput(ParseMultiInput<V, I> multiInput) throws Exception {
-		params.putAll(multiInput.getMap());
-		return null;
+		// defaults to presenting as a multi-input so form post treats as normal MultiInput
+		return visitMultiInput(multiInput);
 	}
 	@Override
 	public <V, I extends Input> Object visitMultiInput(MultiInput<V, I> multiInput) throws Exception {
@@ -76,9 +84,6 @@ public class SetParamVisitor implements InputVisitor<Object> {
 	}
 	@Override
 	public Object visitUnmodifyableInput(UnmodifiableInput input) throws Exception {
-		if (input instanceof LockedInput<?>) {
-			return visitBaseInput((LockedInput<?>)input);
-		}
 		return null;
 	}
 	@Override

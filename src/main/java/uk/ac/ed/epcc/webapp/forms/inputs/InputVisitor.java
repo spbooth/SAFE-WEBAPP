@@ -27,21 +27,120 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * @param <R> type produced by visitor
  */
 public interface InputVisitor<R> {
+	/** An input that presents as check-box
+	 * 
+	 * @param checkBoxInput
+	 * @return
+	 * @throws Exception
+	 */
 	R visitBinaryInput(BinaryInput checkBoxInput) throws Exception;
-	<V,I extends Input> R visitParseMultiInput(ParseMultiInput<V,I> multiInput) throws Exception;
+	/** A composite input
+	 * 
+	 * @param <V> type of data 
+	 * @param <I> type of sub-input
+	 * @param multiInput
+	 * @return
+	 * @throws Exception
+	 */
 	<V,I extends Input> R visitMultiInput(MultiInput<V,I> multiInput) throws Exception;
+	/** A {@link MultiInput} that can add/remove its values from a data-map directly
+	 * 
+	 * @param <V> type of data
+	 * @param <I> type of sub-input
+	 * @param multiInput
+	 * @return
+	 * @throws Exception
+	 */
+	<V,I extends Input> R visitParseMultiInput(ParseMultiInput<V,I> multiInput) throws Exception;
+	/** An {@link ItemInput} that presents as a pull-down list
+	 * 
+	 * @param <V> Type of data
+	 * @param <T> Type of item
+	 * @param listInput
+	 * @return
+	 * @throws Exception
+	 */
 	<V,T> R visitListInput(ListInput<V,T> listInput) throws Exception;
+	/** Functionally equivalent to a {@link ListInput} but presented as a series of radio-buttons
+	 * 
+	 * @param <V>
+	 * @param <T>
+	 * @param listInput
+	 * @return
+	 * @throws Exception
+	 */
 	<V,T> R visitRadioButtonInput(ListInput<V,T> listInput) throws Exception;
-	R visitLengthInput(LengthInput input) throws Exception;
+	/** An {@link ItemInput} that presents as a text box with a suggested list of auto-completions.
+	 * This may allow values not in the autocomplete list
+	 * 
+	 * @param <V> type of data
+	 * @param <T> type of item
+	 * @param autocompleteInput
+	 * @return
+	 * @throws Exception
+	 */
+	default <V,T> R visitAutoCompleteInput(AutoComplete<V,T> autocompleteInput) throws Exception{
+		return visitLengthInput(autocompleteInput);
+	}
+	
+	/** A generic text box input 
+	 * 
+	 * @param <V> type of data
+	 * @param input
+	 * @return
+	 * @throws Exception
+	 */
+	<V> R  visitLengthInput(LengthInput<V> input) throws Exception;
+	/** An input that should be shown as a non editable text label.
+ * 
+ * The input can still be set queried and validated as normal but the presentation layer will 
+ * prevent the user from editing the value
+	 * 
+	 * @param input
+	 * @return
+	 * @throws Exception
+	 */
 	R visitUnmodifyableInput(UnmodifiableInput input) throws Exception;
+	/** An input for file uploads
+	 * 
+	 * @param input
+	 * @return
+	 * @throws Exception
+	 */
 	R visitFileInput(FileInput input) throws Exception;
+	/** A password type text box
+	 * 
+	 * @param input
+	 * @return
+	 * @throws Exception
+	 */
 	R visitPasswordInput(PasswordInput input) throws Exception;
+	/** An input to select a data/time
+	 * 
+	 * @param t
+	 * @return
+	 * @throws Exception
+	 */
 	default R visitTimestampInput(TimeStampInput t) throws Exception {
 		return visitLengthInput(t);
 	}
-	default R visitLockedInput(LockedInput l)throws Exception{
+	/** An unmodifiable input formed by wrapping any other input type
+	 * 
+	 * @param <V>
+	 * @param l
+	 * @return
+	 * @throws Exception
+	 */
+	default <V> R visitLockedInput(LockedInput<V> l)throws Exception{
 		return visitUnmodifyableInput(l);
 	}
+	/** A w
+	 * 
+	 * @param <X>
+	 * @param i
+	 * @return
+	 * @throws Exception
+	 */
 	default <X> R visitWrappedInput(WrappedInput<X> i) throws Exception {
 		return (R) i.getNested().accept(this);
 	}

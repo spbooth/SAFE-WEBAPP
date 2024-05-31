@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
@@ -140,6 +139,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 				return false;
 			}
 			if( lock.takeLock()) {
+				Date next_run = new Date(Long.MAX_VALUE);
 				for(String l  : listeners.split("\\s*,\\s*")){
 					if( serv != null ) serv.startTimer("HeartbeatListener."+l);
 					long begin=System.currentTimeMillis();
@@ -155,6 +155,11 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 								out.println("Next run expected "+next);
 							}
 							log.debug("Next run expected "+next);
+							if( next_run != null) {
+								if( next == null || next.before(next_run)) {
+									next_run=next;
+								}
+							}
 						}else{
 							log.error("No HearBeatListener constructed for tag "+l);
 						}
@@ -169,11 +174,16 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 						log.error("Long heartbeat call "+l+" "+(elapsed/1000L)+" seconds");
 					}
 				}
+				if( next_run != null ) {
+					// We could use this to suppress subsequent calls
+					// but for the moment we just log
+					log.debug("Next action not expected till "+next_run);
+				}
 			}else {
-				getLogger(conn).error("Failed to take heartbeat lock");
+				log.error("Failed to take heartbeat lock");
 			}
 		} catch (Exception e) {
-			getLogger(conn).error("Error in HeartbeatListener",e);
+			log.error("Error in HeartbeatListener",e);
 		}finally{
 			if( lock != null ) {
 				try {

@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -66,6 +67,12 @@ public abstract class WebappServlet extends HttpServlet {
 	 * 
 	 */
 	public static final String MESSAGE_EXTRA_ATTR = "message_extra";
+	/** attribute for a boolean added to the request which
+	 * indicates the current request does not modify state and is safe to
+	 * re-run on a page refresh
+	 * 
+	 */
+	public static final String NON_MODIFY_ATTR = "non_modifying";
 	public static final String CONFIRM_NO = "no";
 	public static final String CONFIRM_YES = "yes";
 	public static final String EXTRA_HTML = "extra_html";
@@ -277,7 +284,17 @@ public abstract class WebappServlet extends HttpServlet {
 	public static void messageWithArgs(AppContext context, HttpServletRequest req,
 				HttpServletResponse res, String message_type, Object args[])
 				throws ServletException, IOException {
-		context.getService(LoggerService.class).getLogger(context.getClass()).debug("sending message " + message_type);
+		Logger log = context.getService(LoggerService.class).getLogger(context.getClass());
+		 // If we can use MessageServlet on modifying post/put to avoid re-submit
+		 String method = req.getMethod();
+		 if( (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT")) && ! WebappServlet.isNonModifying(req)) {
+			 String r = MessageServlet.mapMessageToRedirect(context, message_type,args);
+			 if( r != null) {
+				 context.getService(ServletService.class).redirect(r);
+				 return;
+			 }
+		 }
+		log.debug("sending message " + message_type);
 		// verify the message is valid
 		try {
 			MessageBundleService serv = context.getService(MessageBundleService.class);
@@ -286,7 +303,7 @@ public abstract class WebappServlet extends HttpServlet {
 			mess.getString(message_type + ".text");
 		} catch (MissingResourceException e) {
 			// report the bad message including call site
-			context.error(e, "Bad message " + message_type);
+			log.error("Bad message " + message_type, e);
 		}
 		req.setAttribute(MESSAGE_TYPE_ATTR, message_type);
 		if( args != null ) {
@@ -405,5 +422,15 @@ public void handleFormResult(AppContext conn,HttpServletRequest req, HttpServlet
 			}
 		}
 		return output.toString();
+	}
+	public static void setNonModifying(HttpServletRequest req, boolean non_modifying) {
+		req.setAttribute(NON_MODIFY_ATTR, non_modifying);
+	}
+	public static boolean isNonModifying(HttpServletRequest req) {
+		Boolean val = (Boolean) req.getAttribute(NON_MODIFY_ATTR);
+		if( val != null) {
+			return val.booleanValue();
+		}
+		return false;
 	}
 }

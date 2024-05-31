@@ -20,10 +20,11 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 
 
-public abstract class AbstractInputTestCase<T,I extends AbstractInput<T>> extends WebappTestBase implements TestDataProvider<T,I> ,
+public abstract class AbstractInputTestCase<T,I extends Input<T>> extends WebappTestBase implements TestDataProvider<T,I> ,
 InputInterfaceTest<T, I, AbstractInputTestCase<T, I>>
 {
 	

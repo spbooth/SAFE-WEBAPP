@@ -16,14 +16,10 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.editors.mail;
 
-import java.util.List;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
-import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** Generates view html for a
  * from a {@link MessageHandler}
@@ -66,7 +62,7 @@ public class MessageHandlerFormat {
 		return sb;
 	}
   protected Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(conn,getClass());
 	}
 	
 }

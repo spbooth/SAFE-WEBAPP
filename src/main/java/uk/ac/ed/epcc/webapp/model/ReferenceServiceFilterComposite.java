@@ -36,8 +36,8 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	private static final String SERVICE_ID_FIELD = "ServicesID";
 
 	private boolean auto_narrow=true;
-	public ReferenceServiceFilterComposite(DataObjectFactory<BDO> fac) {
-		super(fac);
+	public ReferenceServiceFilterComposite(DataObjectFactory<BDO> fac,String tag) {
+		super(fac,tag);
 		auto_narrow = fac.getContext().getBooleanParameter("ServiceFilterComposite."+fac.getConfigTag()+".auto_narrow", true);
 	}
 

@@ -21,16 +21,8 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
-import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
-import uk.ac.ed.epcc.webapp.forms.factory.FormCreatorTransition;
-import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
-import uk.ac.ed.epcc.webapp.forms.factory.FormUpdateTransition;
-import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
-import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdateTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionProvider;
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
+import uk.ac.ed.epcc.webapp.forms.factory.*;
+import uk.ac.ed.epcc.webapp.forms.transition.*;
 import uk.ac.ed.epcc.webapp.model.data.forms.registry.SummaryContentProvider;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -141,7 +133,7 @@ public class FormFactoryProviderTransitionProvider<T> implements
 				}
 			}
 		}catch(Exception e){
-			c.error(e,"Error making transition");
+			getLogger().error("Error making transition",e);
 		}
 		return null;
 	}
@@ -168,5 +160,4 @@ public class FormFactoryProviderTransitionProvider<T> implements
 	public <R> R accept(TransitionFactoryVisitor<R,T, FormOperations> vis) {
 		return vis.visitTransitionProvider(this);
 	}
-
 }

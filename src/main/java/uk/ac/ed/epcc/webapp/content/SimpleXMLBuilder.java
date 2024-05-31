@@ -77,7 +77,7 @@ public interface SimpleXMLBuilder {
 	 */
 	public abstract SimpleXMLBuilder close();
 
-	/** Get a new SimpleXMLBuilder of the same type as this object.
+	/** Get a new SimpleXMLBuilder which is a child of this object.
 	 * This is to build un-commited content that is appended to this
 	 * object using the {@link #appendParent} method.
 	 * 

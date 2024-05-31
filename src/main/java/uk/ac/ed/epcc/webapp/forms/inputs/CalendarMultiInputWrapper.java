@@ -59,21 +59,7 @@ public class CalendarMultiInputWrapper extends AbstractCalendarMultiInput {
 		return input.convert(v);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#getMin()
-	 */
-	@Override
-	public Date getMin() {
-		return input.getMin();
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#getMax()
-	 */
-	@Override
-	public Date getMax() {
-		return input.getMax();
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#formatRange(java.lang.Object)
@@ -86,17 +72,15 @@ public class CalendarMultiInputWrapper extends AbstractCalendarMultiInput {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#setMin(java.lang.Object)
 	 */
-	@Override
-	public Date setMin(Date val) {
-		return input.setMin(val);
+	public void setMin(Date val) {
+		input.setMin(val);
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#setMax(java.lang.Object)
 	 */
-	@Override
-	public Date setMax(Date val) {
-		return input.getMax();
+	public void setMax(Date val) {
+		input.setMax(val);
 	}
 
 	/* (non-Javadoc)

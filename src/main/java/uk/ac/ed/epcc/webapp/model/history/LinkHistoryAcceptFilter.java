@@ -20,7 +20,6 @@ import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager;
 
 
@@ -112,7 +111,7 @@ public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T ext
 		return true;
 	}
 	public Logger getLogger() {
-		return this.linkHistoryHandler.getContext().getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(this.linkHistoryHandler.getContext(),getClass());
 	}
 	
 	

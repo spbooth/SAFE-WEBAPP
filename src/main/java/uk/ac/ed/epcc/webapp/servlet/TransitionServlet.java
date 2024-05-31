@@ -39,24 +39,7 @@ import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.result.BackResult;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.transition.AnonymousTransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.DefaultingTransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.DirectTargetlessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.DirectTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
-import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryFinder;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
-import uk.ac.ed.epcc.webapp.forms.transition.ValidatingFormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
+import uk.ac.ed.epcc.webapp.forms.transition.*;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -241,6 +224,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			message(conn, req, res, "access_denied");
         	return;
 		}
+		WebappServlet.setNonModifying(req, non_modifying);
 		Transition<T> t = tp.getTransition(target,key);
 		if( t != null ){
 			// check for trivial FormResults that don't need a lock
@@ -316,6 +300,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 						}
 						t = tp.getTransition(target,key); // transition may depend on target e.g confirm transition
 					}
+					String logTag = getLogTag(tp,target); // target may be deleted in transition to make logTag here
 					try{
 
 						aquired=System.currentTimeMillis();
@@ -336,14 +321,10 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 							// however to be safe log again.
 							log.error("FatalTransitionException", e);
 							if (use_transactions){
+								// Note this will also cancel any actions added to the cleanup service
+								// registered with the DatabaseService during this transaction
 								serv.rollbackTransaction();
 								log.warn("Rolling back transaction in TransitionServlet");
-								CleanupService clean = conn.getService(CleanupService.class);
-								if( clean != null ) {
-									// remove queued actions
-									clean.reset();
-								}
-								
 							}
 						}
 						// These are typically user errors
@@ -379,14 +360,15 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 						}
 						try{
 							long now = System.currentTimeMillis();
+							
 							if((now-aquired) > max_wait){
 								long secs = (now-aquired)/1000L;
 								// This transition has taken a long time
-								log.warn("Long transition "+secs+" seconds ("+HourTransform.toHrsMinSec(secs)+") provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
+								log.warn("Long transition "+secs+" seconds ("+HourTransform.toHrsMinSec(secs)+") provider="+tp.getTargetName()+" target="+logTag+" key="+key);
 							}else if( now-start > max_wait){
 								// Long time waiting for lock
 								long secs = (now-start)/1000L;
-								log.warn("Blocked transition "+secs+" seconds ("+HourTransform.toHrsMinSec(secs)+") provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
+								log.warn("Blocked transition "+secs+" seconds ("+HourTransform.toHrsMinSec(secs)+") provider="+tp.getTargetName()+" target="+logTag+" key="+key);
 							}
 						}catch(Exception tr){
 							log.error("Problem reporting transition timimgs",tr);
@@ -707,7 +689,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
           hb.addClass("input_button");
           hb.attr("type","submit");
           hb.attr("value", text);
-          if( title != null && title.trim().length() > 0){
+          if( title != null && title.trim().length() > 0 && ! title.equals(text)){
           	hb.attr("title", title);
           }
          hb.close();
@@ -779,6 +761,11 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 						@Override
 						public FormResult doTargetLessTransition(TargetLessTransition<B> t) throws TransitionException {
 							return null;
+						}
+
+						@Override
+						public FormResult doModalTransition(ModalTransition<B> t) throws TransitionException {
+							throw new TransitionException("Modal Transition");
 						}
 					});
 				} catch (Exception e) {

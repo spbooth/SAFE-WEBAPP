@@ -20,12 +20,10 @@ import java.util.Set;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimePart;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link ContentMessageVisitor} that only shows each message once.
  * If a message has already been displayed but occurs a second time (e.g. 
@@ -59,7 +57,10 @@ public class ShortContentMessageVisitor extends ContentMessageVisitor {
 						((HtmlBuilder)sb).setNewTab(true);
 					}
 					DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					addLink(messageWalker.getPath(), id, "["+df.format(m.getSentDate())+"] "+m.getSubject());
+					// Call addPAth to terminate the message-walker path so we can safely add the file-name
+					// A normal attachment does not need this termination as its a leaf node but
+					// messages may have their own children
+					addLink(MessageWalker.addPath(messageWalker.getPath()), id, "["+df.format(m.getSentDate())+"] "+m.getSubject());
 					sb=sb.addParent();
 					return false; // truncate recursion
 				}

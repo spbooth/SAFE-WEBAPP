@@ -33,7 +33,7 @@ public class PostgresqlCreateTableVisitor implements FieldTypeVisitor {
 	private final PostgresqlSQLContext ctx;
 	private final StringBuilder sb;
 	private final List<Object> args;
-	public PostgresqlCreateTableVisitor(PostgresqlSQLContext ctx,StringBuilder sb, List<Object> args){
+	public PostgresqlCreateTableVisitor(PostgresqlSQLContext ctx,String config_tag,StringBuilder sb, List<Object> args){
 		this.ctx=ctx;
 		this.sb=sb;
 		this.args=args;
@@ -173,7 +173,7 @@ public class PostgresqlCreateTableVisitor implements FieldTypeVisitor {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#visitForeignKey(uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType)
 	 */
-	public void visitForeignKey(String name, ReferenceFieldType referenceField) {
+	public void visitForeignKey(String name, String prefix,ReferenceFieldType referenceField) {
 		// TODO Auto-generated method stub
 		
 	}

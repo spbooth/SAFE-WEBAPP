@@ -6,8 +6,8 @@ import java.util.Set;
 
 public class FieldOrderComposite<BDO extends DataObject> extends Composite<BDO, FieldOrderComposite> {
 
-	public FieldOrderComposite(DataObjectFactory<BDO> fac) {
-		super(fac);
+	public FieldOrderComposite(DataObjectFactory<BDO> fac,String tag) {
+		super(fac,tag);
 	}
 
 	@Override

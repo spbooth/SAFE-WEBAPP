@@ -39,4 +39,5 @@ public interface TransitionVisitor<X> {
    FormResult doFormTransition(FormTransition<X> t) throws TransitionException;
    FormResult doValidatingFormTransition(ValidatingFormTransition<X> t) throws TransitionException;
    FormResult doTargetLessTransition(TargetLessTransition<X> t) throws TransitionException;
+   FormResult doModalTransition(ModalTransition<X> t)throws TransitionException;
 }

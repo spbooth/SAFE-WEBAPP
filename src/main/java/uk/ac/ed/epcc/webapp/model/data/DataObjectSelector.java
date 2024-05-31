@@ -15,27 +15,24 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory.DataObjectFieldValidator;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 
-/**
+/** A {@link Selector} for {@link DataObjectItemInput}s
+ * 
+ * This allows the 
  * @author Stephen Booth
  *
  */
 public interface DataObjectSelector<B extends DataObject> extends Selector<DataObjectItemInput<B>> {
 
 	/** Generate a new selector with the valid selection further restricted by an additional filter.
+	 * This only narrows the selection filter. To narrow the validation add a {@link DataObjectFieldValidator}
 	 * 
 	 * @param fil
 	 * @return
 	 */
 	public DataObjectSelector<B> narrowSelector(BaseFilter<B> fil);
-	/** Generate a new selector with the valid selection further restricted by an additional filter.
-	 * Allow explict contol of the restrict option.
-	 * 
-	 * @param fil
-	 * @param new_restrict 
-	 * @return
-	 */
-	public DataObjectSelector<B> narrowSelector(BaseFilter<B> fil,boolean new_restrict);
+	
 }

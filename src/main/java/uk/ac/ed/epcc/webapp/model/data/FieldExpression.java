@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 
@@ -60,7 +61,7 @@ public abstract class FieldExpression<T,X extends DataObject> implements FieldSQ
 	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		T result = Repository.makeTargetObject(target, rs, pos);
 		if( result != null && LOG_FETCH.isEnabled(repository.getContext())){
-			repository.getContext().getService(LoggerService.class).getLogger(getClass()).debug(
+			Logger.getLogger(repository.getContext(),getClass()).debug(
 					"Fetch type "+name+" is "+result.toString()+" type "+result.getClass().getCanonicalName()
 					);
 		}

@@ -35,10 +35,12 @@ public class MockTansport extends Transport {
 
 	private static Vector<Message> messages=new Vector<>();
 	private static Vector<Address[]> addresses=new Vector<>();
+	private static boolean fail_connect = false;
 	
 	public static void clear(){
 		messages.clear();
 		addresses.clear();
+		fail_connect = false;
 	}
 	
 	public static int nSent(){
@@ -46,6 +48,9 @@ public class MockTansport extends Transport {
 	}
 	public static Address[] getAddress(int i){
 		return addresses.get(i);
+	}
+	public static void setConnectFail(boolean b) {
+		fail_connect=b;
 	}
 	
 	public static boolean containsAddress(int i, Address addr){
@@ -88,6 +93,9 @@ public class MockTansport extends Transport {
 
 	@Override
 	public void connect() throws MessagingException {
+		if( fail_connect) {
+			throw new MessagingException("Mock connection fail");
+		}
 		System.out.println("connect()");
 	}
 

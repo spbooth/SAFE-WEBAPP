@@ -13,9 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
@@ -30,31 +27,20 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
  */
 public class UnusedNameInput<F extends DataObject> extends NoHtmlInput{
 	private final ParseFactory<F> fac;
-	private F existing=null;
+	private final F existing;
 	public UnusedNameInput(ParseFactory<F> fac,F existing){
-		this(fac);
+		this.fac = fac;
 		this.existing=existing;
+		setSingle(true);
+		// existing null means that name must not be in use. if non-null
+		// the name of the existing element is allowed
+		addValidator(new UnusedNameValidator<F>(fac, existing));
 		if( existing != null ){
-			setText(fac.getCanonicalName(existing));
+			setText(fac.getCanonicalName(existing));	
 		}
 	}
     public UnusedNameInput(ParseFactory<F> fac){
-    	super();
-    	this.fac=fac;
-    	setSingle(true);
-    	addValidator(new FieldValidator<String>() {
-			
-			@Override
-			public void validate(String name) throws FieldException {
-				F dup = fac.findFromString(name);
-				if( dup != null ){
-					if( existing == null || ! existing.equals(dup)){
-						throw new ValidateException("Name "+name+" already in use");
-					}
-				}
-				
-			}
-		});
+    	this(fac,null);
     }
 	
 	

@@ -13,10 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.editors.mail;
 
-import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import jakarta.mail.Address;
 import jakarta.mail.Message;
@@ -32,27 +29,13 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
-import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
-import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
-import uk.ac.ed.epcc.webapp.forms.transition.DirectTargetlessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.ShowDisabledTransitions;
-import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
-import uk.ac.ed.epcc.webapp.forms.transition.ViewPathTransitionProvider;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.forms.result.*;
+import uk.ac.ed.epcc.webapp.forms.transition.*;
 import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
 import uk.ac.ed.epcc.webapp.model.serv.SettableServeDataProducer;
 import uk.ac.ed.epcc.webapp.session.SessionDataProducer;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 /** This is a transition based implementation of email editing.
  * 
  * The main view page is implemented as a view transition
@@ -373,7 +356,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 				throws TransitionException {
 			TextInput input = new TextInput();
 			input.setBoxWidth(SUBJECT_BOX_WIDTH);
-			input.setMaxResultLength(SUBJECT_MAX_WIDTH);
+			input.addValidator(new MaxLengthValidator(SUBJECT_MAX_WIDTH));
 			input.setSingle(true);
 			f.addInput(DATA_FORM_FIELD, "Subject", input);
 			f.addAction(EditAction.Update.toString(), new EditFormAction(target, EditAction.Update));
@@ -390,7 +373,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 				throws TransitionException {
 			TextInput input = new TextInput();
 			input.setBoxWidth(80);
-			input.setMaxResultLength(81920);
+			input.addValidator(new MaxLengthValidator(81920));
 			input.setSingle(false);
 			f.addInput(DATA_FORM_FIELD, "Text", input);
 			f.addAction(EditAction.Update.toString(), new EditFormAction(target, EditAction.Update));
@@ -484,8 +467,15 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	@Override
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb,
 			MailTarget target) {
-		
-		return cb;
+		if(target == null) {
+			return cb;
+		}
+		try {
+			return target.getHandler().getMessageProvider().addMessageContext(cb);
+		} catch (Exception e) {
+			getLogger().error("Error adding message context",e);
+			return cb;
+		}
 	}
 	
 	@Override
@@ -735,10 +725,6 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		return vis.visitPathTransitionProvider(this);
 	}
 	
-	public Logger getLogger(){
-		return getContext().getService(LoggerService.class).getLogger(getClass());
-	}
-
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getBottomContent(uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)

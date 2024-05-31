@@ -1,47 +1,30 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
-import uk.ac.ed.epcc.webapp.forms.inputs.PatternTextInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterWrapper;
 /** An input for valid role names.
- * If a {@link SessionService} is passed on constuction a the standard role names
+ * If a {@link SessionService} is passed on construction a the standard role names
  * are generated as auto-complete suggestions.
  * 
  * @author Stephen Booth
  *
  */
-public class RoleNameInput extends PatternTextInput implements AutoComplete<String, String> {
+public class RoleNameInput extends AutocompleteTextInput<String> {
 	public RoleNameInput(SessionService sess) {
-		super("((@(name:)?)?\\w+)|(\\w+%\\w+(@(name:)?\\w+))");
-		setSingle(true);
-		setTag("");
+		addValidator(new PatternFieldValidator("((@(name:)?)?\\w+)|(\\w+%\\w+(@(name:)?\\w+))"));
 		this.sess=sess;
 	}
 
 	private final SessionService sess;
 
-	@Override
-	public String getItembyValue(String value) {
-		return value;
-	}
+	
 
-	@Override
-	public void setItem(String item) {
-		try {
-			setValue(item);
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
-		
-	}
-
-	@Override
-	public Set<String> getSuggestions() {
+	
+	private Set<String> makeSuggestions() {
 		if( sess == null) {
 			return new HashSet<String>();
 		}
@@ -55,6 +38,14 @@ public class RoleNameInput extends PatternTextInput implements AutoComplete<Stri
 		}
 		return set;
 	}
+	
+	private Set<String> suggestions = null;
+	public Set<String> getSuggestions(){
+		if( suggestions == null) {
+			suggestions=makeSuggestions();
+		}
+		return suggestions;
+	}
 
 	@Override
 	public String getValue(String item) {
@@ -62,7 +53,7 @@ public class RoleNameInput extends PatternTextInput implements AutoComplete<Stri
 	}
 
 	@Override
-	public String getSuggestionText(String item) {
-		return item;
+	public String getItembyValue(String value) {
+		return value;
 	}
 }

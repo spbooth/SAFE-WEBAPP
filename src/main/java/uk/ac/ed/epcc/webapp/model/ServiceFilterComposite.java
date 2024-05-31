@@ -24,8 +24,8 @@ import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 public abstract class ServiceFilterComposite<BDO extends DataObject> extends  Composite<BDO, ServiceFilterComposite> implements NamedFilterProvider<BDO>{
 
 	
-	public ServiceFilterComposite(DataObjectFactory<BDO> fac) {
-		super(fac);
+	public ServiceFilterComposite(DataObjectFactory<BDO> fac,String tag) {
+		super(fac,tag);
 	}
 	
 	@Override

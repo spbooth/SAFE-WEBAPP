@@ -16,11 +16,12 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 /** Input to select a name that is not one of the current fields of a Repository
  * 
  * @author spb
@@ -33,7 +34,7 @@ public class NewFieldInput extends TextInput {
 	 * @author Stephen Booth
 	 *
 	 */
-	public final class NewFieldValidator implements FieldValidator<String> {
+	public final class NewFieldValidator implements SingleLineFieldValidator {
 		/**
 		 * 
 		 */
@@ -58,7 +59,6 @@ public class NewFieldInput extends TextInput {
 	public NewFieldInput(Repository res) {
 		super();
 		setBoxWidth(32);
-		setMaxResultLength(32);
 		setSingle(true);
 		addValidator(new NewFieldValidator(res));
 	}

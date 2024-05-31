@@ -93,10 +93,18 @@ li.frac_10{
 
 
 
+div.report td.val_null, div.report td.val_zero, div.report td.val_negative {
+	background-color: #ed1818;
+  	text-align: right;
+	white-space: nowrap;
+}
 
 
-
-
+div.report td.val_positive {
+		background-color: #18ed18;
+  	text-align: right;
+	white-space: nowrap;
+}
 
 
 

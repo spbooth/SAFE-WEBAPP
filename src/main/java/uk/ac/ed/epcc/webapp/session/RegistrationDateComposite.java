@@ -26,8 +26,8 @@ public class RegistrationDateComposite<AU extends AppUser> extends SignupDateCom
 	/**
 	 * @param fac
 	 */
-	public RegistrationDateComposite(AppUserFactory fac) {
-		super(fac);
+	public RegistrationDateComposite(AppUserFactory fac,String tag) {
+		super(fac,tag);
 	}
 
 	/* (non-Javadoc)

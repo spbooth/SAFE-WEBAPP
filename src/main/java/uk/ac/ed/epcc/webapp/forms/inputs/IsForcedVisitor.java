@@ -67,6 +67,17 @@ public class IsForcedVisitor implements InputVisitor<Boolean> {
 
 
 
+	@Override
+	public <V, T> Boolean visitAutoCompleteInput(AutoComplete<V, T> autocompleteInput) throws Exception {
+		T forced = autocompleteInput.forcedItem();
+		if( forced == null ) {
+			return false;
+		}else{
+			autocompleteInput.setItem(forced);
+			return true;
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor#visitRadioButtonInput(uk.ac.ed.epcc.webapp.forms.inputs.ListInput)
 	 */

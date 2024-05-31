@@ -1,6 +1,7 @@
 package uk.ac.ed.epcc.webapp.model.data.forms;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -8,12 +9,12 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormBuilder;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
-import uk.ac.ed.epcc.webapp.model.data.CreateAction;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory;
 
 /** An interface that can be added to a {@link DataObjectUpdateFormFactory} to convert it into
- * a create transition. This is to help support common customised superclasses for differett types of 
+ * a create transition. This is to help support common customised superclasses for differet types of 
  * {@link DataObjectFormFactory}
  * @author Stephen Booth
  * @see CreatorInterface
@@ -26,7 +27,7 @@ public interface CreateTransitionInterface<BDO extends DataObject> extends Targe
 	public default void buildForm(Form f, AppContext c) throws TransitionException {
 		try {
 			
-			if( buildForm(f,getInitialFixtures())) {
+			if( buildForm(f,getInitialFixtures(),getCreationDefaults())) {
 				customiseCompleteCreationForm(f);
 				addActions(f);
 			}
@@ -35,7 +36,7 @@ public interface CreateTransitionInterface<BDO extends DataObject> extends Targe
 				comp.customiseCreationForm(f);		
 			}
 		} catch (Exception e) {
-			getContext().error(e,"Error creating object");
+			Logger.getLogger(getClass()).error("Error creating object",e);
 			throw new TransitionException("Error creating object");
 		}
 		
@@ -46,7 +47,9 @@ public interface CreateTransitionInterface<BDO extends DataObject> extends Targe
 		return null;
 	}
 	
-
+	default public Map<String,Object> getCreationDefaults(){
+		return null;
+	}
 	
 	
 	

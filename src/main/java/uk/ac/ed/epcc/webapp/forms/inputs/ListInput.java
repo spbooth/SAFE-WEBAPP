@@ -17,8 +17,7 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 /**
- * Input that selects values from a List. For consistency the parse method should
- * parse tag values. That is tags are String representations of the Input values.
+ * Input that selects values from a List. 
  * 
  * Each possible choice has 4 representations
  * <ul>
@@ -31,6 +30,9 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * <li> The text actually presented to the user.
  * </ul>
  * 
+ * For consistency the parse method should
+ * parse tag values. That is tags are String representations of the Input values.
+ * 
  * @author spb
  * @param <V> type of value object
  * @param <T> type of Item object
@@ -38,18 +40,22 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  */
 public abstract interface ListInput<V,T> extends  SuggestedItemInput<V,T> {
 
-	
-
-	
-	/**
-	 * get an identifying tag string from the domain object
+	/** get an identifying tag string from the domain object
 	 * 
 	 * @param item
 	 * @return String tag
 	 */
 	public abstract String getTagByItem(T item);
 	
-	/** Test if an object of the Item type is one of the possible items.
+	/** Convert a tag back into a domain object.
+	 * 
+	 * @param tag
+	 * @return
+	 */
+	public abstract T getItemByTag(String tag);
+	
+	
+	/** Test if an object of the Item type is one of the allowed items.
 	 * 
 	 * @param item
 	 * @return boolean
@@ -63,6 +69,12 @@ public abstract interface ListInput<V,T> extends  SuggestedItemInput<V,T> {
 	 * @return String tag
 	 */
 	public abstract String getTagByValue(V value);
+	/** convert a value into the corresponding tag type
+	 * 
+	 * @param tag
+	 * @return
+	 */
+	public abstract V getValueByTag(String tag);
 
 	/**
 	 * get the user presented text from the domain object
@@ -91,5 +103,9 @@ public abstract interface ListInput<V,T> extends  SuggestedItemInput<V,T> {
 	 */
 	public default String getTooltip(T item) {
 		return null;
+	}
+	
+	public default  <R> R accept(InputVisitor<R> vis) throws Exception{
+		return vis.visitListInput(this);
 	}
 }

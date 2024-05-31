@@ -62,6 +62,9 @@ public interface FormResultVisitor extends Contexed{
   }
   public <T,K> void visitConfirmTransitionResult(ConfirmTransitionResult<T,K> res) throws Exception;
   public void visitMessageResult(MessageResult res) throws Exception;
+  default public void visitWarningMessageResult(WarningMessageResult res) throws Exception{
+	  visitMessageResult(res);
+  }
   public void visitServeDataResult(ServeDataResult res)throws Exception;
   public void visitBackResult(BackResult res)throws Exception;
   public void visitCustomPage(CustomPageResult res)throws Exception;

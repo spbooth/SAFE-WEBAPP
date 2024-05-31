@@ -17,7 +17,8 @@ import java.util.Iterator;
 
 /** An {@link ItemInput} that suggests possible items.
  * 
- * The input may also allow additional items beyond the suggested set
+ * The input may also allow additional items beyond the suggested set but the suggestions should
+ * not include invalid items.
  * @author Stephen Booth
  *
  */

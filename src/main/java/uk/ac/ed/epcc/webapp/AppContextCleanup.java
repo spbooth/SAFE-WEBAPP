@@ -25,6 +25,7 @@ public interface AppContextCleanup {
 	/** {@link AppContext} is being closed.
 	 * Only use this for cleanup that can't be handled by
 	 * normal garbage collection or for state which is never returned by reference.
+	 * Note the {@link AppContext} is invalid at this point.
 	 * 
 	 */
 	void cleanup();

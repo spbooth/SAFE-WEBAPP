@@ -21,10 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.*;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 
 
@@ -40,7 +38,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  * @author spb
  *
  */
-public abstract class AbstractDateInput extends ParseAbstractInput<Date> implements BoundedDateInput, FormatHintInput {
+public abstract class AbstractDateInput extends ParseAbstractInput<Date> implements BoundedDateInput {
 //	public static final Date DEFAULT_MAX_DATE;
 //	static {
 //		Calendar c = Calendar.getInstance();
@@ -48,8 +46,7 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 //		c.set(9999, Calendar.DECEMBER, 31);
 //		DEFAULT_MAX_DATE=c.getTime();
 //	}
-    Date min=null;
-    Date max=null;
+   
     long resolution=1000L; // number of milliseconds in a tick
     public AbstractDateInput(){
     	this(1000L);
@@ -68,21 +65,23 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 
 		}
 		setBoxWidth(length);
-		setMaxResultLength(length);
-		addValidator(new FieldValidator<Date>() {
-			
-			@Override
-			public void validate(Date value) throws FieldException {
-				if( min != null && value.before(min)){
-					throw new ValidateException("Value must be after "+getString(min));
-				}
-				if( max != null && value.after(max)){
-					throw new ValidateException("Value must be before "+getString(max));
-				}
-				
-			}
-		});
+		//With html5 enabled this shows as a placeholder so if the browser overrides
+		// format to show a date picker this is hidden.
+		setFormatHint(getFormats()[getHintIndex()].toLowerCase());
+	
 	}
+	protected void decorate(FieldException e) throws FieldException{
+	    // re-write generic message for dates
+	    if( e instanceof MinimumValueException) {
+	    	Date min = (Date) ((MinimumValueException)e).getMin();
+	    	throw new MinimumValueException("Value must be after "+getString(min), (Comparable) min);
+	    }
+	    if( e instanceof MaximumValueException) {
+	    	Date max = (Date) ((MaximumValueException)e).getMax();
+	    	throw new MinimumValueException("Value must be before "+getString(max), (Comparable) max);
+	    }
+    	throw e;
+ }
 	protected DateFormat getDateFormat(String format) {
 		return new SimpleDateFormat(format);
 	}
@@ -146,13 +145,6 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 	}
 
 	@Override
-	public String getFormatHint() {
-		//With html5 enabled this shows as a placeholder so if the browser overrides
-		// format to show a date picker this is hidden.
-		return getFormats()[getHintIndex()].toLowerCase();
-	}
-
-	@Override
 	public Date convert(Object v) throws TypeException {
 		if( v instanceof Date || v == null){
 		   return (Date) v;
@@ -180,26 +172,7 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 	public String getType() {
 		return "date";
 	}
-	@Override
-	public Date getMin() {
-		return min;
-	}
-	@Override
-	public Date getMax() {
-		return max;
-	}
-	@Override
-	public Date setMin(Date val){
-		Date old = min;
-		min=val;
-		return old;
-	}
-	@Override
-	public Date setMax(Date val){
-		Date old = max;
-		max=val;
-		return old;
-	}
+	
 	@Override
 	public String formatRange(Date n) {
 		return getString(n);

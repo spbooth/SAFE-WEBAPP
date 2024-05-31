@@ -67,7 +67,7 @@ public abstract  class IndexedFormEntry<F extends IndexedProducer<T>&Contexed,T 
 				return ((Owner) fac).isMine(target);
 			}
 		}catch(Exception e){
-			c.error(e,"Error getting owner");
+			getLogger(c).error("Error getting owner",e);
 		}
 		// benefit of the doubt
 		return true;

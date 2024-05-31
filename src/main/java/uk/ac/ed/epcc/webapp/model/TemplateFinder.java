@@ -16,18 +16,15 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.ContextCached;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.TextFileOverlay.TextFile;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
@@ -45,7 +42,7 @@ import uk.ac.ed.epcc.webapp.resource.ResourceService;
  */
 
 
-public class TemplateFinder implements Contexed{
+public class TemplateFinder implements Contexed, ContextCached{
 	private final AppContext conn;
 	private String group;
 	private final TextFileOverlay ov;
@@ -127,7 +124,7 @@ public class TemplateFinder implements Contexed{
 
 				}
 			}
-			conn.getService(LoggerService.class).getLogger(getClass()).error("Template "+name+" not found in "+dir);
+			getLogger().error("Template "+name+" not found in "+dir);
 			return null;
 
 		}
@@ -155,7 +152,7 @@ public class TemplateFinder implements Contexed{
 				content = getText(m.group(1));
 			}catch(Exception e){
 				// fall back to empty string but log
-				conn.getService(LoggerService.class).getLogger(getClass()).error("Error processing include",e);
+				getLogger().error("Error processing include",e);
 			}
 			m.appendReplacement(sb, content);
 		}

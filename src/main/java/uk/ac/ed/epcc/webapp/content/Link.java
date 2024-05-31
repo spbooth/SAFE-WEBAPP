@@ -13,9 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
-import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 
 /** Wrapper object allowing us to add links as {@link Table} content
@@ -24,33 +22,37 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
  *
  */
 
+@HasObjectMapper(tag=FormResultMapper.CONSTRUCTION_TAG)
+public class Link extends FormResultWrapper implements XMLGenerator,UIGenerator {
 
-public class Link extends AbstractContexed implements XMLGenerator,UIGenerator {
-
-	private final String text;
-	private final String help;
-	private final FormResult result;
+	
+	private boolean new_window=false;
 	public Link(AppContext conn,String text,FormResult result){
-		this(conn,text,null,result);
+		super(conn,text,null,result);
 	}
 	public Link(AppContext conn,String text,String help,FormResult result){
-		super(conn);
-		this.text=text;
-		this.help=help;
-		this.result=result;
+		super(conn,text,help,result);
 	}
-	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
-		if( builder instanceof ContentBuilder){
-			addContent((ContentBuilder)builder);
-		}else{
-			builder.clean(text);
+	
+
+	
+	public ContentBuilder addContent(ContentBuilder builder) {
+		
+		if(builder instanceof XMLContentBuilder && new_window) {
+			XMLContentBuilder xb = (XMLContentBuilder)builder;
+			boolean prev = xb.setNewTab(true);
+			xb.addLink(conn, text, help,result);
+			xb.setNewTab(prev);
+		}else {
+			builder.addLink(conn, text, help,result);
 		}
 		return builder;
 	}
-	
-	public String toString(){
-		// makes text tables work sensibly
-		return text;
+	public boolean isNewWindow() {
+		return new_window;
+	}
+	public void setNewWindow(boolean new_window) {
+		this.new_window = new_window;
 	}
 	@Override
 	public boolean equals(Object arg0) {
@@ -62,9 +64,5 @@ public class Link extends AbstractContexed implements XMLGenerator,UIGenerator {
 	@Override
 	public int hashCode() {
 		return text.hashCode();
-	}
-	public ContentBuilder addContent(ContentBuilder builder) {
-		builder.addLink(conn, text, help,result);
-		return builder;
 	}
 }

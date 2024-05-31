@@ -23,31 +23,26 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.FormValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormBuilder;
 import uk.ac.ed.epcc.webapp.forms.factory.FormFactory;
-import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.DateInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.DoubleInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.LongInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.NoHtmlInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.RealInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TimeStampInput;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.registry.IndexedFormEntry;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 /** Base class for Forms based on DataObject fields such as create/update forms.
  * This class is intended to hold code common to both create and update forms which can 
  * customise their behaviour by overriding the various methods.
@@ -67,36 +62,42 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  */
 public  abstract class DataObjectFormFactory<BDO extends DataObject> extends DataObjectLabeller<BDO> implements FormFactory, FormBuilder, IndexedProducer<BDO>{
    public static final Feature DEFAULT_FORBID_HTML = new Feature("form_factory.default_forbid_html_text",true,"Forbid HTML in auto generated text inputs for database fields");
+   public static final Feature DEFAULT_FORBID_HIGH_UNICODE = new Feature("form_factory.default_forbid_high_unicode_text",true,"Forbid High unicode in auto generated text inputs for database fields");
    public static final Feature DEFER_CONTENT = new Feature("form_factory.defer_content",true,"Defer form label generation till needed.");
-
+   public static final Feature WARN_REDUNDANT = new Feature("form_factory.warn_redundant",false,"Generate errors if an explicit Seelctor matches the auto-generated value");
 protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 super(fac);
    }
    /**
-	 * builds a default Form for editing the DataObjects belonging to this
-	 * DataObjectFactory The state of the Form is initialised using getDefaults
+	 * builds a default Form for creating new objects.
+	 * default values are taken from {@link #getCreationDefaults()}
 	 * 
 	 * @param f
 	 *            Form to build
 	 * @throws DataFault
 	 */
 	public final boolean buildForm(Form f) throws DataFault{
-		return buildForm(f,null);
+		return buildForm(f,null,getCreationDefaults());
 	}
+	
+	/** builds a default Form for editing the DataObjects belonging to this
+	 * {@link DataObjectFactory}
+	 * 
+	 * @param f {@link Form} to build
+	 * @param fixtures Map of fixed form values
+	 * @param defaults Map of default values for editable fields
+	 *   
+	 * @throws DataFault
+	 */
 	@Override
-	public final boolean buildForm(Form f,HashMap fixtures) throws DataFault{
+	public final boolean buildForm(Form f,HashMap fixtures,Map<String,Object> defaults) throws DataFault{
 		try(TimeClosable build = new TimeClosable(getContext(), "buildForm")){
 			f.setFormTextGenerator(this);
 			boolean defer = DEFER_CONTENT.isEnabled(getContext());
-			boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(), getSelectors(),getFieldConstraints(),defer ? null :getTranslations(),defer ? null :getFieldHelp(),fixtures);
+			boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(), getSelectors(),getValidators(),getFieldConstraints(),defer ? null :getTranslations(),defer ? null :getFieldHelp(),fixtures,defaults);
 			customiseForm(f);
-			f.setContents(getDefaults());
 			return complete;
 		}
-	}
-	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
-			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels) throws DataFault {
-		return buildForm(conn, res, f, supress_fields, optional, selectors,null, labels, null);
 	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
@@ -116,14 +117,16 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 * 	          Map of field names to form labels
 	 * @throws DataFault
 	
+	 * @return
+	 * @throws DataFault
 	 */
 	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
-			Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
+			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels) throws DataFault {
 		Set<String> keys = new LinkedHashSet<String>(res.getFields());
 		if( supress_fields != null ) {
 			keys.removeAll(supress_fields);
 		}
-		return buildForm(conn, res, keys,f, optional, selectors,constraints,labels, tooltips, null);
+		return buildForm(conn, res, keys,f, optional, selectors,new LinkedHashMap<String, FieldValidationSet>(),(Map<String, FieldConstraint>) null,labels, (Map<String, String>) null, null,null);
 	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
@@ -141,16 +144,30 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 * 	          Map of field names to form labels
 	 * @param tooltips 
 	 * 			  Map of tooltip/help text for form labels
+	 * 
+	 * @return boolean true if the form is complete.
 	 * @throws DataFault
 	 */
 	public static boolean buildForm(AppContext conn,Repository res, Set<String> keys, Form f, 
-				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,HashMap fixtures) throws DataFault {
+				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldValidationSet> validators,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,Map<String,Object> fixtures,Map<String,Object> defaults) throws DataFault {
 		//
 		String table = res.getTag();
 		boolean support_multi_stage = f.supportsMultiStage();
 		if( fixtures == null && constraints != null ) {
-			fixtures = new HashMap();
+			fixtures = new HashMap<>();
 		}
+		// copy defaults to fixtures for any
+		// value not in the key-set or not already set as fixtures.
+		// This is to allow an update form with supressed fields access
+		// to the supressed data in FieldConstraints
+		if( defaults != null && fixtures != null) {
+			for(Map.Entry<String,Object> e : defaults.entrySet()) {
+				if( ! keys.contains(e.getKey())  && ! fixtures.containsKey(e.getKey())) {
+					fixtures.put(e.getKey(), e.getValue());
+				}
+			}
+		}
+		
 		// Try multiple form stages until we have no fields left
 		while( ! keys.isEmpty() ) {
 			int start = keys.size();
@@ -192,48 +209,48 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 					};
 				}
 				boolean emit_input = true;
-
+				Object def = null;
+				if( defaults != null) {
+					def = defaults.get(name);
+					
+				}
+				FieldValidationSet validator_set = validators.get(name);
+				if( validator_set == null) {
+					validator_set= new FieldValidationSet<>();
+				}
 				// Consider field constraints
 				if( constraints != null && constraints.containsKey(name)) {
 					FieldConstraint fc = constraints.get(name);
-					if( fc.suppress(name, sel, f, fixtures)) {
+					if( fc.suppress(fixtures)) {
 						emit_input=false;
 						it.remove();
-					}else {
-						Selector new_sel = fc.apply(support_multi_stage,name, sel, f,fixtures);
-						if( new_sel != null ) {
-							// constraint applied
-							sel = new_sel;
-							if( support_multi_stage) {
-								is_optional = fc.changeOptional(name, is_optional,f,fixtures);
-							}
+					}else if( fc.requestMultiStage(fixtures)) {
+						// multi-stage requested
+						if( support_multi_stage ) {
+							emit_input=false;  // skip this input
+							multi_stage=true;  // do the request
 						}else {
-							// multi-stage requested
-							if( support_multi_stage ) {
-								emit_input=false;  // skip this input
-								multi_stage=true;  // do the request
+							FormValidator fv = fc.getFormValidator();
+							if( fv != null) {
+								f.addValidator(fv);
 							}
 						}
+					}else {
+						sel = fc.changeSelector(sel, fixtures);
+						is_optional = fc.changeOptional( is_optional,fixtures);
+						def = fc.defaultValue(def, fixtures);
+						validator_set = fc.validationSet(validator_set, fixtures);
 					}
 				}
 
 				if( emit_input ) {
 					Input<?> input = sel.getInput();
+					
 					if( input == null) {
 						throw new DataFault("Unable to create input for "+name);
 					}
-					if( input instanceof TextInput){
-						// If MaxResultLength out of range then
-						// set from the DB.
-						TextInput ti = (TextInput) input;
-						int length=ti.getMaxResultLength();
-						if( info != null ) {
-							int max = info.getMax();
-							if( max > 0 && (length <= 0 || length > max)){
-								ti.setMaxResultLength(max);
-							}
-						}
-					}
+					
+					input.addValidatorSet(validator_set);
 					String lab = null;
 					if (labels != null ) {
 						if( labels.containsKey(name)) {
@@ -259,6 +276,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 						}
 					}
 					f.addInput(name, lab,tooltip, input).setOptional(is_optional);
+					
 					if( fixtures != null ) {
 						if( f.isFixed(name) ) {
 							// pre-emptive copy of fixed value to fixtures
@@ -270,12 +288,15 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 							f.getField(name).lock();
 						}
 					}
+					if( def != null ) {
+						f.put(name, def);
+					}
 					it.remove(); // field has been processed
 				}
 			}
 			if( start == keys.size()) {
 				// No additional inputs have been added this pass
-				conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("No additional inputs added");
+				Logger.getLogger(conn,DataObjectFormFactory.class).error("No additional inputs added");
 				support_multi_stage=false; // This should emit the remaining inputs next pass
 				multi_stage=false; // should be false anyway
 			}
@@ -294,7 +315,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 						}
 					}
 				} catch (TransitionException e) {
-					conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("Form poll failed",e);
+					Logger.getLogger(conn,DataObjectFormFactory.class).error("Form poll failed",e);
 					support_multi_stage=false; // This should emit the remaining inputs next pass
 				}
 			}
@@ -302,6 +323,9 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 		return true;
 	}
 	public static Input<?> getInputFromType(AppContext conn, Repository res,  Repository.FieldInfo info) {
+		if(info == null) {
+			return null;
+		}
 		int sql_type = info.getType();
 		// build default based on type
 		switch (sql_type) {
@@ -329,8 +353,9 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 			}else{
 				ti= new TextInput();
 			}
-			ti.setMaxResultLength(info.getMax());
+			ti.addValidator(new MaxLengthValidator(info.getMax()));
 			int maxwid = conn.getIntegerParameter("forms.max_text_input_width", 64);
+			maxwid = conn.getIntegerParameter(info.getName(true)+".maxwid", maxwid);
 			ti.setBoxWidth(maxwid);
 			return ti;
 			
@@ -361,72 +386,111 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 			try{
 				return conn.makeObject(c);
 			}catch(Exception e){
-				conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("Failed to make input",e);
+				Logger.getLogger(conn,DataObjectFormFactory.class).error("Failed to make input",e);
 				
 			}
 		}
 		return null;
 	}
 	
-	/** Add a set of selectors based on the tables referenced by field keys
-	 * @param conn 
+	/** Add a set of selectors based on the REpository/TableSpecification
+	 * 
+	 * To avoid lots of builder-plate and duplication of specification we
+	 * would rather pick up Selectors here than explicitly from the Factory/Composites
+	 * we therefore have a debugging uption to try and locate redundant definitions
+	 * however this won't help with similar but not identical definitions.
+	 * 
+	 * 
+	 * 
 	 * @param sel 
-	 * @param res
 	 * @return modified map
 	 */
-	public static Map<String,Selector> addSelectors(AppContext conn,Map<String,Selector> sel,Repository res){
+	public Map<String,Selector> addSelectors(Map<String,Selector> sel){
 		if( sel == null ){
 			sel = new HashMap<>();
 		}
+		AppContext conn = getContext();
+		Repository res = factory.res;
+		TableSpecification ts = getSpecification(); // may be null.
+		boolean warn_redundant = WARN_REDUNDANT.isEnabled(conn);
+		Logger logger = getLogger();
 		for(String field : res.getFields()){
 			Repository.FieldInfo info = res.getInfo(field);
-			if( ! sel.containsKey(field)){		
-				if( info.getTypeProducer() != null ){
-					// Some TypeProducers also implement selector.
-					// check these before referenced table as 
+			if( warn_redundant || ! sel.containsKey(field)){
+				Selector auto=null;
+				// Check for  a TypeProducer in the Repository
+				TypeProducer prod = info.getTypeProducer();
+				if( prod != null ){
+					auto=prod;
+					// TypeProducers also implement selector.
+					// check for IndexedProducer in preference
 					// 
-					TypeProducer prod = info.getTypeProducer();
-					if( prod instanceof Selector){
-						sel.put(field, (Selector) prod);
+					if( prod instanceof IndexedTypeProducer) { // This should handle reference fields
+						IndexedTypeProducer itp = (IndexedTypeProducer)prod;
+						IndexedProducer ip = itp.getProducer();
+						if( ip instanceof Selector) {
+							auto = (Selector) ip;
+						}	
 					}
-				}else{
-					String ref_table = info.getReferencedTable();
-					if( ref_table != null ){
-						Selector o = null;
-						Class<? extends Selector> c = conn.getPropertyClass(Selector.class, null,ref_table);
-						if( c != null ){
-							try {
-								o = conn.makeParamObject(c,conn,ref_table );
-							} catch (Exception e) {
-								try {
-									o = conn.makeObject(c);
-								} catch (Exception e1) {
-									conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("Unable to construct "+c.getCanonicalName()+" for table "+ref_table);
-								}
-							}
-						}
-						if( o != null ){
-							sel.put(field, o);
-						}
+
+				}
+				if( auto == null && ts != null ) {
+					// Can we get anything from the TableSpecification
+					FieldType t = ts.getField(field);
+					if ( t != null ) {
+						MakeSelectorVisitor vis = new MakeSelectorVisitor(res,field);
+						t.accept(vis);
+						auto = vis.getSelector();
 					}
+					
 				}
 				
-			}else{
-				// check for consistency against repo don't allow values that will overflow field.
-				Object input =  sel.get(field);
-				if( input instanceof TextInput && info.isString()){
-					int len = info.getMax();
-					TextInput text_input = (TextInput)input;
-					if( text_input.getMaxResultLength() > len){
-						text_input.setMaxResultLength(len);
-					}
-					if( text_input.getBoxWidth() > len){
-						text_input.setBoxWidth(len);
+				if( auto != null ) {
+					if( ! warn_redundant ) {
+						sel.put(field, auto);
+					}else {
+						Selector prev = sel.get(field);
+						if( prev == null ) {
+							sel.put(field, auto);
+						}else {
+							// override or redundant
+							if( auto.equals(prev)) {
+								// redundent set
+
+								logger.error("Redundant selector for "+res.getTable()+"."+field);
+							}else {
+								logger.info("Overidden selector for "+res.getTable()+"."+field);
+							}
+						}
 					}
 				}
 			}
 		}
 		return sel;
+		
+	}
+	
+	/** Add validators based on the database
+	 * @param conn 
+	 * @param val 
+	 * @param res
+	 * @return modified map
+	 */
+	public static Map<String,FieldValidationSet> addValidators(AppContext conn,Map<String,FieldValidationSet> val,Repository res){
+		if( val == null ){
+			val = new HashMap<>();
+		}
+		for(String field : res.getFields()){
+			Repository.FieldInfo info = res.getInfo(field);
+			if( info.isString() && ! info.isTruncate()) {
+				int max = info.getMax();
+				FieldValidationSet.add(val, field, new MaxLengthValidator(max));
+			}
+			if( info.isString()) {
+				FieldValidationSet.add(val, field, new LowUnicodeValidator());
+			}
+		}
+		return val;
 		
 	}
 	/**
@@ -444,20 +508,41 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
         	   c.customiseForm(f);
            }
 	}
+	private Map<String,Selector> selector_map=null;
 	/**
 	 * Get a Map of selectors to use for forms of this type.
 	 * 
 	 * @return Map
 	 */
-	protected  Map<String,Selector> getSelectors() {
-		Map<String,Selector>sel = factory.getSelectors();
-		if( sel == null ){
-			sel = new HashMap<>();
+	protected Map<String,Selector> getSelectors() {
+		if( selector_map == null ) {
+			Map<String,Selector>sel = factory.getSelectors();
+			if( sel == null ){
+				sel = new HashMap<>();
+			}
+			for(TableStructureContributer c : factory.getTableStructureContributers()){
+				sel = c.addSelectors(sel);
+			}
+			sel = addSelectors(sel);
+			selector_map = addSelectors( sel);
+		}
+		return selector_map;
+	}
+	
+	/**
+	 * Get a Map of {@link FieldValidationSet} to use for forms of this type.
+	 * 
+	 * @return Map
+	 */
+	protected  Map<String,FieldValidationSet> getValidators() {
+		Map<String,FieldValidationSet>val = factory.getValidators();
+		if( val == null ){
+			val = new HashMap<String, FieldValidationSet>();
 		}
 		for(TableStructureContributer c : factory.getTableStructureContributers()){
-			sel = c.addSelectors(sel);
+			val = c.addFieldValidations(val);
 		}
-		return addSelectors(getContext(), sel, factory.res);
+		return addValidators(getContext(), val, factory.res);
 	}
 	/**
 	 * generate the set of suppressed fields to be used in form creation/update
@@ -530,7 +615,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 * 
 	 * @return Map of defaults
 	 */
-	public  Map<String, Object> getDefaults() {
+	public  Map<String, Object> getCreationDefaults() {
 		Map<String, Object> defaults = factory.getDefaults();
 		if( defaults == null){
 			defaults=new HashMap<>();

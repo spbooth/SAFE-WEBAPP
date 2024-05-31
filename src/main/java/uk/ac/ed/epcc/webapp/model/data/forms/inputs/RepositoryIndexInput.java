@@ -18,13 +18,8 @@ package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
 import java.util.Iterator;
 
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
-import uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.StringListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 /** Input to select one of the fields of a Repository
  * 
@@ -33,7 +28,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  */
 
 
-public class RepositoryIndexInput extends StringListInput implements ListInput<String,String>{
+public class RepositoryIndexInput extends StringListInput{
     private final Repository res;
 
     public RepositoryIndexInput(Repository res){

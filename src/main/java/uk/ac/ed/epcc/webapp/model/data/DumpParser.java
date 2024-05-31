@@ -74,6 +74,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 	private Repository res=null;
 	private FieldInfo field=null;
 	private boolean null_value=false;
+	private boolean deleted=false;
 	private Integer id=null;
 	private StringBuilder sb = new StringBuilder();
 	private String table_name;
@@ -150,7 +151,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 						// end of record
 						Record rec = current;
 
-						int new_id = processRecord(id,rec);
+						int new_id = processRecord(id,rec,deleted);
 						if( new_id != 0 && id_map != null){
 							Map<Integer,Integer> map = id_map.get(res.getTag());
 							if( map == null ){
@@ -161,7 +162,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 						}
 					}
 				}catch(Exception t){
-					conn.error(t,"Error commiting record "+current.getRepository().getTable()+":"+id);
+					getLogger().error("Error commiting record "+current.getRepository().getTable()+":"+id,t);
 				}finally{
 					res=null;
 					current=null;
@@ -173,7 +174,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 				try{
 					processSpecification(table_name, spec);
 				}catch(Exception t){
-					conn.error(t,"Error creating table");
+					getLogger().error("Error creating table",t);
 				}finally{
 					table_name=null;
 					spec=null;
@@ -194,12 +195,13 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 	/**	 handle a {@link Record} once we have parsed it
 	 * @param parse_id int id parsed from file.
 	 * @param rec uncommitted {@link Record} parsed from the file
+	 * @param deleted Deletion state
 	 * @return int id to record in id_map.
 	 * @throws ConsistencyError
 	 * @throws DataException 
 	 * @throws IOException 
 	 */
-	public abstract int processRecord(int parse_id,Record rec) throws ConsistencyError, DataException, IOException;
+	public abstract int processRecord(int parse_id,Record rec,boolean deleted) throws ConsistencyError, DataException, IOException;
 	/** handle a {@link TableSpecification} once we have parsed it.
 	 * 
 	 * @param table
@@ -255,6 +257,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 		}
 		if( state == State.Top){
 			String id_str  = arg3.getValue(Dumper.ID);
+			String deleted_str = arg3.getValue(Dumper.DELETED_ATTR);
 			if( id_str != null ){
 				depth=1; // start counting
 				if( skipRecord(name,id_str)) {
@@ -283,6 +286,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 							}
 						}
 						field=null;
+						deleted=deleted_str != null && deleted_str.equals("true");
 					}catch(Exception t){
 						id=null;
 						res=null;
@@ -315,8 +319,10 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 			String type = arg3.getValue(Dumper.TYPE_ATTR);
 			String ref = arg3.getValue(Dumper.REFERENCE_ATTR);
 			String def = arg3.getValue(Dumper.DEFAULT_ATTR);
+			String nullable_value = arg3.getValue(Dumper.NULLABLE_ATTR);
 			if( ref != null ){
-				spec.setField(name,new ReferenceFieldType(ref));
+				boolean nullable= nullable_value == null || Boolean.parseBoolean(nullable_value);
+				spec.setField(name,new ReferenceFieldType(nullable,ref));
 			}else if( type.equals(Dumper.INDEX_TYPE)){
 				boolean unique = arg3.getValue(Dumper.UNIQUE_ATTR).equalsIgnoreCase("true");
 				state = State.SchemaIndex;
@@ -330,7 +336,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 					getLogger().error("Error making index", e);
 				}
 			}else{
-				boolean nullable= Boolean.parseBoolean(arg3.getValue(Dumper.NULLABLE_ATTR));
+				boolean nullable= Boolean.parseBoolean(nullable_value);
 				
 				if( type.equals(Dumper.STRING_TYPE)){
 					int max;

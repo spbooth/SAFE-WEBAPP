@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.forms.ParseAbstractInputTestCase;
 
-public abstract class NumberInputTestCase<N extends Number,I extends NumberInput<N>> extends ParseAbstractInputTestCase<N,I> implements BoundedInputInterfaceTest<N, I, NumberInputTestCase<N,I>>,BoundedInputDataProvider<N, I> {
+public abstract class NumberInputTestCase<N extends Number&Comparable<N>,I extends NumberInput<N>> extends ParseAbstractInputTestCase<N,I> implements BoundedInputInterfaceTest<N, I, NumberInputTestCase<N,I>>,BoundedInputDataProvider<N, I> {
 
 	BoundedInputInterfaceTestImpl<N,I, NumberInputTestCase<N,I>> bounded_tests = new BoundedInputInterfaceTestImpl<>(this);
 	@Test

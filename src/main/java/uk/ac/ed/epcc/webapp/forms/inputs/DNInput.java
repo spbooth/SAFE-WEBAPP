@@ -13,10 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,11 +21,10 @@ import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 /** A {@link TextInput} to input Globus/LDAP DN names.
  * 
  * for historical reasons the canonical {@link String} representation is the
@@ -44,7 +40,6 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Str
 	//private static final Pattern valid_pattern = Pattern.compile("(/\\w+=[^/=]+)+");
 	public DNInput() {
 		super();
-		setMaxResultLength(256);
 		setBoxWidth(64);
 		setSingle(true);
 		addValidator(new FieldValidator<String>() {
@@ -188,12 +183,8 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Str
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
 	 */
 	@Override
-	public void setItem(LdapName item) {
-		try {
-			setValue(makeGlobusName(item));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
+	public String getValueByItem(LdapName item) {
+		return makeGlobusName(item);
 	}
 
 	@Override

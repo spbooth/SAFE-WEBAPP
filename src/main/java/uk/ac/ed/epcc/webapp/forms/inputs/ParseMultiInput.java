@@ -16,9 +16,15 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-
+/** A {@link MultiInput} that also implements {@link ParseInput}.
+ * Normally this is presented as a {@link MultiInput} but the {@link ParseInput}
+ * functionality can be used to serialise the input value or read text input.
+ * 
+ * @param <V>
+ * @param <I>
+ */
 public abstract class ParseMultiInput<V,I extends Input> extends MultiInput<V,I> implements
-		ParseMapInput {
+		ParseInput<V> {
 	@Override
 	public final <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitParseMultiInput(this);

@@ -95,8 +95,17 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 	 * @see uk.ac.ed.epcc.safe.accounting.db.RelationshipProvider#setRole(A, B, java.lang.String, boolean)
 	 */
 	public final void setRole(A user, B target, String role, boolean value){
-		if( ! getLeftFactory().isMine(user) || ! getRightFactory().isMine(target)){
-			throw new ConsistencyError("Factory types do not match");
+		if( user == null) {
+			throw new ConsistencyError("user must not be null");
+		}
+		if( target == null) {
+			throw new ConsistencyError("target must not be null");
+		}
+		if( ! getLeftFactory().isMine(user) ){
+			throw new ConsistencyError("Factory types do not match "+getLeftFactory().getTag()+" "+user.getClass().getCanonicalName());
+		}
+		if( ! getRightFactory().isMine(target)){
+			throw new ConsistencyError("Factory types do not match "+getRightFactory().getTag()+" "+target.getClass().getCanonicalName());
 		}
 		if( ! getRelationships().contains(role)){
 			getLogger().error("Invalid role "+role);

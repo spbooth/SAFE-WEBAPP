@@ -42,11 +42,8 @@ public class ExtendedTest extends WebappTestBase {
 	
 	@Test
 	public void testConfigTags() throws Exception {
-		Map<String,String> config = new HashMap<>();
-		fac.addConfigTags(config);
+		Map<String,String> config = fac.getConfigTags();
 		assertEquals("Dummy", config.get(Dummy1.MANDATORY));
-		assertEquals("Dummy", config.get(Dummy1.Factory.BASE));
 		assertEquals("Dummy", config.get(Dummy1.NAME));
-		assertEquals("Extended",config.get(ExtededDummyFactory.BOGUS));
 	}
 }

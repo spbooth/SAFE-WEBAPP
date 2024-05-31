@@ -13,13 +13,15 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** An integer input that selects an integer from a set as a pull down
  * 
@@ -28,7 +30,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  */
 
 
-public class IntegerSetInput extends IntegerInput implements ListInput<Integer,Integer> {
+public class IntegerSetInput extends AbstractInput<Integer> implements ListInput<Integer,Integer> {
+	private NumberFormat nf=null;
     /**
 	 * @author Stephen Booth
 	 *
@@ -80,12 +83,8 @@ public class IntegerSetInput extends IntegerInput implements ListInput<Integer,I
 	}
 
 	@Override
-	public void setItem(Integer item) {
-		try {
-			setValue(item);
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
+	public Integer getValueByItem(Integer item) {
+		return item;
 	}
 
 	@Override
@@ -95,20 +94,20 @@ public class IntegerSetInput extends IntegerInput implements ListInput<Integer,I
 
 	@Override
 	public Iterator<Integer> getItems() {
-		Number min = getMin();
-		Number max = getMax();
-		if( min != null || max != null) {
-			// return items that are in range
-			LinkedHashSet<Integer> tmp = new LinkedHashSet<>();
-			for(Integer i : values) {
-				if( (min == null || i.intValue() >= min.intValue()) &&
-					(max == null || i.intValue() <= max.intValue())) {
-					tmp.add(i);
-				}
+
+		// return items that are valid
+		LinkedHashSet<Integer> tmp = new LinkedHashSet<>();
+		for(Integer i : values) {
+			try {
+				validate(i);
+				tmp.add(i);
+			}catch(FieldException e) {
+
 			}
-			return tmp.iterator();
 		}
-		return values.iterator();
+		return tmp.iterator();
+
+
 	}
 	@Override
 	public int getCount(){
@@ -127,8 +126,10 @@ public class IntegerSetInput extends IntegerInput implements ListInput<Integer,I
 
 	@Override
 	public String getText(Integer item) {
-		// use getString so we can control presented text using the NumberFormat
-		return getString(item);
+		if( nf != null ) {
+			return nf.format(item);
+		}
+		return item.toString();
 	}
 	
 	@Override
@@ -142,5 +143,46 @@ public class IntegerSetInput extends IntegerInput implements ListInput<Integer,I
 	public boolean isValid(Integer item) {
 		return values.contains(item);
 	}
+	@Override
+	public Integer getItemByTag(String tag) {
+		return Integer.parseInt(tag);
+	}
+	@Override
+	public Integer getValueByTag(String tag) {
+		return Integer.parseInt(tag);
+	}
 
+	public void setInteger(int i) {
+		try {
+			setValue(i);
+		} catch (TypeException e) {
+			throw new ConsistencyError("Impossible type error", e);
+		}
+	}
+	@Override
+	public Integer convert(Object v) throws TypeException {
+		if( v == null ) {
+			return null;
+		}
+		if( v instanceof Integer) {
+			return (Integer) v;
+		}
+		if( v instanceof Number) {
+			Integer.valueOf(((Number)v).intValue());
+		}
+		if( v instanceof String) {
+			try {
+				return Integer.parseInt((String)v);
+			}catch(NumberFormatException nfe) {
+				throw new TypeException(nfe);
+			}
+		}
+		throw new TypeException(v.getClass());
+	}
+	public NumberFormat getNumberFormat() {
+		return nf;
+	}
+	public void setNumberFormat(NumberFormat nf) {
+		this.nf = nf;
+	}
 }

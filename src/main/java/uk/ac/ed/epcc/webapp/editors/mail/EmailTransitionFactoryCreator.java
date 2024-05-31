@@ -15,9 +15,8 @@ package uk.ac.ed.epcc.webapp.editors.mail;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 
 /** A {@link TransitionFactoryCreator} that creates an
  * {@link EmailTransitionProvider} from the tag of the {@link MessageHandlerFactory}.
@@ -48,7 +47,7 @@ public class EmailTransitionFactoryCreator extends AbstractContexed implements T
 				fac = conn.makeObjectWithDefault(MessageHandlerFactory.class,null,tag);
 			}
 			if( fac == null ){
-				conn.getService(LoggerService.class).getLogger(getClass()).error("Cannot find MessageHandler with tag "+tag);
+				Logger.getLogger(conn,getClass()).error("Cannot find MessageHandler with tag "+tag);
 				return null;
 			}
 		}

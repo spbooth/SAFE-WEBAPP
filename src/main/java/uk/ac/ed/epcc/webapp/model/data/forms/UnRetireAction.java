@@ -24,7 +24,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.UnRetirable;
 
@@ -57,11 +57,11 @@ import uk.ac.ed.epcc.webapp.model.data.UnRetirable;
 			
 			if (dat.canRestore()) {
 				try {
-					dat.getContext().getService(LoggerService.class).getLogger(getClass()).info("Un-Retiring object "+dat.getIdentifier());
+					Logger.getLogger(dat.getContext(),getClass()).info("Un-Retiring object "+dat.getIdentifier());
 					dat.restore();
 					return new MessageResult("object_restored",type_name);
 				} catch (Exception e) {
-					dat.getContext().error(e, "error restoring object");
+					Logger.getLogger(getClass()).error("error restoring object",e);
 					throw new ActionException("Error retiring object");
 				}
 			}else{

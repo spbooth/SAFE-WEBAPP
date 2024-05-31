@@ -19,7 +19,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 /**
- * extended version of Input that supports parsing a String represenatation of
+ * extended version of Input that supports parsing a String representation of
  * the input
  * 
  * @author spb
@@ -32,10 +32,11 @@ public interface ParseInput<T> extends Input<T> {
 	 * This may apply tighter validation constraints than the {@link #convert(Object)}
 	 * method applied to a String
 	 * 
-	 * This must be compatible with the {@link #getString(Object)} method.
+	 * This must be compatible with the {@link #getString(Object)} method but may be able to parse 
+	 * other representations as well.
 	 * 
 	 * @param v
-	 * @return
+	 * @return  parsed value.
 	 * @throws ParseException
 	 */
 	

@@ -49,10 +49,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Base64;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.AppContextCleanup;
-import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.Indexed;
+import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
@@ -167,7 +164,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * 
  */
 
-public final class Repository implements AppContextCleanup{
+public final class Repository extends AbstractContexed implements AppContextCleanup {
 	/** config property prefix to mark that text fields should truncate 
 	 *  to the size of the field
 	 */
@@ -212,7 +209,7 @@ public final class Repository implements AppContextCleanup{
 
 	public static final String CACHE_FEATURE_PREFIX = "cache.";
 
-	private static final int DEFAULT_RESOLUTION = 1000;
+	public static final int DEFAULT_RESOLUTION = 1000;
 
 	public static final Feature REQUIRE_ID_KEY = new Feature("require.id_key", true, "Require all tables to have an integer primary key");
 	// This seems to serialise in the database affecting performance.
@@ -444,6 +441,13 @@ public final class Repository implements AppContextCleanup{
         }
         public boolean isReference(){
         	return producer != null || references != null;
+        }
+        /** Is this a reference to the hosting table.
+         * 
+         * @return
+         */
+        public boolean isSelfReference() {
+        	return references != null && ( references.equals(getTag()) || references.equals(tagToTable(getContext(),getTag())));
         }
         /** method to dump the field value to a canonical text
          * representation.
@@ -1054,9 +1058,14 @@ public final class Repository implements AppContextCleanup{
 				return def;
 			}
 			try {
-				return t.find(val);
+				F v = t.find(val);
+				if( v == null) {
+					// Might be non-null but invalid e.g. empty string
+					return def;
+				}
+				return v;
 			} catch (Exception e) {
-				getContext().error(e,"Error converting via TypeProducer");
+				getLogger().error("Error converting via TypeProducer",e);
 				return def;
 			}
 		}
@@ -1075,6 +1084,26 @@ public final class Repository implements AppContextCleanup{
 			return get(name);
 		}
 
+		/** Get a property using a {@link TypeProducer} registered with or discovered
+		 * by the {@link Repository}.
+		 * If the {@link TypeProducer} is already in-scope use {@link #getProperty(TypeProducer)} as it will
+		 * have better type safety. However this method can be used instead of explicitly constructing 
+		 * a {@link TypeProducer} as the producer will be cached within the {@link Repository}.
+		 * 
+		 * @param name
+		 * @return
+		 */
+		public final Object getProducedProperty(String name) {
+			FieldInfo info = getInfo(name);
+			if( info == null ) {
+				return null; // optional field?
+			}
+			TypeProducer prod = info.getTypeProducer();
+			if( prod == null ) {
+				throw new ConsistencyError("Expecting TypeProducer for "+getTag()+"."+name);
+			}
+			return getProperty(prod);
+		}
 		/**
 		 * Returns the value associated with this database column name Unlike
 		 * getProperty the returned value should never be null to additional error
@@ -1128,7 +1157,7 @@ public final class Repository implements AppContextCleanup{
 				try {
 					s.write(dat);
 				} catch (Exception e) {
-					getContext().error(e, "error converting StreamData to string");
+					getLogger().error("error converting StreamData to string", e);
 					return null;
 				}
 				return dat.toString();
@@ -1628,14 +1657,14 @@ public final class Repository implements AppContextCleanup{
 		synchronized private boolean update() throws ConsistencyError, DataFault {
 			int pattern_count=1;
 
-			if( READ_ONLY_FEATURE.isEnabled(ctx)|| sql.isReadOnly()){
+			if( READ_ONLY_FEATURE.isEnabled(getContext())|| sql.isReadOnly()){
 				return false;
 			}
 			if (!isDirty()) {
 				return false;
 			}
 			
-			TimerService time = ctx.getService(TimerService.class);
+			TimerService time = getContext().getService(TimerService.class);
 			if( time != null ){
 				time.startTimer(getTag()+"-update");
 			}
@@ -1951,7 +1980,7 @@ public final class Repository implements AppContextCleanup{
 			return sb.toString();
 		}
 	}
-	final private AppContext ctx;
+	
 	final private SQLContext sql;
 
 	/**This is the tag used to find this repository.
@@ -2036,13 +2065,12 @@ public final class Repository implements AppContextCleanup{
 	 *            
 	 */
 	protected Repository(AppContext c, String tag) throws SQLException {
-		super();
-		ctx = c;
-		db_tag = ctx.getInitParameter("db-tag."+tag,null);
-		sql = ctx.getService(DatabaseService.class).getSQLContext(db_tag);
+		super(c);
+		db_tag = c.getInitParameter("db-tag."+tag,null);
+		sql = c.getService(DatabaseService.class).getSQLContext(db_tag);
 		tag_name=TableToTag(c, tag);
 		param_name=c.getInitParameter( CONFIG_TAG_PREFIX+tag,tag);
-		table_name = tagToTable(ctx,tag);
+		table_name = tagToTable(c,tag);
 		// Setting this allows multiple joins to the same table by
 		// having more than one tag for the same table with different aliases
 		alias_name = c.getInitParameter("table_alias."+tag, table_name);
@@ -2166,7 +2194,7 @@ public final class Repository implements AppContextCleanup{
     	Class<? extends IndexedProducer> clazz = getContext().getPropertyClass(IndexedProducer.class, null, getTag());	
     	if( clazz != null ){
     		// use lazy creation constructor
-    		producer = new IndexedTypeProducer(getUniqueIdName(),ctx,clazz,getTag());		
+    		producer = new IndexedTypeProducer(getUniqueIdName(),getContext(),clazz,getTag());		
     	}
     	return producer;
     }
@@ -2288,14 +2316,14 @@ public final class Repository implements AppContextCleanup{
 		}
 		if ( o instanceof Date) {
 			// assume unix date in seconds
-			return new Long(((Date) o).getTime()
+			return Long.valueOf(((Date) o).getTime()
 					/ getResolution());
 		}
 		if( o instanceof Indexed ){
-			return new Long(((Indexed)o).getID());
+			return Long.valueOf(((Indexed)o).getID());
 		}
 		if( o instanceof String){
-			return new Double((String)o );
+			return Double.valueOf((String)o );
 		}
 		return (Number) o;
 	}
@@ -2432,14 +2460,7 @@ public final class Repository implements AppContextCleanup{
 			}
 		}
 	}
-	/**
-	 * get the AppContext associated with this Repository.
-	 * 
-	 * @return the AppContext
-	 */
-	public AppContext getContext() {
-		return ctx;
-	}
+	
 
 	/** return the Record cache or null
 	 * Even if caching is enabled this may still return null under 
@@ -2706,7 +2727,7 @@ public final class Repository implements AppContextCleanup{
 	 * @param key field name
 	 * @return {@link FieldValue}
 	 */
-	public <X extends DataObject> FieldValue<Date,X> getDateExpression(String key) {
+	public <X extends DataObject> FieldSQLExpression<Date,X> getDateExpression(String key) {
 		
 		FieldInfo info = getInfo(key);
 		if( info == null ){
@@ -2757,7 +2778,7 @@ public final class Repository implements AppContextCleanup{
 		if( info == null || ! info.isNumeric() ){
 			throw new ConsistencyError("Invalid reference/numeric field "+getTag()+"."+key);
 		}
-		IndexedTypeProducer producer = new IndexedTypeProducer(ctx, key, prod);
+		IndexedTypeProducer producer = new IndexedTypeProducer(getContext(), key, prod);
 		TypeProducer typeProducer = info.getTypeProducer();
 		if( info.isReference() && ! typeProducer.equals(producer)){
 			throw new ConsistencyError("Incompatible producer specified for field "+getTag()+"."+key+" "+typeProducer.toString()+"!="+producer.toString());
@@ -2776,10 +2797,11 @@ public final class Repository implements AppContextCleanup{
 	 * @throws DataFault
 	 */
 	protected int insert(Record r) throws DataFault {
-			if( READ_ONLY_FEATURE.isEnabled(ctx) || sql.isReadOnly()){
+			AppContext c = getContext();
+			if( READ_ONLY_FEATURE.isEnabled(c) || sql.isReadOnly()){
 				return -1;
 			}
-			TimerService time = ctx.getService(TimerService.class);
+			TimerService time = c.getService(TimerService.class);
 			if( time != null ){
 				time.startTimer(getTag()+"-insert");
 			}
@@ -2816,7 +2838,7 @@ public final class Repository implements AppContextCleanup{
 			}
 			query.append(query_values.toString());
 			query.append(')');
-			if( ! atleastone && AT_LEAST_ONE.isEnabled(ctx)){
+			if( ! atleastone && AT_LEAST_ONE.isEnabled(getContext())){
 				throw new DataFault("Insert with no values");
 			}
 			
@@ -2958,7 +2980,7 @@ public final class Repository implements AppContextCleanup{
 				if (value != null) {
 					if (info.isData()) {
 						if (value instanceof Blob) {
-							value = new BlobStreamData(ctx, (Blob) value);
+							value = new BlobStreamData(getContext(), (Blob) value);
 						}else if( value instanceof byte[]) {
 							
 							value = new ByteArrayStreamData((byte[]) value);
@@ -3008,7 +3030,7 @@ public final class Repository implements AppContextCleanup{
 			Connection c = sql.getConnection();
 			try(Statement stmt=c.createStatement(); ResultSet rs = stmt.executeQuery(sb.toString())) {
 				setMetaData(rs);
-				setReferences(ctx,c);
+				setReferences(getContext(),c);
 				if(CHECK_INDEX.isEnabled(getContext())) {
 					setIndexes();
 				}
@@ -3168,7 +3190,7 @@ public final class Repository implements AppContextCleanup{
 	 * 
 	 */
 	public String dbFieldtoTag(String name){
-		return ctx.getInitParameter("rename."+table_name+"."+name, name);
+		return getContext().getInitParameter("rename."+table_name+"."+name, name);
 	}
 	
 	/** Map a tag name to the actual database table.
@@ -3371,7 +3393,7 @@ public final class Repository implements AppContextCleanup{
 				r = new Repository(c, tag);
 				c.setAttribute(key, r);
 			}catch(Exception e){
-				c.error(e,"Error making repository");
+				Logger.getLogger(Repository.class).error("Error making repository",e);
 				return null;
 			}
 		}
@@ -3444,6 +3466,9 @@ public final class Repository implements AppContextCleanup{
 		if (getClass() != obj.getClass())
 			return false;
 		Repository other = (Repository) obj;
+		if( other.conn != conn) {
+			return false;
+		}
 		if (tag_name == null) {
 			if (other.tag_name != null)
 				return false;
@@ -3477,7 +3502,7 @@ public final class Repository implements AppContextCleanup{
 				find_statement.close();
 			}
 		} catch (SQLException e) {
-			ctx.getService(DatabaseService.class).logError("Error closing find_Statement",e);
+			getContext().getService(DatabaseService.class).logError("Error closing find_Statement",e);
 		}
 		find_statement=null;
 	}
@@ -3490,13 +3515,18 @@ public final class Repository implements AppContextCleanup{
     	case(Types.DATE): return "Date";
     	case(Types.TIME): return "Time";
     	case(Types.FLOAT): return "Float";
+    	case(Types.REAL): return "Real";
     	case(Types.DOUBLE): return "Double";
+    	case(Types.NUMERIC): return "Numeric";
+    	case(Types.DECIMAL): return "Decimal";
     	case(Types.CHAR): return "Char";
     	case(Types.VARCHAR): return "Varchar";
     	case(Types.LONGVARCHAR): return "LongVarChar";
     	case(Types.BLOB): return "Blob";
-    	case(Types.VARBINARY): return "VarBianry";
+    	case(Types.VARBINARY): return "VarBinary";
     	case(Types.LONGVARBINARY): return "LongVarBinary";
+    	case(Types.TINYINT): return "TinyInt";
+    	case(Types.BIT): return "Bit";
     	default: return "Unknown";
     	}
     }

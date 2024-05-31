@@ -13,8 +13,15 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import java.util.Set;
+
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.MaxValueValidator;
+import uk.ac.ed.epcc.webapp.validation.MinValueValidator;
+
 /** Interface for {@link Input} which come from a range.
- * 
+ *  The actual range limits should be set by adding {@link FieldValidator}s
+ *  however this interface adds support for reflecting this as html validation markup
  * Normally the {@link Input#convert(Object)} method should
  * be able to parse string values for setting min/max values.
  * 
@@ -22,20 +29,9 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * @param <T> type of input
  *
  */
-public interface BoundedInput<T> extends HTML5Input, Input<T> {
-	/** Minimum valid  value.
-	 * null value implies no minimum.
-	 * 
-	 * @return T
-	 */
-	public abstract T getMin();
-
-	/** Maximum  valid value
-	 * null value implies no maximum
-	 * 
-	 * @return T
-	 */
-	public abstract T getMax();
+public interface BoundedInput<T extends Comparable<T>> extends HTML5Input, MinMaxInput<T> {
+	
+	
 	
 	/** format step/range values as used by the input into compatible to the way they are  
 	 * presented. for example a percent input may use 0.0 and 1.0 but present as 0, 100
@@ -45,16 +41,5 @@ public interface BoundedInput<T> extends HTML5Input, Input<T> {
 	 * @return
 	 */
 	public abstract String formatRange(T n);
-	/** Set the minimum value
-	 * 
-	 * @param val
-	 * @return previous limit
-	 */
-	public abstract T setMin(T val);
-	/** set the maximum value
-	 * 
-	 * @param val
-	 * @return previous limit
-	 */
-	public abstract T setMax(T val);
+	
 }

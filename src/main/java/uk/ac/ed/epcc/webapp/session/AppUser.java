@@ -284,7 +284,7 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 			
 				fac.update(this);
 			} catch (Exception e) {
-				conn.error(e, "Error updating PersonHistory");
+				getLogger().error("Error updating PersonHistory", e);
 				return;
 			}
 		}
@@ -298,7 +298,7 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 			
 				fac.terminate(this);
 			} catch (Exception e) {
-				conn.error(e, "Error terminating PersonHistory");
+				getLogger().error("Error terminating PersonHistory", e);
 				return;
 			}
 		}

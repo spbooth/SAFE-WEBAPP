@@ -76,6 +76,12 @@ body > div.block > h1:first-child, body > div.block > h2:first-child {
 	text-align: center;
 	
 }
+/** Default link visited colour is too close to background
+ */
+body > div.block > h1:first-child > a:visited, body > div.block > h2:first-child > a:visited{
+	color: 	var(--th-bg-color);
+}
+
 /* we use three levels of header as standard 
  * h1 or h2 is the top level header in a block
  * h3 is a secondary header or a header in a div.bar
@@ -158,7 +164,10 @@ div.action_buttons {
 .input_button{
 	border-radius: 8px;
 }
-
+:disabled, .disabled, .input_button:disabled, .input_button.disabled{
+	color: white;
+	background-color: grey;
+}
 table.navbar tr td a {
 	border-radius: 8px;
 }

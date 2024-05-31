@@ -22,7 +22,7 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory;
  * @author Stephen Booth
  *
  */
-public abstract class CodeAuthComposite<AU extends AppUser,T> extends FormAuthComposite<AU> {
+public abstract class CodeAuthComposite<AU extends AppUser,F extends FormAuthComposite, T> extends FormAuthComposite<AU,F> {
 
 	
 	/** form field for autentication code in augmented forms.
@@ -34,8 +34,8 @@ public abstract class CodeAuthComposite<AU extends AppUser,T> extends FormAuthCo
 	/**
 	 * @param fac
 	 */
-	public CodeAuthComposite(AppUserFactory<AU> fac) {
-		super(fac);
+	public CodeAuthComposite(AppUserFactory<AU> fac,String tag) {
+		super(fac,tag);
 	}
 
 	/* (non-Javadoc)
@@ -50,7 +50,7 @@ public abstract class CodeAuthComposite<AU extends AppUser,T> extends FormAuthCo
 	
 	public abstract Input<T> getInput();
 
-	public abstract boolean verify(AU target, T value);
+	public abstract boolean verify(AU target, T value, StringBuilder notes);
 	
 	
 }

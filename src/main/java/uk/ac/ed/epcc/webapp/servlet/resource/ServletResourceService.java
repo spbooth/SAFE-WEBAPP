@@ -23,6 +23,8 @@ import java.net.URL;
 import javax.servlet.ServletContext;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.resource.DefaultResourceService;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
 /** ResourceServlet that can also get resources from the {@link ServletContext}
@@ -55,7 +57,7 @@ public class ServletResourceService implements ResourceService{
 				}
 			}
 		}catch(Exception e){
-			getContext().error(e,"Error in ServletContext.getResource");
+			getLogger().error("Error in ServletContext.getResource",e);
 		}
 		//log.debug("revert to super.getResource");
 		return nested.getResource(name);
@@ -80,7 +82,7 @@ public class ServletResourceService implements ResourceService{
 				}
 			}
 		}catch(Exception e){
-			getContext().error(e,"Error in ServletContext.getResource");
+			getLogger().error("Error in ServletContext.getResource",e);
 		}
 		//log.debug("revert to super.getResourceAsStream");
 		return nested.getResourceAsStream(name);
@@ -100,5 +102,7 @@ public class ServletResourceService implements ResourceService{
 	public Class<? super ResourceService> getType() {
 		return ResourceService.class;
 	}
-
+	private Logger getLogger() {
+		return getContext().getService(LoggerService.class).getLogger(getClass());
+	}
 }

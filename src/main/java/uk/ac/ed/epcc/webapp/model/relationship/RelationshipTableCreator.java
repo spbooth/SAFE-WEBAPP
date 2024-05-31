@@ -84,7 +84,7 @@ public class RelationshipTableCreator extends AbstractContexed implements FormCr
 			    	
 				return new TableListResult();
 			}catch(Exception e){
-				conn.error(e,"Error creating table");
+				getLogger().error("Error creating table",e);
 				throw new ActionException("Create failed");
 			}
 		}

@@ -16,61 +16,42 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.email.inputs;
 
-import uk.ac.ed.epcc.webapp.email.Emailer;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
 /**
- * test input that must be a valid email address
+ * text input that must be a valid email address
  * 
  * @author spb
  * 
  */
 
 
-public class EmailInput extends TextInput implements HTML5Input , FormatHintInput{
+public class EmailInput extends TextInput {
 
+	private static final int DEFAULT_BOX_WIDTH = 32;
 	/**
 	 * 
 	 */
 	public static final int MAX_EMAIL_LENGTH = 254;
+	/**
+	 * property to set the email input box width
+	 * 
+	 */
+	public static final String EMAIL_MAXWIDTH_PROP = "email.maxwidth";
 	public EmailInput(){
 		super();
-		setBoxWidth(32); // 64 is too long for EmailChangeRequest page
-		setMaxResultLength(MAX_EMAIL_LENGTH);
+		setBoxWidth(DEFAULT_BOX_WIDTH); 
+		addValidator(new MaxLengthValidator(MAX_EMAIL_LENGTH));
+
 		setSingle(true);
-		addValidator(new FieldValidator<String>() {
-			
-			@Override
-			public void validate(String email) throws FieldException {
-				if( email == null || email.trim().length()==0){
-					// must be optional
-					return;
-				}
-				if (!Emailer.checkAddress(getString())) {
-					throw new ValidateException("Invalid email address");
-				}
-				
-			}
-		});
+		addValidator(new EmailFieldValidator());
+	}
+	public static int defaultBoxWidth(AppContext conn) {
+		return conn.getIntegerParameter(EMAIL_MAXWIDTH_PROP, DEFAULT_BOX_WIDTH);
 	}
 	
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
-	 */
-	public String getType() {
-		return "email";
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput#getFormatHint()
-	 */
-	@Override
-	public String getFormatHint() {
-		return "name@example.com";
-	}
+	
+	
 }

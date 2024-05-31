@@ -27,6 +27,8 @@ import javax.servlet.ServletException;
 import org.junit.Before;
 
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
+import uk.ac.ed.epcc.webapp.forms.Field;
+import uk.ac.ed.epcc.webapp.forms.SetParamVisitor;
 import uk.ac.ed.epcc.webapp.forms.SimpleFormTextGenerator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.BaseHTMLForm;
@@ -210,7 +212,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		// Setup the transition for next operation
 		// we don't call resetRequest as
 		Map<String,Object> multi_stage = (Map<String, Object>) req.getAttribute(BaseHTMLForm.FORM_STATE_ATTR);
-		resetRequest();
+		
 		setTransition(fac, key, target);
 		if( multi_stage != null) {
 			// copy over the current form state 
@@ -251,12 +253,31 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * normalisation XLST transform to remove time dependent 
 	 * output and compared with a file of expected output.
 	 * 
+	 * Request parameters are pre-set to the default values in the form to 
+	 * simulate browser behaviour
 	 * 
 	 * @param normalize_transform
 	 * @param expected_xml
 	 * @throws Exception 
 	 */
 	public <K,T> void checkFormContent(String normalize_transform, String expected_xml) throws Exception{
+		checkFormContent(normalize_transform, expected_xml, true);
+	}
+	/** Generates a XML (mostly HTML) representation of the 
+	 * contents of the transition form page that can be directly 
+	 * influenced by the transform. This is then (optionally) put through a
+	 * normalisation XLST transform to remove time dependent 
+	 * output and compared with a file of expected output.
+	 * 
+	 * Optionally the request parameters are pre-set to the default parameters of 
+	 * the Form to simulate browser behaviour
+	 * 
+	 * @param normalize_transform
+	 * @param expected_xml
+	 * @param set_params
+	 * @throws Exception 
+	 */
+	public <K,T> void checkFormContent(String normalize_transform, String expected_xml,boolean set_params) throws Exception{
 		HtmlBuilder builder = new HtmlBuilder();
 		builder.setValidXML(true);
 		builder.open("transition_page");
@@ -330,6 +351,16 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 			 builder.addActionButtons(f);
 		 }
 		 builder.close();
+		 if( set_params) {
+			 // copy the form defaults into the request
+			 SetParamVisitor vis = new SetParamVisitor(req.params);
+			 for(Field ff : f) {
+				 if( ff.getValue() != null ){
+					ff.getInput().accept(vis); 
+				 }
+			 }
+			 req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
+		 }
         
 		 if( factory instanceof NavigationProvider){
 			 NavigationProvider<K, T> np = (NavigationProvider<K, T>) factory;
@@ -385,7 +416,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		   
 		    ViewTransitionFactory provider = (ViewTransitionFactory) tp;
 		    SessionService session_service = getContext().getService(SessionService.class);
-		    assertTrue( provider.canView(target,session_service));
+		    assertTrue("View permission denied", provider.canView(target,session_service));
 		    
 		    
 

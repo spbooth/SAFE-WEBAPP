@@ -91,8 +91,8 @@ public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserCo
 	/**
 	 * @param fac
 	 */
-	protected PasswordAuthComposite(AppUserFactory<T> fac) {
-		super(fac);
+	protected PasswordAuthComposite(AppUserFactory<T> fac,String tag) {
+		super(fac,tag);
 	}
 
 	/* (non-Javadoc)

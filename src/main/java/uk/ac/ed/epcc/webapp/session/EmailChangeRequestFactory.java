@@ -17,6 +17,8 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
@@ -35,10 +37,12 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
 
 
 
@@ -90,9 +94,16 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 		public void complete() throws DataException{
 			AppUser user = getUser();
 			AppUserNameFinder finder = user_fac.getRealmFinder(EmailNameFinder.EMAIL);
-			finder.setName(user, record.getStringProperty(NEW_EMAIL));
+			String old_email = finder.getCanonicalName(user);
+			String new_email = record.getStringProperty(NEW_EMAIL);
+			finder.setName(user, new_email);
 			finder.verified(user); // email address verified
 			user.commit();
+			LoggerService ls = getContext().getService(LoggerService.class);
+			Map attr = new HashMap();
+			attr.put("new_email", new_email);
+			attr.put("old_email",old_email);
+			ls.securityEvent("EmailUpdated", getContext().getService(SessionService.class), attr);
 			delete();
 		}
 		
@@ -124,12 +135,19 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 		public FormResult action(Form f) throws ActionException {
 			try {
 				
-				EmailChangeRequest req = createRequest(user,(String)f.get(EmailNameFinder.EMAIL));
+				String new_email = (String)f.get(EmailNameFinder.EMAIL);
+				EmailChangeRequest req = createRequest(user,new_email);
+				String old_email=user.getEmail();
 				Emailer em= Emailer.getFactory(getContext());
 				em.newEmailRequest(user, req);
+				LoggerService ls = getContext().getService(LoggerService.class);
+				Map attr = new HashMap();
+				attr.put("new_email", new_email);
+				attr.put("old_email",old_email);
+				ls.securityEvent("EmailChangeRequested", getContext().getService(SessionService.class), attr);
 				return new MessageResult("email_change_request_made");
 			} catch (Exception e) {
-				getContext().error(e,"Error making EmailChangeRequest");
+				getLogger().error("Error making EmailChangeRequest",e);
 				throw new ActionException("Internal Error");
 			}
 		}
@@ -154,7 +172,7 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 				em.newEmailRequest(user, req);
 				return new MessageResult("email_verify_request_made",user.getEmail());
 			} catch (Exception e) {
-				getContext().error(e,"Error making EmailChangeRequest");
+				getLogger().error("Error making EmailChangeRequest",e);
 				throw new ActionException("Internal Error");
 			}
 		}
@@ -170,10 +188,8 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 	    	// use email field so we can use the normal field input
 		    // the factory class may have a special version
 	    	AppUserFactory factory = getAppUserFactory();
-			Input input = (Input) factory.getSelectors().get(EmailNameFinder.EMAIL);
-	    	if( input == null ){
-	    		input = new EmailInput();
-	    	}
+	    	EmailInput input = new EmailInput();
+	    	
 			f.addInput(EmailNameFinder.EMAIL, "New Email Address", input);
 			// Must not change to existing email unless already taken by same user.
 			Field field = f.getField(EmailNameFinder.EMAIL);

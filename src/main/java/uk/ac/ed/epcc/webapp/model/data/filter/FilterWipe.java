@@ -18,17 +18,14 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterSelect;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -85,7 +82,7 @@ public class FilterWipe<T> extends FilterSelect<T> {
 	    		list=getFilterArguments(my_filter, list);
 	    		setParams(1, sql, stmt, list);
 	    		if( DatabaseService.LOG_UPDATE.isEnabled(res.getContext())){
-	    			res.getContext().getService(LoggerService.class).getLogger(getClass()).debug("Query is "+sql);
+	    			Logger.getLogger(res.getContext(),getClass()).debug("Query is "+sql);
 	    		}
 	    		int updates = stmt.executeUpdate();
 	    		if( updates > 0) {

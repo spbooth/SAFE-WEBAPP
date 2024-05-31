@@ -183,7 +183,7 @@ public class TwoFactorHandler<A extends AppUser> {
   				sess.setAuthenticationTime(time.getCurrentTime());
   			}
   			sess.setAuthenticationType(type);
-  			sess.setAttribute(AUTH_USES_2FA_ATTR, Boolean.TRUE);
+  			recordTwoFactor();
   		}
   		securityEvent("SucessfulAuthentication - asserted");
   		next_page = RequiredPageServlet.getNext(sess, next_page);
@@ -191,6 +191,13 @@ public class TwoFactorHandler<A extends AppUser> {
   	
   	
   	}
+
+    /** record 2 factor login in the session
+     * 
+     */
+	public void recordTwoFactor() {
+		sess.setAttribute(AUTH_USES_2FA_ATTR, Boolean.TRUE);
+	}
 	public FormResult completeTwoFactor(boolean success,A expected) {
 		try {
 			Logger logger = getLogger();
@@ -221,7 +228,7 @@ public class TwoFactorHandler<A extends AppUser> {
 					if( type != null ) {
 						sess.setAuthenticationType(type);
 					}
-					sess.setAttribute(AUTH_USES_2FA_ATTR, Boolean.TRUE);
+					recordTwoFactor();
 					completeAuth(user);
 					securityEvent("Sucessful2FA");
 				}else {

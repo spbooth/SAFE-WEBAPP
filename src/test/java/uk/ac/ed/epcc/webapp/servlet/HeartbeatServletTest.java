@@ -18,7 +18,6 @@ import javax.servlet.ServletException;
 import org.junit.Before;
 
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
-import uk.ac.ed.epcc.webapp.servlet.HeartbeatServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 public abstract class HeartbeatServletTest extends ServletTest {

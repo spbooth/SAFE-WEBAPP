@@ -13,51 +13,21 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-
 /** Input for URLs
+ * 
+ * All customisation is in the {@link URLValidator}
  * @author spb
  *
  */
 
-public class URLInput extends TextInput implements HTML5Input{
+public class URLInput extends TextInput {
 	
-	/**
-	 * @author Stephen Booth
-	 *
-	 */
-	public final class URLValidator implements FieldValidator<String> {
-		@Override
-		public void validate(String value) throws FieldException {
-			try {
-				URL url = new URL(value);
-			} catch (MalformedURLException e) {
-				throw new ValidateException("Bad URL", e);
-			}
-			
-		}
-	}
-
 	public URLInput(){
 		super();
 		setSingle(true);
 		setTrim(true);
-		setMaxResultLength(128);
 		addValidator(new URLValidator());
 	}
 
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
-	 */
-	@Override
-	public String getType() {
-		return "url";
-	}
 	
 }

@@ -62,7 +62,7 @@ public interface ServeDataProducer extends Contexed,Tagged{
 	
 	/** Could this be externally provided content. IF this is true then
 	 * additional restrictions may be applied when serving the content. For example
-	 * mapping certain mime types to less dangerours alternatives
+	 * mapping certain mime types to less dangerous alternatives
 	 * 
 	 * @param path
 	 * @return

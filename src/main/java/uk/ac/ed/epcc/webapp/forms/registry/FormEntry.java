@@ -21,8 +21,6 @@ package uk.ac.ed.epcc.webapp.forms.registry;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
-import uk.ac.ed.epcc.webapp.jdbc.filter.GetListFilterVisitor;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.forms.registry.SummaryContentProvider;
 
 
@@ -66,7 +64,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.registry.SummaryContentProvider;
 				cb = ((SummaryContentProvider<T>)fac).getSummaryContent(c, cb, target);
 			}
 			}catch(Exception t) {
-				c.getService(LoggerService.class).getLogger(getClass()).error("Error makings SummaryContent", t);
+				getLogger(c).error("Error makings SummaryContent", t);
 			}
 			return cb;
 		}

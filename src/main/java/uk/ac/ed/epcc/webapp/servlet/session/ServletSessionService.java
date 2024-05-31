@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.servlet.session;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -84,6 +85,7 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 	// also used to supress access to an invalidated session on logout
 	private boolean use_session=true;
 	private ServletService ss;
+	private Map<String,Object> no_session_attr=null;
 	private HttpServletRequest request;
 	private String log_name = null;
   public ServletSessionService(AppContext c){
@@ -143,6 +145,11 @@ public void setAttribute(String key, Object value) {
 	}
 	if( sess != null ){
 		sess.setAttribute(key, value);
+	}else {
+		if( no_session_attr == null) {
+			no_session_attr=new HashMap<String, Object>();
+		}
+		no_session_attr.put(key, value);
 	}
 	
 }
@@ -154,8 +161,9 @@ public void removeAttribute(String key) {
 		sess = ((DefaultServletService)ss).getSession();
 	}
 	if( sess != null ){
-		sess.removeAttribute(key);
-		
+		sess.removeAttribute(key);	
+	}else if( no_session_attr != null) {
+		no_session_attr.remove(key);
 	}
 }
 
@@ -167,6 +175,8 @@ public Object getAttribute(String key) {
 	}
 	if( sess != null ){
 		return sess.getAttribute(key);
+	}else if( no_session_attr != null) {
+		return no_session_attr.get(key);
 	}
 	return null;
 }
@@ -200,7 +210,7 @@ protected A lookupPerson() {
 					}
 				}
 			}catch(Exception e){
-				getContext().error(e, "Error updating Wtmp");
+				getLogger().error("Error updating Wtmp", e);
 				removeAttribute(WTMP_EXPIRY_DATE);
 				removeAttribute(WTMP_ID);
 			}
@@ -228,11 +238,13 @@ public void clearCurrentPerson() {
 			Integer id = getWtmpID();
 			if( id != null ){
 				Wtmp w = man.find(id);
-				w.logout();
+				if( w != null ) {
+					w.logout();
+				}
 			}
 		}
 	}catch(Exception e){
-		getContext().error(e,"Error in Wtmp logoff");
+		getLogger().error("Error in Wtmp logoff",e);
 	}finally{
 		removeAttribute(WTMP_EXPIRY_DATE);
 		removeAttribute(WTMP_ID);
@@ -268,7 +280,7 @@ public void logOut(){
 			setCookie(false, "");
 		}
 	}catch(Exception t){
-		getContext().error(t, "Error closing Wtmp");
+		getLogger().error("Error closing Wtmp", t);
 	}
 	if( ss instanceof DefaultServletService){
 		DefaultServletService defss = (DefaultServletService)ss;
@@ -276,6 +288,7 @@ public void logOut(){
 	}
 	// session is invalid may throw exception if accessed now
 	use_session=false;
+	no_session_attr=null;
 }
 public A getSuperPerson(){
 	Integer super_person_id = (Integer) getAttribute(SUPER_PERSON_ID_ATTR);
@@ -288,6 +301,7 @@ public A getSuperPerson(){
 public void setCurrentPerson(A person) {
 	
 	setCurrentPersonNoWtmp(person);
+	force_no_person=false;
 	if( use_session) {
 		try {
 			WtmpManager man = getWtmpManager();
@@ -309,7 +323,7 @@ public void setCurrentPerson(A person) {
 				}
 			}
 		} catch (DataException e) {
-			getContext().error(e,"Error setting wtmp");
+			getLogger().error("Error setting wtmp",e);
 			removeAttribute(WTMP_EXPIRY_DATE);
 			removeAttribute(WTMP_ID);
 		}
@@ -372,7 +386,7 @@ public void setCrossCookie(WtmpManager man, Wtmp w)  {
 			}
 		}
 	}catch(Exception t){
-		getContext().error(t,"Error setting cross app cookie");
+		getLogger().error("Error setting cross app cookie",t);
 	}
 }
 
@@ -466,7 +480,7 @@ protected Integer getPersonID() {
 							}
 						}
 					}catch(Exception t){
-						getContext().error(t,"Error reading cross app cookie");
+						getLogger().error("Error reading cross app cookie",t);
 					}
 				}
 			}finally {
@@ -479,7 +493,7 @@ protected Integer getPersonID() {
 		// non-valid best to slow down unregistered users.
 		clearCurrentPerson();
 	}catch(Exception t){
-		getContext().error(t, "Error populating session");
+		getLogger().error("Error populating session", t);
 	}
 	return 0;
 }

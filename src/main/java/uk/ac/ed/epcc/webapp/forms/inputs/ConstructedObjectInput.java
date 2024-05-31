@@ -23,9 +23,9 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Tagged;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** Input to select a objects dynamically constructed from the configuration service 
  * This defaults to the set of <b>class.</b> definitions {@link AppContext#makeObject(Class, String)}
@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  */
 
 
-public class ConstructedObjectInput<T> extends AbstractInput<String> implements ListInput<String,T>{
+public class ConstructedObjectInput<T> extends SimpleListInput<T>{
     private final AppContext c;
     private Class<T> clazz;
     private Map<String,Class> reg;
@@ -74,8 +74,8 @@ public class ConstructedObjectInput<T> extends AbstractInput<String> implements 
     	
     }
 	@Override
-	public T getItembyValue(String value) {
-		if( value == null ){
+	public T getItemByTag(String value) {
+		if( value == null  || value.isEmpty()){
 			return null;
 		}
 		return c.makeObject(clazz, value); 
@@ -108,57 +108,6 @@ public class ConstructedObjectInput<T> extends AbstractInput<String> implements 
 			}
 		}
 		return null;
-	}
-
-	@Override
-	public String getTagByValue(String value) {
-		return value;
-	}
-
-	@Override
-	public String getText(T item) {
-		String tag = getTagByItem(item);
-		return tag;
-	}
-
-	@Override
-	public String convert(Object v) throws TypeException  {
-		if( v == null) {
-			return null;
-		}
-		if( v instanceof String ){
-			return (String) v;
-		}
-		throw new TypeException(v.getClass());
-	}
-
-	
-
-
-	
-
-
-	@Override
-	public T getItem() {
-		String value = getValue();
-		if( value == null || value.isEmpty()) {
-			return null;
-		}
-		return c.makeObject(clazz, value);
-	}
-
-	@Override
-	public void setItem(T item) {
-		try {
-			setValue(getTagByItem(item));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
-		
-	}
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
 	}
 
 	/* (non-Javadoc)

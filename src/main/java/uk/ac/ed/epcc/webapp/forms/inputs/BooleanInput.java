@@ -17,7 +17,6 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 
 
@@ -39,6 +38,9 @@ public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<B
 	@Override
 	public Boolean convert(Object v) {
 		if( v instanceof String ){
+			if( "Y".equals(v)) {
+				return Boolean.TRUE;
+			}
 		    return Boolean.valueOf((String) v);
 		}
 		if( v instanceof Boolean){
@@ -59,11 +61,6 @@ public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<B
 		return value.toString();
 	}
 
-
-	@Override
-	public final <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitBinaryInput(this);
-	}
 
 	@Override
 	public boolean isChecked() {

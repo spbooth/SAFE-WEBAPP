@@ -21,7 +21,6 @@ import javax.swing.JFrame;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 
 
@@ -41,7 +40,7 @@ public class FormResultActionListener implements ActionListener {
 		try {
 			handler.process(result);
 		} catch (Exception e) {
-			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+			Logger log = Logger.getLogger(conn,getClass());
 			log.error("Error processing form result",e);
 		}
 

@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
-public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransition<T> implements GatedTransition<T>{
+public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransition<T> implements TimeLocked<T>{
 	public class SplitAction extends FormAction{
 		
 		private final boolean nav_first;
@@ -181,7 +181,7 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 	 * @see uk.ac.ed.epcc.webapp.model.period.GatedTransition#allow(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.Object)
 	 */
 	@Override
-	public boolean allow(SessionService<?> serv, T target) {
+	public boolean allowTimeBounds(SessionService<?> serv, T target) {
 		Date limit = fac.getEditLimit(serv);
 		if( limit != null ) {
 			return limit.before(target.getEnd());

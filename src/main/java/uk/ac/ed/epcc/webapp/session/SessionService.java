@@ -360,7 +360,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	default public <T extends DataObject> FilterResult<A> getPeopleInRelationship(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException, DataFault{
 		return getLoginFactory().getResult(getPersonInRelationshipRoleFilter(fac, role, target));
 	}
-	/** Helpder method to test if any people exist with a relationship to a target
+	/** Helper method to test if any people exist with a relationship to a target
 	 * 
 	 * @param <T>
 	 * @param fac

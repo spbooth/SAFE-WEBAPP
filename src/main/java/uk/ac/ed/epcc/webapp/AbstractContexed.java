@@ -14,7 +14,6 @@
 package uk.ac.ed.epcc.webapp;
 
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** A simple implementation of {@link Contexed}
  * 
@@ -46,10 +45,7 @@ public abstract class AbstractContexed implements Contexed {
 	
 	public final Logger getLogger() {
 		if( log == null) {
-		  LoggerService service = getContext().getService(LoggerService.class);
-		  if( service != null) {
-			  log =  service.getLogger(getClass());
-		  }
+		  log = Logger.getLogger(getContext(), getClass());
 		}
 		return log;
 	}

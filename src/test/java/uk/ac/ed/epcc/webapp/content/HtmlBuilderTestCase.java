@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder.Heading;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder.Panel;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder.Text;
+import uk.ac.ed.epcc.webapp.editors.mail.DirectMessageLinker;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 

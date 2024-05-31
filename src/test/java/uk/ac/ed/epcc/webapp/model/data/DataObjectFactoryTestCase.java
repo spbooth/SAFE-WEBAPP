@@ -224,12 +224,12 @@ ListInputInterfaceTest
 			   O o =  it.next();
 			   //System.out.println(o.getIdentifier());
 			   Form form = new HTMLForm(f.getContext());
-			   ff.buildForm(form);
-			   Map h = o.getMap();
-			   form.setContents(h);
+			   Map<String, Object> h = o.getMap();
+			   ff.buildForm(form,null,h);
 			   form.validate();
 			   Map m = form.getContents();
 
+			
 			   for(Iterator it2 = m.keySet().iterator();it2.hasNext();){
 				   String key = (String) it2.next();
 				   Input i = form.getInput(key);

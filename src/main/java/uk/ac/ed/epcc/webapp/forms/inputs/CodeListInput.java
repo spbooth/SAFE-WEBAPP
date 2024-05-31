@@ -16,35 +16,49 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 /** Abstract class to implement ListInput where we want
  * the input to generate a String code for each item.
  * 
+ * The values and the list tags are always the same and can be derived from the item so
+ * internally this holds state as an item rather than a value.
+ * 
  * @author spb
  *
  * @param <O> type of item
+ * @see SimpleListInput
  */
 public abstract class CodeListInput<O> extends BaseInput<String> implements ListInput<String,O>, NameInput<O> {
 
 	private O item=null;
 	
-	
-
-	
 	@Override
-	public String getTagByValue(String value) {
+	public final String getTagByValue(String value) {
 		return value;
 	}
-
-	
 	@Override
-	public String convert(Object v)  {
+	public final String getValueByTag(String value) {
+		return value;
+	}
+	@Override
+	public final String getValueByItem(O item) throws TypeException {
+		return getTagByItem(item);
+	}
+	@Override
+	public final O getItembyValue(String value) {
+		return getItemByTag(value);
+	}
+	@Override
+	public String convert(Object v) throws TypeException  {
 		if( v == null ){
 			return null;
 		}
-		return v.toString();
+		if( v instanceof String){
+			return (String)v;
+		}
+		throw new TypeException(v.getClass());
 	}
 
 	
@@ -58,12 +72,12 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 	}
 
 	@Override
-	public String getString(String value) {
+	public final String getString(String value) {
 		return value;
 	}
 
 	@Override
-	public String getValue() {
+	public final String getValue() {
 		if( item == null) {
 			return null;
 		}
@@ -71,27 +85,29 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 	}
 
 	@Override
-	public String setValue(String v) {
+	public final String setValue(String v) {
+
 		String previous = getTagByItem(item);
 		item = getItembyValue(v);
 		return previous;
+
 	}
 
 
 
 	@Override
-	public O getItem() {
+	public final O getItem() {
 		return item;
 	}
 
 	@Override
-	public void setItem(O item) {
+	public final void setItem(O item) {
 		this.item=item;		
 	}
 
 
 	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
+	public final <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
 	}
 	@Override
@@ -99,4 +115,6 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 		item=null;
 	}
 
+
+	
 }

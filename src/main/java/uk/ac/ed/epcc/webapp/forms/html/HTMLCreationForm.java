@@ -28,7 +28,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+
 //import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataException;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
@@ -61,7 +62,7 @@ public class HTMLCreationForm {
 		try {
 			creator.buildCreationForm(form);
 		} catch (Exception e) {
-			creator.getContext().error(e, "Error building Form");
+			Logger.getLogger(HTMLCreationForm.class).error("Error building Form", e);
 		}
 		use_multipart = form.containsInput(FileInput.class);
 		return form;
@@ -86,12 +87,15 @@ public class HTMLCreationForm {
         }catch(Exception e){
         	AppContext c = creator.getContext();
         
-        	c.error(e,"Error creating form");
+        	getLogger(c).error("Error creating form",e);
         	
         	return "An error occured creating a form";
         }
 	}
 
+	Logger getLogger(AppContext c) {
+		return Logger.getLogger(c,getClass());
+	}
 	/**
 	 * method to parse and validate the post params
 	 * 
@@ -126,7 +130,7 @@ public class HTMLCreationForm {
     	}
 		boolean ok = f.parsePost(req);
 		if (!ok) {
-			conn.getService(LoggerService.class).getLogger(getClass()).debug("form failed to parse");
+			getLogger(conn).debug("form failed to parse");
 			return null;
 		}
 		ConfirmMessage confirm_action = f.mustConfirm(params);
@@ -139,7 +143,7 @@ public class HTMLCreationForm {
 		}
 		FormResult o =  f.doAction(params);
 		if (o == null) {
-			conn.error(null,"error in create doAction");
+			Logger.getLogger(getClass()).error("error in create doAction",null);
 		}
 
 		return o;

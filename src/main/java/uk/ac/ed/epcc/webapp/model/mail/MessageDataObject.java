@@ -40,6 +40,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 /** Handy common base class for DataObjects that hold MailMessages
  * This class would normally be used when the {@link MessageHandler} 
  * needs to link to the message by reference. 
@@ -79,12 +80,13 @@ public abstract class MessageDataObject extends DataObject implements
 	 */
 	public final MimeMessage getMessage() throws DataFault, MessagingException {
 		if (m == null) {
-			Session session = Session.getInstance(getContext().getProperties(),
-					null);
+			
 			StreamData sd = record.getStreamDataProperty(MESSAGE);
 			if (sd == null) {
 				return null;
 			}
+			Session session = Session.getInstance(getContext().getProperties(),
+					null);
 			m = new MimeMessage(session, sd.getInputStream());
 			auto_save=true; // These we can save
 		}
@@ -107,7 +109,7 @@ public abstract class MessageDataObject extends DataObject implements
     			   }
     			   this.hash = (int) hash;
     		   } catch (Exception e) {
-    			   getContext().error(e,"Error making message hash");
+    			   getLogger().error("Error making message hash",e);
     			   hash=-1;
     		   }
     	   }
@@ -127,7 +129,7 @@ public abstract class MessageDataObject extends DataObject implements
 				return s;
 			}
 		} catch (Exception e) {
-			getContext().error(e, "Error getting subject");
+			getLogger().error("Error getting subject", e);
 		}
 		return "";
 	}
@@ -152,7 +154,7 @@ public abstract class MessageDataObject extends DataObject implements
 			}
 			return sb.toString();
 		} catch (Exception e) {
-			getContext().error(e, "Error getting recipients");
+			getLogger().error("Error getting recipients", e);
 		}
 		return "";
 	}
@@ -165,7 +167,7 @@ public abstract class MessageDataObject extends DataObject implements
 		 * 
 		 */
 		hash = -1;
-		try {
+		try(TimeClosable tc = new TimeClosable(getContext(), "MessageDataObject.pre_commit")) {
 			if (m != null) {
 				//StreamData sd = new MessageStreamData(m);
 				StreamData sd = new ByteArrayStreamData();
@@ -173,14 +175,22 @@ public abstract class MessageDataObject extends DataObject implements
 				if(auto_save){
 					m.saveChanges();
 				}
-				m.writeTo(sd.getOutputStream());
+				m.writeTo(sd.getOutputStream(),ignoreList());
 				//getLogger().debug("update value to "+sd);
 				record.setProperty(MESSAGE, sd);
 				m=null; // force re-read 
 			}
 		} catch (Exception e) {
-			getContext().error(e, "Error writing mail message");
+			getLogger().error("Error writing mail message", e);
 		}
+	}
+	
+	/** HEaders to be ignored when saving message
+	 * 
+	 * @return
+	 */
+	protected String[] ignoreList() {
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -231,7 +241,7 @@ public abstract class MessageDataObject extends DataObject implements
 			}
 			DataBaseHandlerService serv = c.getService(DataBaseHandlerService.class);
 			if( serv != null ){
-				if( ! serv.tableExists(MESSAGE)) {
+				if( ! serv.tableExists(table)) {
 					return;
 				}
 			}

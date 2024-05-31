@@ -24,11 +24,8 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.Targetted;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.filter.LinkClause;
 /** common base for classes that generate results via SQL.
@@ -75,9 +72,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	
 	protected abstract void addSource(StringBuilder sb);
 	protected abstract Set<Repository> getSourceTables();
-	protected final Logger getLogger(){
-		return getContext().getService(LoggerService.class).getLogger(getClass());
-	}
+	
 	/**
 	 * accessor for cached copy of the filter for use by sub-classes
 	 * 

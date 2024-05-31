@@ -18,13 +18,9 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTest;
-import uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTestImpl;
-import uk.ac.ed.epcc.webapp.forms.ParseAbstractInputTestCase;
-import uk.ac.ed.epcc.webapp.forms.TestDataProvider;
-import uk.ac.ed.epcc.webapp.forms.TestEnum;
+import uk.ac.ed.epcc.webapp.forms.*;
 
-public class EnumIntegerInputTest extends ParseAbstractInputTestCase<Integer,EnumIntegerInput<TestEnum>> implements TestDataProvider<Integer,EnumIntegerInput<TestEnum>>,
+public class EnumIntegerInputTest extends AbstractInputTestCase<Integer,EnumIntegerInput<TestEnum>> implements TestDataProvider<Integer,EnumIntegerInput<TestEnum>>,
 ListInputInterfaceTest<Integer, TestEnum, EnumIntegerInput<TestEnum>, TestDataProvider<Integer,EnumIntegerInput<TestEnum>>>
 {
 
@@ -32,24 +28,6 @@ ListInputInterfaceTest<Integer, TestEnum, EnumIntegerInput<TestEnum>, TestDataPr
 	
 	public EnumIntegerInputTest() {
 		
-	}
-
-	@Override
-	public Set<String> getGoodParseData() {
-		Set<String> good = new HashSet<>();
-		for(Integer i : getGoodData()){
-			good.add(i.toString());
-		}
-		return good;
-	}
-
-	@Override
-	public Set<String> getBadParseData() {
-		Set<String> bad = new HashSet<>();
-		bad.add("Lion");
-		bad.add("987");
-		bad.add("1fred");
-		return bad;
 	}
 
 	@Override

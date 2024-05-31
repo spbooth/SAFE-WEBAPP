@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
@@ -241,7 +242,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 				try {
 					next=iterate();
 				} catch (DataException e) {
-					getContext().error(e, "DataFault in ResultIterator");
+					Logger.getLogger(getClass()).error("DataFault in ResultIterator", e);
 					next=null;
 				} catch (SQLException e) {
 					getContext().getService(DatabaseService.class).logError("SQLException in ResultIterator",e);

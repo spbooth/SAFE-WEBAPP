@@ -23,6 +23,8 @@ import uk.ac.ed.epcc.webapp.model.data.forms.FieldHelpProvider;
 import uk.ac.ed.epcc.webapp.model.data.forms.FormLabelProvider;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** An interface for objects that contribute fields etc. to the structure of a table and control the default form generation
  * of those fields. 
@@ -69,6 +71,10 @@ public interface TableStructureContributer<BDO extends DataObject> extends FormL
 	 * 
 	 * This method provides a class specific set of defaults but the specific form classes can
 	 * override this.
+	 * 
+	 * While this is necessary in some cases it is better to encode customisation as {@link FieldValidator}s
+	 * as these are composable. 
+	 * 
 	 * @param selectors
 	 * @return {@link Map} of modified selectors/inputs
 	 */
@@ -105,6 +111,15 @@ public interface TableStructureContributer<BDO extends DataObject> extends FormL
 	default Map<String,FieldConstraint> addFieldConstraints(Map<String,FieldConstraint> constraints){
 		return constraints;
 	}
+	/** Add any {@link FieldValidationSet}s 
+	 * Note there might be multiple {@link FieldValidator}s so existing values should be merged.
+	 * 
+	 * @param validators
+	 * @return
+	 */
+	default Map<String,FieldValidationSet> addFieldValidations(Map<String,FieldValidationSet> validators){
+		return validators;
+	}
 	/**
 	 * Extension hook to allow additional Form customisation generic to all
 	 * types of Form (create and update) For example adding a FormValidator .
@@ -134,4 +149,9 @@ public interface TableStructureContributer<BDO extends DataObject> extends FormL
 	 */
 	void postUpdate(BDO o, Form f, Map<String, Object> orig, boolean changed) throws DataException;
 
+	/** Get an additional config tag to use for fields added by this {@link TableStructureContributer}
+	 * 
+	 * @return
+	 */
+	public String getConfigTag();
 }

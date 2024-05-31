@@ -21,10 +21,11 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
-public class MergeTransition<T extends TimePeriod,K> extends AbstractDirectTransition<T> implements GatedTransition<T>{
+public class MergeTransition<T extends TimePeriod,K> extends AbstractDirectTransition<T> implements TimeLocked<T>{
 
 	protected final boolean move_up;
 	private final ViewTransitionFactory<K, T> tp;
@@ -54,7 +55,23 @@ public class MergeTransition<T extends TimePeriod,K> extends AbstractDirectTrans
 			return fac.canMerge(peer, target);
 		}
 	}
-	
+	@Override
+	public boolean allowTimeBounds(SessionService<?> serv, T target) {
+		Date limit = fac.getEditLimit(serv);
+		if( limit == null) {
+			return true;
+		}
+		if( move_up){
+			if( limit != null && target.getEnd().before(limit)) {
+				return false;
+			} 
+		}else{
+			if( limit != null && target.getStart().before(limit)) {
+				return false;
+			}
+		}
+		return true;
+	}
 	@Override
 	public FormResult doTransition(T target, AppContext c)
 			throws TransitionException {
@@ -66,7 +83,7 @@ public class MergeTransition<T extends TimePeriod,K> extends AbstractDirectTrans
 			return new ViewTransitionResult<>(tp, fac.merge(peer,target)); 
 		}
 		}catch(Exception t){
-			tp.getContext().error(t,"Error in merge");
+			Logger.getLogger(getClass()).error("Error in merge",t);
 			throw new TransitionException("Internal error");
 		}
 	}

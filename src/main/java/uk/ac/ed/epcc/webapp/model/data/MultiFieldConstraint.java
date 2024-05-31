@@ -15,10 +15,12 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
 
 
 
@@ -26,20 +28,20 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
  * @author Stephen Booth
  *
  */
-public class MultiFieldConstraint extends LinkedHashSet<FieldConstraint> implements FieldConstraint{
+public class MultiFieldConstraint<D> extends LinkedHashSet<FieldConstraint<D>> implements FieldConstraint<D>{
 	
 	/**
 	 * 
 	 */
-	public MultiFieldConstraint(FieldConstraint ...constraints) {
+	public MultiFieldConstraint(FieldConstraint<D> ...constraints) {
 		super();
-		for(FieldConstraint c : constraints) {
+		for(FieldConstraint<D> c : constraints) {
 			add(c);
 		}
 	}
 
 	@Override
-	public boolean add(FieldConstraint e) {
+	public boolean add(FieldConstraint<D> e) {
 		if( e == null) {
 			return false;
 		}
@@ -52,26 +54,12 @@ public class MultiFieldConstraint extends LinkedHashSet<FieldConstraint> impleme
 		return super.add(e);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.FieldConstraint#apply(boolean, java.lang.String, uk.ac.ed.epcc.webapp.model.data.forms.Selector, uk.ac.ed.epcc.webapp.forms.Form)
-	 */
-	@Override
-	public <I extends Input> Selector<I> apply(boolean support_multi_stage, String field, Selector<I> sel,
-			Form form, HashMap fixtures) {
-		for(FieldConstraint c: this) {
-			sel = c.apply(support_multi_stage, field, sel, form, fixtures);
-			if( sel == null ) {
-				return null;
-			}
-		}
-		return sel;
-	}
+	
 
 	@Override
-	public <I extends Input> boolean suppress(String field, Selector<I> original, Form form,
-			HashMap fixtures) {
-		for(FieldConstraint c: this) {
-			if( c.suppress( field, original, form, fixtures)) {
+	public boolean suppress(Map<String,Object> fixtures) {
+		for(FieldConstraint<D> c: this) {
+			if( c.suppress(  fixtures)) {
 				return true;
 			}
 		}
@@ -79,9 +67,43 @@ public class MultiFieldConstraint extends LinkedHashSet<FieldConstraint> impleme
 	}
 
 	@Override
-	public boolean changeOptional(String field, boolean original, Form form,HashMap fixtures) {
-		for(FieldConstraint c : this) {
-			original = c.changeOptional(field, original,form,fixtures);
+	public boolean changeOptional(boolean original, Map<String,Object> fixtures) {
+		for(FieldConstraint<D> c : this) {
+			original = c.changeOptional(original,fixtures);
+		}
+		return original;
+	}
+
+	@Override
+	public boolean requestMultiStage(Map<String, Object> fixtures) {
+		for(FieldConstraint<D> c : this) {
+			if( c.requestMultiStage(fixtures)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public <I extends Input<D>> Selector<I> changeSelector(Selector<I> original, Map<String, Object> fixtures) {
+		for(FieldConstraint<D> c : this) {
+			original = c.changeSelector(original, fixtures);
+		}
+		return original;
+	}
+
+	@Override
+	public D defaultValue(D original, Map<String, Object> fixtures) {
+		for(FieldConstraint<D> c : this) {
+			original = c.defaultValue(original, fixtures);
+		}
+		return original;
+	}
+
+	@Override
+	public FieldValidationSet<D> validationSet(FieldValidationSet<D> original, Map<String, Object> fixtures) {
+		for(FieldConstraint<D> c : this) {
+			original = c.validationSet(original, fixtures);
 		}
 		return original;
 	}

@@ -159,6 +159,7 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 		sess.setCurrentPerson(user);
 		req.path_info="1-2u5t433z3f3i2o28114j6g133e503XXX";
 		doPost();
+		checkUnchanged();
 		checkMessage("email_change_request_denied");
 		
 	
@@ -168,28 +169,26 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 	public void testCompleteNoUser() throws ConsistencyError, Exception{
 		MockTansport.clear();
 		takeBaseline();
-	
-		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
-		A user =  fac.findByEmail("fred@example.com");
-		SessionService<A> sess = ctx.getService(SessionService.class);
 		
 		req.path_info=CORRECT_TAG;
 		doPost();
-		checkForward("/login.jsp");
+		checkUnchanged();
+		checkRedirect(LoginServlet.getLoginPage(ctx));
 	
 	}
 	@Test
 	@DataBaseFixtures("email_change.xml")
 	public void testCompleteWrongUser() throws ConsistencyError, Exception{
 		MockTansport.clear();
-		takeBaseline();
+		
 	
 		//AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 	
 		SessionService<A> sess = setupPerson("bill@example.com");
-		
+		takeBaseline();  // baseline after adding user so we can check no change
 		req.path_info=CORRECT_TAG;
 		doPost();
+		checkUnchanged();
 		checkMessage("email_change_request_denied");
 		
 	

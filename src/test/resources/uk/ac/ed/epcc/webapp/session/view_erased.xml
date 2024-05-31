@@ -1,29 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><view_page>
-<Title>User details</Title>
-<top/>
-<log>
-<h1>User details</h1>
-<table class="column">
-<tr>
-<th>Name</th>
-<td>Anonymous-1</td>
-</tr>
-<tr>
-<th>Must change password</th>
-<td>true</td>
-</tr>
-<tr>
-<th>Details updated</th>
-<td>Fri May 15 14:28:50 BST 2020</td>
-</tr>
-<tr>
-<th>Next update required</th>
-<td>Sat May 15 14:28:50 BST 2021</td>
-</tr>
+<view_page><Title>User details</Title><top/><log><h1>User details</h1><table class='column'>
+<tr><th>Name</th><td>Anonymous-1</td></tr>
+<tr><th>Must change password</th><td>true</td></tr>
+<tr><th>Details updated</th><td>Fri May 03 11:39:42 BST 2024</td></tr>
+<tr><th>Next update required</th><td>Sat May 03 11:39:42 BST 2025</td></tr>
 </table>
-</log>
-<buttons>
-<active value="Anonymise" help="Remove personally identifiable information"/>
-</buttons>
-</view_page>
-
+</log><buttons><active value='Anonymise' help='Remove personally identifiable information'></active></buttons></view_page>

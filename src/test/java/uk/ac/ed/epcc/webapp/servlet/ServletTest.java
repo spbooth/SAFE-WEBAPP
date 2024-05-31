@@ -31,9 +31,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.junit.After;
 import org.junit.Before;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Indexed;
-import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
@@ -160,7 +158,7 @@ public abstract class ServletTest extends WebappTestBase{
 	public MockResponse res=null;
 	public MockServletContext serv_ctx;
 	
-	
+	public static final Feature CHECK_REDUNDENT = new Feature("tests.check_redundant_param",true,"Throw error if redundant form parameter set");
 	
 	/** setup the mock objects for a test
 	 * 
@@ -252,14 +250,24 @@ public abstract class ServletTest extends WebappTestBase{
 		assertNull("redirect not forward ",res.redirect);
 		assertEquals("Wrong redirect", url, res.forward);
 	}
-	
 	public void checkRequestAuth(String page) {
+		checkRequestAuth(page, null);
+	}
+	public void checkRequestAuth(String page,String username) {
 		HttpSession session = req.getSession(false);
 		assertNotNull(session);
 		RedirectResult result = (RedirectResult) LoginServlet.getSavedResult(ctx.getService(SessionService.class));
 		assertNotNull(result);
 		assertEquals(page, result.getURL());
-		checkForward(LoginServlet.getLoginPage(ctx));
+		String loginPage = LoginServlet.getLoginPage(ctx);
+		if( username != null ) {
+			loginPage = loginPage+"?username="+username;
+		}
+		if( DefaultServletService.REDIRECT_TO_LOGIN_FEATURE.isEnabled(ctx)) {
+			checkRedirect(loginPage);
+		}else{
+			checkForward(loginPage);
+		}
 	}
 	/** Assert form error reported with a specific error reported on one of the parameters
 	 * 
@@ -357,9 +365,23 @@ public abstract class ServletTest extends WebappTestBase{
  * @param name
  * @param value
  */
+	
 	public void addParam(String name, String value) {
+		addParam(name,value,CHECK_REDUNDENT.isEnabled(ctx));
+	}
+	public void addParam(String name, String value,boolean check_redundant) {
 		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
+		Object prev = req.params.get(name);
+		if( check_redundant && prev != null ) {
+			assertFalse("Redundant parameter set in test", value.equals(prev));
+		}
 		req.params.put(name, value);
+		req.method="POST";
+	}
+	
+	public void checkParam(String name,String value) {
+		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
+		assertEquals("Unexpected form parameter",value, req.params.get(name));
 		req.method="POST";
 	}
 	/** Add the form parameters corresponding to an Input.
@@ -404,6 +426,9 @@ public abstract class ServletTest extends WebappTestBase{
 	public void addParam(String name,Indexed i){
 		addParam(name, Integer.toString(i.getID()));
 	}
+	public void checkParam(String name,Indexed i){
+		checkParam(name, Integer.toString(i.getID()));
+	}
 	/** Set the form action. This only needs to be called when there is more than one action (submit button) specified 
 	 * 
 	 * @param action The action String specified in the {@link Form}
@@ -415,6 +440,12 @@ public abstract class ServletTest extends WebappTestBase{
 	
 	protected final void doPost() throws ServletException, IOException{
 		servlet.doPost(req, res);
+		deferredActions();
+
+	}
+	
+	protected final void doPut() throws ServletException, IOException{
+		servlet.doPut(req, res);
 		deferredActions();
 
 	}
@@ -525,7 +556,7 @@ public abstract class ServletTest extends WebappTestBase{
 		assertNotNull("null provider",provider);
 		TransitionFactory transitionFactory = (TransitionFactory)req.getAttribute(TransitionServlet.TRANSITION_PROVIDER_ATTR);
 		assertNotNull("null factory",transitionFactory);
-		assertEquals(provider.getTargetName(), transitionFactory.getTargetName());
+		assertEquals("Transition target type mis-match",provider.getTargetName(), transitionFactory.getTargetName());
 		if( key == null ){
 			assertNull(req.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR));
 		}else{

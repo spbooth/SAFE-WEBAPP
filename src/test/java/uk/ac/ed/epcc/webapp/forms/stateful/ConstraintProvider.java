@@ -18,6 +18,8 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormCreatorTransition;
 import uk.ac.ed.epcc.webapp.forms.stateful.ConstrainedFactory.ConstrainedObject;
 import uk.ac.ed.epcc.webapp.forms.transition.AnonymousTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionFactory;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTransition;
 import uk.ac.ed.epcc.webapp.model.data.transition.SimpleViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -33,6 +35,7 @@ public class ConstraintProvider extends SimpleViewTransitionProvider<Constrained
 	 * 
 	 */
 	public static final TransitionKey<ConstrainedObject> CREATE_KEY = new TransitionKey<ConstrainedObject>(ConstrainedObject.class, "Create");
+	public static final TransitionKey<ConstrainedObject> UPDATE_KEY = new TransitionKey<ConstrainedObject>(ConstrainedObject.class, "Update");
 	
 	public static class CreateTransition extends FormCreatorTransition<ConstrainedObject>{
 
@@ -42,11 +45,21 @@ public class ConstraintProvider extends SimpleViewTransitionProvider<Constrained
 		}
 		
 	}
+    public static class EditTransiion extends UpdateTransition{
 
+		public EditTransiion(DataObjectFactory fac) {
+			super(fac);
+
+		}
+
+		
+    	
+    }
 	
 	public ConstraintProvider(AppContext c) {
 		super(c,new ConstrainedFactory(c),"Constrained");
 		addTransition(CREATE_KEY, new CreateTransition(c));
+		addTransition(UPDATE_KEY, new EditTransiion((DataObjectFactory) getProducer()));
 	}
 
 	

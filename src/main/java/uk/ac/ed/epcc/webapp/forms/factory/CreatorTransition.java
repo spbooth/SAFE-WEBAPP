@@ -20,6 +20,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 /** A create transition that uses a {@link Creator} object
  * 
@@ -36,7 +37,7 @@ public abstract class CreatorTransition<X> extends AbstractTargetLessTransition<
 		try {
 			c.buildCreationForm(f);
 		} catch (Exception e) {
-			ctx.error(e,"Error building Creation form");
+			Logger.getLogger(getClass()).error("Error building Creation form",e);
 			throw new TransitionException("Internal error");
 		}
 	}

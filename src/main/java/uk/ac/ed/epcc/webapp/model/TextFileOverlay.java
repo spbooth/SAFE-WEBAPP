@@ -48,7 +48,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -60,6 +59,7 @@ import uk.ac.ed.epcc.webapp.model.serv.SettableServeDataProducer;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
 import uk.ac.ed.epcc.webapp.session.SessionDataProducer;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
 /** TextFileOverlay represents a DB overlay above the local file-system
  * intended to allow overrides of file contents to be stored in the database.
@@ -115,7 +115,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 
 	protected static InputStream getResourceStream(AppContext conn,
 			final String group, String name) {
-		Logger log = conn.getService(LoggerService.class).getLogger(TextFileOverlay.class);
+		Logger log = Logger.getLogger(conn,TextFileOverlay.class);
 		ResourceService serv = conn.getService(ResourceService.class);
 		String dirs=conn.getInitParameter(group);
 		log.debug("dirs="+dirs);
@@ -132,7 +132,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 					return stream;
 				}
 				}catch(Exception e){
-					conn.error(e,"Error getting resource stream for TextFile");
+					Logger.getLogger(TextFileOverlay.class).error("Error getting resource stream for TextFile",e);
 				}
 			}
 		}
@@ -160,7 +160,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		}
 		URL getURL(){
 			AppContext conn = getContext();
-			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+			Logger log = getLogger();
 			log.debug("In getURL");
 			if(base_url != null ){
 				try {
@@ -168,7 +168,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 					log.debug("returning url "+url);
 					return url;
 				} catch (MalformedURLException e) {
-					conn.error(e,"Error making URL from base");
+					getLogger().error("Error making URL from base",e);
 				}
 			}
 			
@@ -209,7 +209,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		 */
 		boolean hasResourceStream(){
 			AppContext conn = getContext();
-			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+			Logger log = getLogger();
 			ResourceService serv = conn.getService(ResourceService.class);
 			String dirs=conn.getInitParameter(getGroup());
 			log.debug("dirs="+dirs);
@@ -267,7 +267,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 				InputStream stream = getResourceStream();
 				return getStringFromStream(getContext(),stream);
 			} catch (Exception e) {
-				getContext().error(e, "Error getting stream resource");
+				getLogger().error("Error getting stream resource", e);
 				return null;
 			}
 		}
@@ -469,7 +469,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			try {
 				dat.commit();
 			} catch (DataFault e) {
-				dat.getContext().error(e,"Update failed");
+				Logger.getLogger(getClass()).error("Update failed",e);
 				throw new ActionException("Update failed");
 			}
 			return new MessageResult("object_updated",type_name,dat);
@@ -494,7 +494,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			try {
 				dat.commit();
 			} catch (DataFault e) {
-				dat.getContext().error(e,"Revert failed");
+				Logger.getLogger(getClass()).error("Revert failed",e);
 				throw new ActionException("Revert failed");
 			}
 			return new MessageResult("object_updated",type_name,dat);
@@ -624,6 +624,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table){
 		TableSpecification s = new TableSpecification();
+		s.setCurrentTag("TextFileOverlay");
 		// mysql (5.1 at least) has a 1000 byte limit on index size for MyISAM
 		// and its 3 bytes per char
 		s.setField(GROUP, new StringFieldType(false, null, 64));
@@ -632,8 +633,9 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		try {
 			s.new Index("find_key", true, GROUP,NAME);
 		} catch (InvalidArgument e) {
-			c.error(e,"Error making find_key");
+			getLogger().error("Error making find_key",e);
 		}
+		s.clearCurrentTag();
 		return s;
 	}
 	public FilterResult<T> allbyGroup(String groupName) throws DataFault {		
@@ -658,7 +660,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 					return;
 				}
 			} catch (DataFault e) {
-				getContext().error(e,"Error looking for TextFile");
+				getLogger().error("Error looking for TextFile",e);
 			}
 			throw new ValidateException("Target file already exists");
 		}
@@ -712,7 +714,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			@Override
 			public Input getInput() {
 				TextInput text = new TextInput();
-				text.setMaxResultLength(1<<24);
+				text.addValidator(new MaxLengthValidator(1<<24));
 				return text;
 			}
 			

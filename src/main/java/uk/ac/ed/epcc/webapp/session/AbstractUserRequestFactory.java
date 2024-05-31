@@ -13,10 +13,15 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
+import java.util.List;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.FilterResult;
+import uk.ac.ed.epcc.webapp.model.data.NullFilterResult;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /** A {@link AbstractRequestFactory} for requests tied to a specific {@link AppUser}
  * @author Stephen Booth
@@ -40,12 +45,24 @@ public abstract class AbstractUserRequestFactory<A extends AppUser,R extends Abs
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table) {
 		TableSpecification spec = super.getDefaultTableSpecification(c, table);
+		spec.setCurrentTag("AbstractUserRequestFactory");
 		spec.setField(USER_ID, new IntegerFieldType());
-		
+		spec.clearCurrentTag();
 		return spec;
 	}
 	public final AppUserFactory<A> getAppUserFactory() {
 		return user_fac;
+	}
+	
+	/**
+	 * Finds any existing unassociated requests that could be for the given user, and associate them.
+	 * By default, this does not match or update anything, but subclasses can override this to match by an appropriate method, e.g. email
+	 * 
+	 * @param user
+	 * @throws DataFault
+	 */
+	public void linkNewUser(A user) throws DataFault {
+		return;
 	}
 	
 	public static class AbstractRequest<A extends AppUser> extends AbstractRequestFactory.AbstractRequest{

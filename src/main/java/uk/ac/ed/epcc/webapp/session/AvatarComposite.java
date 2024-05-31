@@ -165,8 +165,8 @@ public class AvatarComposite<AU extends AppUser> extends AppUserComposite<AU, Av
 	/**
 	 * @param fac
 	 */
-	public AvatarComposite(AppUserFactory<AU> fac) {
-		super(fac);
+	public AvatarComposite(AppUserFactory<AU> fac,String tag) {
+		super(fac,tag);
 	}
 
 	/* (non-Javadoc)

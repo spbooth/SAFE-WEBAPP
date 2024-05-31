@@ -20,22 +20,18 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import uk.ac.ed.epcc.webapp.Indexed;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
-import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectIntegerInput;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.SQLMatcher;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 /** This is a wrapper round some other class that implements ListInput intended to
  * add a null-value option to the list. This is for use in SQLFormFilters to allow for null fields to be searched for
  * The null-value entry corresponds to -1 so the internal input must not support that value.
@@ -46,13 +42,21 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
  */
 
 
-public class NullListInput<T extends Indexed>   implements ListInput<Integer,Object>,ParseInput<Integer>, SQLMatcher{
+public class NullListInput<T extends Indexed>   implements AutoCompleteListInput<Integer,Object>,ParseInput<Integer>, SQLMatcher<T>,HTML5Input,FormatHintInput{
     private ListInput<Integer,T> internal;
     public static final String NULLTAG="NULL-VALUE";
     public static final int NULL_VALUE=-1;
+    private boolean null_value=false;
    
     public NullListInput(ListInput<Integer,T> input){
     	internal = input;
+    }
+    
+    private boolean useAuto() {
+    	return internal instanceof AutoCompleteListInput;
+    }
+    private AutoCompleteListInput<Integer, T> getAuto(){
+    	return (AutoCompleteListInput<Integer, T>) internal;
     }
 	@Override
 	public Object getItembyValue(Integer value) {
@@ -81,14 +85,24 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public String getTagByItem(Object item) {
+	public String getTagByItem(Object item){
 		if( item == null ){
 			return null;
 		}
 		if( item == NULLTAG){
-			return ""+NULL_VALUE;
+			return NULLTAG;
 		}
 		return internal.getTagByItem((T)item);
+	}
+	@Override
+	public Object getItemByTag(String tag) {
+		if( tag == null || tag.isEmpty()) {
+			return null;
+		}
+		if( tag.equals(NULLTAG)) {
+			return NULLTAG;
+		}
+		return internal.getItemByTag(tag);
 	}
 
 	@Override
@@ -96,12 +110,28 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		if( value == null ){
 			return null;
 		}
+		if( value == NULL_VALUE ) {
+			return NULLTAG;
+		}
 		return value.toString();
 	}
-
+	@Override
+	public Integer getValueByTag(String tag) {
+		if( tag == null) {
+			return null;
+		}
+		if( tag.equals(NULLTAG)) {
+			return NULL_VALUE;
+		}
+		return Integer.parseInt(tag);
+	}
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public String getText(Object item) {
+		if( item == null ) {
+			return null;
+		}
 		if( item==NULLTAG){
 			return NULLTAG;
 		}
@@ -109,6 +139,9 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	}
 	@Override
 	public String getPrettyString(Integer value) {
+		if( value == null ) {
+			return null;
+		}
 		if( value.intValue() == NULL_VALUE){
 			return NULLTAG;
 		}
@@ -118,34 +151,45 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	public Object getItem() {
 		Integer value = internal.getValue();
 		if( value == null ){
+			if( null_value) {
+				return NULLTAG;
+			}
 			return null;
 		}
-		if( value.intValue() == NULL_VALUE){
+		if( value.intValue() == NULL_VALUE){  // this should not happen as we try not to ever put the null value into internal
 			return NULLTAG;
 		}
 		return internal.getItembyValue(value);
 	}
 
 	@Override
-	public void setItem(Object item) {
-		try{
-			if( item == null ){
-				setValue(null);
-				return;
-			}
-			if( item == NULLTAG){
-				setValue(NULL_VALUE);
-				return;
-			}
-			setValue(((Indexed)item).getID());
-		}catch(TypeException e) {
-			// this should never happen
-			throw new TypeError(e);
+	public final Integer getValueByItem(Object item) throws TypeException {
+		if( item == null) {
+			return null;
 		}
+		if( item == NULLTAG) {
+			return NULL_VALUE;
+		}
+		return internal.getValueByItem((T) item);
 	}
 	@Override
 	public Integer setValue(Integer v) throws TypeException {
-			return internal.setValue(v);		
+		boolean was_null_value = null_value;
+		null_value = false;
+		Integer prev;
+		if( v == null) {
+			prev = internal.setValue(null);
+		}else if( v.intValue() == NULL_VALUE) {
+			null_value=true;
+			prev = internal.getValue();
+			internal.setNull();
+		}else {	
+			prev = internal.setValue(v);
+		}
+		if( was_null_value ) {
+			return NULL_VALUE;
+		}
+		return prev;
 	}
 	@Override
 	public  SQLFilter getSQLFilter(Repository res, String target,
@@ -179,8 +223,10 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	}
 	@Override
 	public Integer getValue() {
-		Integer i = internal.getValue();
-	    return i;
+		if( null_value ) {
+			return NULL_VALUE;
+		}
+		return internal.getValue();
 	}
 	@Override
 	public void setKey(String key) {
@@ -189,7 +235,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	}
 	@Override
 	public void validate() throws FieldException {
-		if( internal.getValue() == null || internal.getValue() == NULL_VALUE){
+		if( null_value || internal.getValue() == null ){
 			return;
 		}
 		internal.validate();
@@ -203,7 +249,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	}
 	@Override
 	public String getString() {
-	    if( internal.getValue() == NULL_VALUE){
+	    if( null_value ){
 	    	return NULLTAG;
 	    }
 	    if( internal.getValue() == null ){
@@ -217,11 +263,12 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	}
 	@Override
 	public Integer parseValue(String v) throws ParseException {
-		if( v == NULLTAG){
-			return NULL_VALUE;
-		}
-		if( v == null || v == ""){
+		
+		if( v == null || v.isEmpty()){
 			return null;
+		}
+		if( NULLTAG.equals(v)){
+			return NULL_VALUE;
 		}
 		if( internal instanceof ParseInput){
 			return ((ParseInput<Integer>)internal).parseValue(v);
@@ -230,10 +277,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		}
 		
 	}
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
+	
 	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
@@ -256,6 +300,11 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		internal.addValidator(val);
 		
 	}
+	@Override
+	public void addValidatorSet(FieldValidationSet<Integer> val) {
+		internal.addValidatorSet(val);
+		
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#removeValidator(uk.ac.ed.epcc.webapp.forms.FieldValidator)
 	 */
@@ -264,7 +313,10 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		internal.removeValidator(val);
 		
 	}
-	
+	@Override
+	public FieldValidationSet<Integer> getValidators() {
+		return internal.getValidators();
+	}
 	/** wrap any Selector with a compatible input
 	 * 
 	 */
@@ -277,7 +329,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 			@Override
 			public Input getInput() {
 				Input input = s.getInput();
-				if( input != null && input instanceof ListInput && input instanceof IntegerInput){
+				if( input != null && input instanceof ListInput && (input instanceof IntegerInput|| input instanceof DataObjectIntegerInput)){
 					return new NullListInput((ListInput) input);
 				}
 				return input;
@@ -288,8 +340,57 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	}
 	@Override
 	public void setNull() {
+		null_value = false;
 		internal.setNull();
 		
 	}
+	@Override
+	public String getSuggestionText(Object item) {
+		if( NULLTAG.equals(item)) {
+			return NULLTAG;
+		}
+		return getAuto().getSuggestionText((T)item);
+	}
+	@Override
+	public int getBoxWidth() {
+		return getAuto().getBoxWidth();
+	}
+	@Override
+	public void setBoxWidth(int l) {
+		if( useAuto()) {
+			getAuto().setBoxWidth(l);
+		}
+	}
+	@Override
+	public boolean getSingle() {
+		return true;
+	}
+	@Override
+	public boolean useListPresentation() {
+		if( useAuto()) {
+			return getAuto().useListPresentation();
+		}
+		return true;
+	}
+	public final  <R> R accept(InputVisitor<R> vis) throws Exception{
+		if( useListPresentation()) {
+			return vis.visitListInput(this);
+		}else {
+			return vis.visitAutoCompleteInput(this);
+		}
+	}
 
+	@Override
+	public String getFormatHint() {
+		if( internal instanceof FormatHintInput) {
+			return ((FormatHintInput)internal).getFormatHint();
+		}
+		return null;
+	}
+
+	@Override
+	public final String getType() {
+		// Always supress this as we need to parse NULL-VALUE
+		return null;
+	}
 }

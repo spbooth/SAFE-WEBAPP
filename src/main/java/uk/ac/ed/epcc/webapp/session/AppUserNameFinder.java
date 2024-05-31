@@ -54,7 +54,7 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 	 * @param realm   The realm to implement (can be prefixed by <b>Namefinder.</b>)
 	 */
 	public AppUserNameFinder(AppUserFactory<AU> factory,String realm) {
-		super(factory);
+		super(factory,realm);
 		if( realm.contains(".")){
 			// realm names should be unqualified so strip of any qualifying prefix.
 			realm=realm.substring(realm.lastIndexOf('.')+1);
@@ -107,7 +107,7 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 	}
 	/** Is this a name we might expect the user to know or an internal generated id.
 	 * This also controls if the realm name can be used via the default {@link NameFinder} of
-	 * the {@link AppUserFactory}
+	 * the {@link AppUserFactory} depending on a feature setting.
 	 * @return
 	 */
 	public boolean userVisible(){

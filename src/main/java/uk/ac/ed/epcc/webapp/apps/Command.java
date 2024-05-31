@@ -17,7 +17,9 @@
 package uk.ac.ed.epcc.webapp.apps;
 
 import java.util.LinkedList;
+
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 
 /** Interface for classes that implement gridsafe sub-commands
  * 
@@ -40,4 +42,8 @@ public interface Command extends Contexed {
     * @return help text
     */
    public String help();
+   
+   public default Logger getLogger() {
+	   return Logger.getLogger(getContext(),getClass());
+   }
 }

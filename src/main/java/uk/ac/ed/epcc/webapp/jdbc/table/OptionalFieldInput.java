@@ -17,13 +17,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.forms.inputs.SimpleListInput;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 /** Select a field from an option map that does not already exist
  * in a Repository.
@@ -35,7 +30,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  * @param <I> item type
  *
  */
-public class OptionalFieldInput<I> extends ParseAbstractInput<String> implements ListInput<String, I>{
+public class OptionalFieldInput<I> extends SimpleListInput<I>{
 	
 
 	Map<String,I> fields;
@@ -47,10 +42,7 @@ public class OptionalFieldInput<I> extends ParseAbstractInput<String> implements
 			}
 		}
 	}
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
+	
 	
 	@Override
 	public I getItem() {
@@ -58,28 +50,10 @@ public class OptionalFieldInput<I> extends ParseAbstractInput<String> implements
 		return fields.get(getValue());
 	}
 
-	@Override
-	public void setItem(I item) {
-		try {
-			setValue(getTagByItem(item));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
-		
-	}
-
+	
 	
 	@Override
-	public String parseValue(String v) throws ParseException {
-		if( fields.containsKey(v)){
-			return v;
-		}
-		throw new ParseException("Illegal value "+v);
-	}
-
-	
-	@Override
-	public I getItembyValue(String value) {
+	public I getItemByTag(String value) {
 		return fields.get(value);
 	}
 
@@ -105,11 +79,6 @@ public class OptionalFieldInput<I> extends ParseAbstractInput<String> implements
 	}
 
 	
-	@Override
-	public String getTagByValue(String value) {
-		return value;
-	}
-
 	
 	@Override
 	public String getText(I item) {

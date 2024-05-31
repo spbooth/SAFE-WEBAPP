@@ -42,15 +42,7 @@ import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.DateInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
-import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
-import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.LongFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.table.*;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
@@ -238,7 +230,7 @@ public class RepositoryTest extends WebappTestBase {
 		Set<String> idx = res.getIndexNames();
 		
 		assertNotNull(idx);
-		assertEquals(2, idx.size());
+		assertEquals(MySqlCreateTableVisitor.FOREIGN_KEY_FEATURE.isEnabled(ctx)? 3 :  2, idx.size());
 		assertTrue(idx.contains("name_index"));
 		assertTrue(idx.contains("number_date_index"));
 	}

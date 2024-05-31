@@ -19,16 +19,10 @@ package uk.ac.ed.epcc.webapp.content;
 import java.text.NumberFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.forms.action.DisabledAction;
-import uk.ac.ed.epcc.webapp.forms.action.FormAction;
-import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisistor;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 
 
@@ -174,6 +168,10 @@ protected static final class Text extends Panel {
 			}
 			return super.getAttribute(name);
 		}
+		@Override
+		public SimpleXMLBuilder getNested() throws UnsupportedOperationException {
+			return new SpanText(this);
+		}
 	}
 public HtmlBuilder(){
 	super();
@@ -303,7 +301,7 @@ public void addScriptFile(String path){
 	close();
 }
 public final Logger getLogger(AppContext conn){
-	return conn.getService(LoggerService.class).getLogger(getClass());
+	return Logger.getLogger(conn,getClass());
 }
 
 

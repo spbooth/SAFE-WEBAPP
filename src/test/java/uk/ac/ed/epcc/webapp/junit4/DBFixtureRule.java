@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.ContextHolder;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.model.data.XMLDataUtils;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
 public class DBFixtureRule implements TestRule {
 
@@ -80,11 +81,13 @@ public class DBFixtureRule implements TestRule {
 			conn.clearAttributes();
 			conn.getService(ConfigService.class).clearServiceProperties();
 		}
-		if( global_fixtures != null && global_fixtures.length > 0){
-			utils.readFixtures(ctx.getClass(), global_fixtures);
-		}
-		if( fixtures != null && fixtures.length > 0){
-			utils.readFixtures(ctx.getClass(), fixtures);
+		try(TimeClosable load = new TimeClosable(conn, "database-fixtures")){
+			if( global_fixtures != null && global_fixtures.length > 0){
+				utils.readFixtures(ctx.getClass(), global_fixtures);
+			}
+			if( fixtures != null && fixtures.length > 0){
+				utils.readFixtures(ctx.getClass(), fixtures);
+			}
 		}
 	}
 

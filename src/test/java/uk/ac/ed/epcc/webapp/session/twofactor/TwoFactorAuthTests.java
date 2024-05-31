@@ -117,7 +117,7 @@ public class TwoFactorAuthTests<A extends AppUser> extends AbstractTransitionSer
 		addParam(CODE, 278504);
 		runTransition();
 		assertFalse(ctx.getService(SessionService.class).haveCurrentUser());
-		checkError(CODE, "Incorrect");
+		checkError(CODE, "This code has already been used once");
 		
 	}
 	@Test

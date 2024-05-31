@@ -22,7 +22,7 @@ import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
-/**
+/** Base class for {@link DatabaseService}s that wrap another one
  * @author Stephen Booth
  *
  */
@@ -180,6 +180,11 @@ public abstract class DatabaseServiceWrapper implements DatabaseService {
 		Map<String,Object> result = nested.getConnectionAttributes();
 		result.put("wrapped",getClass().getCanonicalName());
 		return result;
+	}
+
+	@Override
+	public void addCleanup(Runnable r) {
+		nested.addCleanup(r);
 	}
 
 }

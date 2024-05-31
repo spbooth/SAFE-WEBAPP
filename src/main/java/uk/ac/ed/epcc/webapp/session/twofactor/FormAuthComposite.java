@@ -29,10 +29,14 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** super-class for {@link TwoFactorComposite}s that validate using a pin-code
+ * 
+ * Note the composite used to implement user login MFA should be installed with class as its type.
+ * though we can install more than one composite that implements this
+ * 
  * @author Stephen Booth
  *
  */
-public abstract class FormAuthComposite<AU extends AppUser> extends AppUserComposite<AU, FormAuthComposite> implements TwoFactorComposite<AU> {
+public abstract class FormAuthComposite<AU extends AppUser,F extends FormAuthComposite> extends AppUserComposite<AU, F> implements TwoFactorComposite<AU> {
    /**
 	 * 
 	 */
@@ -41,8 +45,8 @@ public abstract class FormAuthComposite<AU extends AppUser> extends AppUserCompo
 	/**
 	 * @param fac
 	 */
-	protected FormAuthComposite(AppUserFactory<AU> fac) {
-		super(fac);
+	protected FormAuthComposite(AppUserFactory<AU> fac,String tag) {
+		super(fac,tag);
 		re_auth_minutes = getContext().getIntegerParameter(getConfigPrefix()+".re_auth_minutes", 30);
 	}
 
@@ -124,7 +128,7 @@ public abstract class FormAuthComposite<AU extends AppUser> extends AppUserCompo
 
 	}
 	@Override
-	protected final Class<? super FormAuthComposite> getType() {
+	protected Class<? super F> getType() {
 		return FormAuthComposite.class;
 	}
 

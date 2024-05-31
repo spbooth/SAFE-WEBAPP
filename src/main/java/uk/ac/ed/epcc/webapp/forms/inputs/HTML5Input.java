@@ -13,7 +13,10 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-/** An Interface for {@link Input}s that can represented as html5 inputs.
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+
+/** An Interface for {@link Input}s that can represented as html5 inputs, or
+ * {@link FieldValidator}s that correspond to the validation rules of a html5 input.
  * This does not change the behaviour of the input but does assert compatibility (or not) with 
  * a corresponding html-5 input type. 
  * @author spb
@@ -24,8 +27,9 @@ public interface HTML5Input {
 	/** get the <em>type</em> tag to emit for
 	 * the corresponding html5 type. If this method returns null
 	 * no type should be used. This is for the case where.
-	 * a sub-class breaks compatibility and needs to supress
+	 * a sub-class breaks compatibility and needs to suppress
 	 * a type set in a superclass.
+	 * 
 	 * 
 	 * @return name or null;
 	 */

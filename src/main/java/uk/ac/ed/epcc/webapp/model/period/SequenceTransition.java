@@ -15,9 +15,7 @@ package uk.ac.ed.epcc.webapp.model.period;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
-import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
+import uk.ac.ed.epcc.webapp.forms.result.*;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -38,7 +36,7 @@ public class SequenceTransition<T extends TimePeriod,K> extends AbstractDirectTr
 			throws TransitionException {
 		T result = getNext(target);
 		if( result == null ){
-			return new MessageResult("no_next_rate");
+			return new WarningMessageResult("no_next_rate");
 		}
 		return new ViewTransitionResult<>(tp, result);
 	}

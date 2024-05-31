@@ -16,7 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data;
 
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory.FilterIterator;
 /** Interface for {@link DataObject}s that can be removed from a {@link FilterIterator}
  * Classes that implement this should therefore have a well defined iteration order

@@ -34,8 +34,8 @@ public abstract class MultiComposite<BDO extends DataObject, X extends Composite
 	/**
 	 * @param fac
 	 */
-	protected MultiComposite(DataObjectFactory<BDO> fac) {
-		super(fac);
+	protected MultiComposite(DataObjectFactory<BDO> fac,String tag) {
+		super(fac,tag);
 	}
 
 	/** get the collection of underlying composites

@@ -94,7 +94,7 @@ public class TotpCompositeTest extends WebappTestBase {
 		
 		
 		
-		assertTrue(comp.verify(user, 278504));
+		assertTrue(comp.verify(user, 278504,null));
 		
 	}
 	

@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.action.DisabledAction;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.html.AddButtonVisitor;
 import uk.ac.ed.epcc.webapp.forms.html.AddLinkVisitor;
-import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisistor;
+import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisitor;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -52,6 +52,8 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
 public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 	
 	public static final Feature STREAM_BUILDER_FEATURE = new Feature("html.stream_builder",true,"use HtmlWriter where possible");
+	public static final Feature FIELDSET_FEATURE = new Feature("html.fieldset_actions",false,"use fieldset for action buttons even without legend");
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormLabel(uk.ac.ed.epcc.webapp.forms.Field)
 	 */
@@ -343,12 +345,18 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 	 */
 	@Override
 	public default void addActionButtons(Form f,String legend,Set<String> actions) {
-		boolean can_submit=CanSubmitVisistor.canSubmit(f);
+		boolean can_submit=CanSubmitVisitor.canSubmit(f);
 
 		if( ! actions.isEmpty()){
-			open("fieldset");
+			boolean use_legend = legend != null && ! legend.isEmpty();
+			if( use_legend || FIELDSET_FEATURE.isEnabled(f.getContext())) {  // Accessibility tester says don't use fieldset without legend
+				open("fieldset");
+			}else {
+				open("div");
+			}
 			addClass( "action_buttons");
-			if( legend != null && ! legend.isEmpty()) {
+			
+			if( use_legend) {
 				open("legend");
 				clean(legend);
 				close();
@@ -363,7 +371,7 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 
 
 	public default void addActionButton(Form f, String name) {
-		boolean can_submit=CanSubmitVisistor.canSubmit(f);
+		boolean can_submit=CanSubmitVisitor.canSubmit(f);
 
 		addActionButton(f, can_submit, name);
 	}
@@ -373,7 +381,7 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 			return;
 		}
 		Object content = action.getText();
-		
+
 		if( content != null ){
 			open("button");
 		}else{
@@ -390,7 +398,7 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 		}
 		
 		String help = action.getHelp();
-		if( help != null){
+		if( help != null &&  ! help.equals(content != null ? content.toString() : name)){
 			attr("title", help);
 		}
 		String shortcut = action.getShortcut();

@@ -48,6 +48,14 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * <p>
  * The default value (to use when no database field present can be set using
  * <b><i>factory-tag</i>.<i>field</i>.default</b> (false if unspecified).
+ * <p>
+ * The settings can be shown via the {@link SummaryContributer} interface controlled by the following paramters
+ * <ul>
+ * <li> <b><i>factory-tag</i>.<i>field</i>.show_attribute</b> boolean switch</li>
+ * <li> <b><i>factory-tag</i>.<i>field</i>.label</b> String attribute name</li>
+ * <li> <b><i>factory-tag</i>.<i>field</i>.attribute_relationship</b> Optional relationship for access control</li>
+ * </ul>
+ * 
  * @author spb
  *
  */
@@ -58,7 +66,7 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	 * @param fac
 	 */
 	public ConfigNamedFilterComposite(DataObjectFactory<BDO> fac,String comp_tag) {
-		super(fac);
+		super(fac,comp_tag);
 		String name_list = getContext().getInitParameter(fac.getConfigTag()+".config_namefilters");
 		if( name_list != null ) {
 			for( String name : name_list.split("\\s*,\\s*")) {
@@ -172,7 +180,10 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	public void addAttributes(Map<String, Object> attributes, BDO target) {
 		for(String name : names) {
 			if( getRepository().hasField(name) && getContext().getBooleanParameter(getFactory().getConfigTag()+"."+name+".show_attribute", false)) {
-				attributes.put(getLabel(name), hasNamedFilter(target, name));
+				String relationship = getContext().getInitParameter(getFactory().getConfigTag()+"."+name+".attribute_relationship");
+				if( relationship == null || getContext().getService(SessionService.class).hasRelationship(getFactory(), target, relationship, false)) {
+					attributes.put(getLabel(name), hasNamedFilter(target, name));
+				}
 			}
 		}
 		

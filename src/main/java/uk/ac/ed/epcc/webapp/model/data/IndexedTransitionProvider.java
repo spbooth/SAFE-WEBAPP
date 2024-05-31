@@ -50,9 +50,8 @@ public interface IndexedTransitionProvider<K,T extends Indexed> extends Contexed
 	public default T getTarget(String id) {
 		id = normaliseID(id);
 		AppContext c = getContext();
+		IndexedProducer<? extends T> fac = getProducer();
 		try {
-			IndexedProducer<? extends T> fac = getProducer();
-			
 			if( useParser() && fac instanceof ParseFactory){
 				T val = ((ParseFactory<T>)fac).findFromString(id);
 				if( val != null){
@@ -62,7 +61,12 @@ public interface IndexedTransitionProvider<K,T extends Indexed> extends Contexed
 			
 			return (T) fac.find(Integer.parseInt(id));
 		}catch(NumberFormatException nfe){
-			// Not worth reporing
+			// Not worth reporting
+			if( fac instanceof ParseFactory) {
+				// If useParser returns false we can still check the parser
+				// for non-numeric strings. even though default rep is numeric id
+				return ((ParseFactory<T>)fac).findFromString(id);
+			}
 			return null;
 		} catch (DataException e) {
 			getLogger().error("Error making IndexedTransitionProvider target",e);

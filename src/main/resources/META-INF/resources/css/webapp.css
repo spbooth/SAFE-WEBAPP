@@ -18,6 +18,16 @@
 	
 	--table-width: 100%;
 	--cell-padding: 3px;
+	
+	/* suggested colours from html5 standard. should be close to browser defaults
+	 */
+	--link-color: #0000ee;
+	--visited-color: #551a8b;
+	
+	/* Allow overrides to fix contrast for links in hotice regions. Default is to use normal colours
+	 */
+	--link-notice-color: var(--link-color);
+	--visited-notice-color: var(--visited-color);
 	/* standard special markup 
 	 * different hover color for styles used in form tables
 	 */
@@ -428,13 +438,13 @@ form table tr.highlight:hover td {
 }
 
 /* a warning paragraph */
-div.warn{
+div.warn, div.block div.warn{
 	border: var(--warn-border);
 	background-color: var(--warn-bg-color);
 	color: var(--warn-color);
 }
 
-div p.warn, div.warn p, .warn, .warn.sorting_1 {
+div p.warn, div.warn p, .warn, .warn.sorting_1, div.warn div.para  {
 	background-color: var(--warn-bg-color);
 	color: var(--warn-color);
 }
@@ -451,21 +461,21 @@ div td, div table.auto td form , div.block td ul, div.block td ol{
         background-color: #ffffff;
         padding: var(--cell-padding);
 }
-td.numeric, td[numeric] ,  td.numeric input {
+td.numeric, td[numeric] ,  td.numeric input, table.dataTable tfoot td[numeric]  {
 text-align: right;
 white-space: nowrap;
 }
 
-div th {
+div th , div td.header{
         color: var(--th-color);
         background-color: var(--th-bg-color);
         padding: var(--cell-padding);
 }
-div table.column th{
+div table.column th, div table.column td.header{
         color: var(--column-th-color);
         background-color: var(--column-th-bg-color);
 }
-div table.column td th{
+div table.column td th, div table.column td td.header{
         color: var(--th-color);
         background-color: var(--th-bg-color);
 }
@@ -592,11 +602,11 @@ table.form td {
         padding: 2px;
    
 }
-form table.form th{
+form table.form th, form table.form td.header{
         color: var(--form-th-color);
         background-color: var(--form-th-bg-color);
 }
-form table.form tr:hover th{
+form table.form tr:hover th, form table.form tr:hover td.header{
 	background-color: var(--th-hover-bg-color);
 }
 table.form td {
@@ -608,7 +618,7 @@ form table tr:hover td {
 }
 
 
-fieldset.action_buttons{
+.action_buttons{
 border: solid var(--form-border-color);
 border-width: 2px;
 margin-top: 5px;
@@ -628,25 +638,39 @@ margin-right: 0;
 }
 
 /* Button like links so we can open new page using right mouse */
-div.block table.navbar{
+div.block .navbar{
 	margin-top: 10px;
 	margin-bottom: 10px;
 	border: none;
-	border-spacing: 0;
 	background-color: inherit;	
+}
+div.block div.navbar{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+ 	align-items: center;
+    justify-content: space-around;
+}
+.nav_entry{
+	padding: var(--cell-padding);
+	flex: 1;
+}
+
+div.block table.navbar{
+	border-spacing: 0;
 }
 div.block table.navbar td {
 	background-color: inherit;	
 }
 /* can put single input forms with class input_button in navbar */
-table.navbar tr td form input{
+.navbar form input{
 	width: 100%;
 	border-style: outset;
 	background-color: var(--button-bg-color);
 	color: var(--button-color);
 }
 /* or can put links that look similar */
-table.navbar tr td a {
+.navbar  a {
     background-color: var(--button-bg-color);
     color: var(--button-color);
     margin: 3px 0px;
@@ -994,4 +1018,19 @@ div.sub_label {
 }
 div.sub_input {
 	display: table-cell;
+}
+
+/* put links into selected pallete */
+a:link {
+	color: var(--link-color);
+}
+.notice a:link, .notice.sorting_1 a:link {
+	color: var(--link-notice-color);
+}
+
+a:visited {
+	color: var(--visited-color);
+}
+.notice a:visited, .notice.sorting_1 a:visited {
+	color: var(--visited-notice-color);
 }

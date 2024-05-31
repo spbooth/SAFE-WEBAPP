@@ -66,9 +66,9 @@ public final class CreateAction<BDO extends DataObject> extends FormAction {
 		log.debug("In create action");
 		try {
 			// populate as a record in case factory is polymorphic and needs form parameters to create object.
-			o = creator.makeObject();
+			o = creator.makeObject(f);
 			// we may have default values supressed in the form
-			Map<String,Object> defs = creator.getDefaults();
+			Map<String,Object> defs = creator.getCreationDefaults();
 			if( defs != null){
 				log.debug("set default contents");
 				o.setContents(defs);

@@ -18,11 +18,10 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.StringTokenizer;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** Input for a time duration in  HH:mm::ss format
  * returned in seconds
@@ -32,13 +31,13 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
  */
 
 
-public class ElapsedSecondInput extends ParseAbstractInput<Number> implements FormatHintInput{
+public class ElapsedSecondInput extends ParseAbstractInput<Number> {
 
 	public ElapsedSecondInput() {
 		super();
 		setBoxWidth(10);
-		setMaxResultLength(16);
 		setSingle(true);
+		setFormatHint("HH:MM:SS");
 		addValidator(new FieldValidator<Number>() {
 			
 			@Override
@@ -91,10 +90,4 @@ public class ElapsedSecondInput extends ParseAbstractInput<Number> implements Fo
 		total = total/60;
 		return total+":"+min+":"+seconds;
 	}
-
-	@Override
-	public String getFormatHint() {
-		return "HH:MM:SS";
-	}
-
 }

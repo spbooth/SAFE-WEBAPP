@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.AbstractFormTextGenerator;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.forms.FieldHelpProvider;
 import uk.ac.ed.epcc.webapp.model.data.forms.FormLabelProvider;
 
@@ -43,12 +44,15 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 		}
 		for(String field : factory.res.getFields()){
 			if( ! trans.containsKey(field)){  // no explicit translation
-				
-				// look for a secondary config value
-				String cfg = getConfigTags().get(field);
 				String label = null;
-				if( cfg != null ) {
-					label = getTranslationFromConfig(cfg, field);
+				// look for a secondary config value
+				Map<String, String> configTags = getConfigTags();
+				if( configTags != null ) {
+					String cfg = configTags.get(field);
+
+					if( cfg != null ) {
+						label = getTranslationFromConfig(cfg, field);
+					}
 				}
 				if( label != null ) {
 					trans.put(field, label);
@@ -87,13 +91,16 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 			if( ! help.containsKey(field)){  // no explicit translation
 				
 				// look for a secondary config value
-				String cfg = getConfigTags().get(field);
-				String label = null;
-				if( cfg != null ) {
-					label = getHelpTextFromConfig(cfg, field);
-				}
-				if( label != null ) {
-					help.put(field, label);
+				Map<String, String> configTags = getConfigTags();
+				if( configTags != null ) {
+					String cfg = configTags.get(field);
+					String label = null;
+					if( cfg != null ) {
+						label = getHelpTextFromConfig(cfg, field);
+					}
+					if( label != null ) {
+						help.put(field, label);
+					}
 				}
 			}
 			// allow config to override if using factory tag.
@@ -135,14 +142,17 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 			if( translations == null){
 				translations=new HashMap<>();
 			}
-			if( factory instanceof FormLabelProvider) {
-				((FormLabelProvider)factory).addTranslations(translations);
+			try {
+				if( factory instanceof FormLabelProvider) {
+					((FormLabelProvider)factory).addTranslations(translations);
+				}
+				for(FormLabelProvider c : factory.getComposites(FormLabelProvider.class)){
+					translations=c.addTranslations(translations);
+				}
+				addTranslations(translations);
+			}catch(Exception e) {
+				getLogger().error("Error generating translations",e);
 			}
-			for(FormLabelProvider c : factory.getComposites(FormLabelProvider.class)){
-				translations=c.addTranslations(translations);
-			}
-			addTranslations(translations);
-
 			translation_set = Collections.unmodifiableMap(translations);
 		}
 		return translation_set;
@@ -155,14 +165,18 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 	protected final Map<String,String> getFieldHelp() {
 		if( help_map == null) {
 			Map<String, String> help = new HashMap<>();
-			if( factory instanceof FieldHelpProvider) {
-				((FieldHelpProvider)factory).addFieldHelp(help);
+			try {
+				if( factory instanceof FieldHelpProvider) {
+					((FieldHelpProvider)factory).addFieldHelp(help);
+				}
+				for(FieldHelpProvider c : factory.getComposites(FieldHelpProvider.class)){
+					Map mod = c.addFieldHelp(help);
+					assert(mod != null);
+				}
+				addHelpText(help);
+			}catch(Exception e) {
+				getLogger().error("Error generating field help",e);
 			}
-			for(FieldHelpProvider c : factory.getComposites(FieldHelpProvider.class)){
-				Map mod = c.addFieldHelp(help);
-				assert(mod != null);
-			}
-			addHelpText(help);
 			help_map = Collections.unmodifiableMap(help);
 		}
 		return help_map;
@@ -173,24 +187,30 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 		factory=fac;  
 	}
 
+	private TableSpecification spec=null;
+	protected TableSpecification getSpecification() {
+		if( spec == null ) {
+			spec = factory.getFinalTableSpecification(getContext(), factory.getTag());
+		}
+		return spec;
+	}
 	/** Get a map of field names to secondary config tags.
 	 * 
 	 * @return
 	 */
 	protected Map<String,String> getConfigTags() {
 		if( config_tags == null) {
-			config_tags = new HashMap<>();
 			try {
-				if( factory instanceof FieldHandler) {
-					((FieldHandler)factory).addConfigTags(config_tags);
-				}
-				for(FieldHandler h : factory.getComposites(FieldHandler.class)) {
-					h.addConfigTags(config_tags);
+				TableSpecification s = getSpecification();
+				if( s != null ) {
+					config_tags = s.getConfigTags();
+					if( config_tags != null ) {
+						config_tags = Collections.unmodifiableMap(config_tags);
+					}
 				}
 			}catch(Exception e) {
-				getLogger().error("Error getting config tags", e);
+				getLogger().error("Error making config tags",e);
 			}
-			config_tags = Collections.unmodifiableMap(config_tags);
 		}
 		return config_tags;
 	}
@@ -202,5 +222,8 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 	public String getFieldHelp(String field) {
 		return getFieldHelp().get(field);
 	}
-
+	@Override
+	public String getFieldHint(String field) {
+		return null;
+	}
 }

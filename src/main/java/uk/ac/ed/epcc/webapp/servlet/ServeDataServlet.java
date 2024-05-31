@@ -22,9 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
@@ -40,7 +42,8 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 @WebServlet(name="DataServlet",urlPatterns=ServeDataServlet.DATA_PATH+"*")
 public class ServeDataServlet extends WebappServlet {
-
+   private static final String CONTENT_SECURITY_POLICY_HEADER = ErrorFilter.CONTENT_SECURITY_POLICY_HEADER;
+public static final Feature HTML_AS_TEXT = new Feature("serve_data.html_as_text", true, "Force html serve-data to text/plain");
 	/**
 	 * 
 	 */
@@ -79,9 +82,20 @@ public class ServeDataServlet extends WebappServlet {
 				String content_type = msd.getContentType();
 				if( producer.isExternalContent(args)) {
 					// Disable any scripting in this content
-					res.setHeader("Content-Security-Policy", "script-src 'none'; object-src 'none'; default-src 'none'");
+					// This will override any header set in the ErrorFilter
+					// We could just add an additional header but the final restriction is
+					// the most restrictive intersection
+					CSPUtils util = new CSPUtils();
+					util.parse(res.getHeader(CONTENT_SECURITY_POLICY_HEADER));
+					util.addPolicy(conn.getExpandedProperty("serve_data_servlet.external_csp", "script-src 'none'; object-src 'none'; default-src 'none'"));
+					if( ! util.isEmpty()) {
+						res.setHeader(CONTENT_SECURITY_POLICY_HEADER, util.toString());
+					}
 					String lc = content_type.toLowerCase();
-					if( lc.contains("javascript") ||  lc.contains("html") ) {
+					if( lc.contains("javascript")  ) {
+						content_type="text/plain";
+					}
+					if( HTML_AS_TEXT.isEnabled(conn) && lc.contains("html")) {
 						content_type="text/plain";
 					}
 				}
@@ -151,7 +165,7 @@ public class ServeDataServlet extends WebappServlet {
 			hb.attr("href", conn.getService(ServletService.class).encodeURL(getURL(conn, producer, args)));
 			hb.attr("target","_blank"); // always in new tab for download
 		} catch (Exception e) {
-			conn.error(e,"Error making URL");
+			conn.getService(LoggerService.class).getLogger(ServeDataServlet.class).error("Error making URL",e);
 		}
 		hb.clean(text);
 		hb.close();

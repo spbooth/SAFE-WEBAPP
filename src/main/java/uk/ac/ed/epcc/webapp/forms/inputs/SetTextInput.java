@@ -4,9 +4,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 /** A {@link TextInput} that takes a comma separated list of values that must come
  * from a defined set
  * 
@@ -24,7 +24,7 @@ public class SetTextInput extends TextInput implements PatternInput, ItemInput<S
 		for(String a : list.split(SPLIT)) {
 			allowed.add(a);
 		}
-		addValidator(new FieldValidator<String>() {
+		addValidator(new SingleLineFieldValidator() {
 			
 			@Override
 			public void validate(String data) throws FieldException {
@@ -67,12 +67,8 @@ public class SetTextInput extends TextInput implements PatternInput, ItemInput<S
 	}
 
 	@Override
-	public void setItem(Set<String> item) {
-		try {
-			setValue(String.join(",", item.toArray(new String[item.size()])));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
+	public String getValueByItem(Set<String> item) {
+		return String.join(",", item.toArray(new String[item.size()]));
 	}
 
 }

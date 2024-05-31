@@ -19,12 +19,12 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** {@link FileInput} for image files
  * @author Stephen Booth
@@ -79,13 +79,16 @@ public class ImageInput extends FileInput implements ItemInput<StreamData,Buffer
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
 	 */
-	public void setBufferedImage(BufferedImage item) throws DataFault, TypeException {
+	@Override
+	public StreamData getValueByItem(BufferedImage item) throws TypeException {
 		if( item == null) {
-			setValue(null);
+			return null;
 		}
-		
-		setValue(new ByteArrayMimeStreamData(((DataBufferByte)item.getData().getDataBuffer()).getData()));
-		
+		try {
+			return new ByteArrayMimeStreamData(((DataBufferByte)item.getData().getDataBuffer()).getData());
+		} catch (DataFault e) {
+			throw new TypeException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -100,19 +103,7 @@ public class ImageInput extends FileInput implements ItemInput<StreamData,Buffer
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
-	 */
-	@Override
-	public void setItem(BufferedImage item) {
-		try {
-			setBufferedImage(item);
-		} catch (DataFault | TypeException e) {
-			setNull();
-		}
-		
-	}
-
+	
 	/**
 	 * @return the max_x
 	 */

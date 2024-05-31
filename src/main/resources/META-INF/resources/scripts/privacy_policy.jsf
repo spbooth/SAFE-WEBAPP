@@ -3,7 +3,6 @@
     if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 
 %>
 <p>
-<small>All information supplied is held and processed in accordance with our Personal Data and Privacy Policy.
-	  You can find full details <a href="<%= privacy_policy%>" target="_blank"><b>here</b></a>.</small>
+<small>All information supplied is held and processed in accordance with our <a href="<%= privacy_policy%>" target="_blank">Personal Data and Privacy Policy</a>.</small>
 </p>
 <% } %>

@@ -13,14 +13,10 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data.stream;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 /** StreamData Object wrapping a file.
  * 
  * @author spb
@@ -44,16 +40,19 @@ public class FileStreamData implements StreamData {
 		try {
 			return new FileInputStream(file);
 		} catch (FileNotFoundException e) {
-			conn.error(e,"Failed to open file for input");
+			getLogger().error("Failed to open file for input",e);
 			return null;
 		}
+	}
+	Logger getLogger() {
+		return Logger.getLogger(conn,getClass());
 	}
 
 	public OutputStream getOutputStream() {
 		try {
 			return new FileOutputStream(file);
 		} catch (FileNotFoundException e) {
-			conn.error(e,"Failed ot open file for output");
+			getLogger().error("Failed ot open file for output",e);
 			return null;
 		}
 		

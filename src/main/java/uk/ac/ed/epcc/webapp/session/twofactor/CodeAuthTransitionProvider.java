@@ -57,14 +57,14 @@ public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransit
 			/**
 			 * @param comp
 			 */
-			public ProcessAction(SessionService<A> sess,FormAuthComposite<A> comp, A target) {
+			public ProcessAction(SessionService<A> sess,FormAuthComposite<A,FormAuthComposite> comp, A target) {
 				super();
 				this.sess=sess;
 				this.comp = comp;
 				this.target=target;
 			}
 			private final SessionService<A> sess;
-			private final FormAuthComposite<A> comp;
+			private final FormAuthComposite<A,FormAuthComposite> comp;
 			private final A target;
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
@@ -88,7 +88,7 @@ public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransit
 		@Override
 		public void buildForm(Form f, A target, AppContext conn) throws TransitionException {
 			SessionService<A> sess = conn.getService(SessionService.class);
-			FormAuthComposite<A> comp = (FormAuthComposite<A>) sess.getLoginFactory().getComposite(FormAuthComposite.class);
+			FormAuthComposite<A,FormAuthComposite> comp = (FormAuthComposite<A,FormAuthComposite>) sess.getLoginFactory().getComposite(FormAuthComposite.class);
 			if( comp != null ) {
 				comp.modifyForm(target, f);
 				f.addAction("Submit", new ProcessAction(sess, comp,target));
@@ -101,7 +101,7 @@ public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransit
 		 */
 		@Override
 		public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, A target) {
-			FormAuthComposite<A> comp = (FormAuthComposite<A>) op.getLoginFactory().getComposite(FormAuthComposite.class);
+			FormAuthComposite<A,FormAuthComposite> comp = (FormAuthComposite<A,FormAuthComposite>) op.getLoginFactory().getComposite(FormAuthComposite.class);
 			if( comp != null) {
 				comp.addExtra(cb);
 			}
@@ -119,7 +119,7 @@ public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransit
 		if( sess == null || ! sess.haveCurrentUser() || sess.isCurrentPerson(target)) {
 			// allow if anonymous (we are doing a login) or the current user
 			// we are authenticating an operation.
-			FormAuthComposite<A> comp = (FormAuthComposite<A>) sess.getLoginFactory().getComposite(FormAuthComposite.class);
+			FormAuthComposite<A,FormAuthComposite> comp = (FormAuthComposite<A,FormAuthComposite>) sess.getLoginFactory().getComposite(FormAuthComposite.class);
 			if( comp != null) {
 				
 				return true;
@@ -158,6 +158,12 @@ public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransit
 	@Override
 	public TransitionKey<A> getDefaultTransition(A target) {
 		return AUTHENTICATE;
+	}
+
+	@Override
+	public boolean useParser() {
+		// use ids in preference for people due to multiple possible names
+		return false;
 	}
 
 	

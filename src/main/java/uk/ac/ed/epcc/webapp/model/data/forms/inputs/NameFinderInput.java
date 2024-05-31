@@ -1,96 +1,85 @@
 package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
+import uk.ac.ed.epcc.webapp.model.ParseFactory;
+import uk.ac.ed.epcc.webapp.model.data.AbstractDataObjectInput;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
-import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
-/** An {@link DataObjectItemInput} for {@link NameFinder} factories.
+/** An {@link DataObjectItemInput} for {@link ParseFactory}/{@link NameFinder} factories.
  * 
- * This is a text {@link AutoComplete} input using the permitted names
- * optionally creating bootstrap entries 
+ * This is an {@link AutoCompleteListInput} that can be presented as either a pull-down list or
+ * an auto-complete text box. Optionally if created with a {@link NameFinder} it can be used to create new bootstrap
+ * entries. Though this requires tet-box presentation. 
  * 
- * Autocompletion can be 
+ * In text-box mode it is also possible to turn off the auto-completion list for selections where the
+ * suggestion list is too long.
  * 
  * @author spb
  *
  */
-public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>> extends ParseAbstractInput<Integer> implements AutoComplete<T, Integer>, DataObjectItemInput<T>{
+public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>> extends AbstractDataObjectInput<T> implements AutoCompleteListInput<Integer, T>, PreSelectInput<Integer, T>, ModifiableFormatHintInput{
+	protected final ParseFactory<T> finder; // in most cases this will aslo be the factory but not always
+	
+	/** Possible operating modes.
+	 * 
+	 * This is the requested operating mode. 
+	 */
+	public static enum Options{
+		CREATE(true,false,true,true),					// Text with create and suggestions
+		CREATE_NO_SUGGESTIONS(true,false,true,false),	// Text create with no suggestions
+		LIST(false,true,false,true),					// force list presentation
+		AUTO_COMPLETE(false,false,false,true),			// adaptive choice of list or text
+		TEXT_COMPLETE(false,false,true,true),			// force text presentation
+		TEXT_ONLY(false,false,true,false);				// text presentation no suggestions
+		private Options(boolean create, boolean list, boolean text,boolean suggestions) {
+			this.create = create;
+			this.force_list = list;
+			this.force_text = text;
+			this.suggestions = suggestions;
+		}
+		final boolean create; // Create new objects, requires text presentations and a NameFinder
+		final boolean force_list;   // Force list presentation
+		final boolean force_text;   // forct text presentation
+		final boolean suggestions; // generate suggestions in text mode
+	
+	}
+	
+	public NameFinderInput(F factory,ParseFactory<T> finder,BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
+		this(factory,finder,Options.AUTO_COMPLETE,restrict,autocomplete);
+	}
+	public NameFinderInput(F factory,ParseFactory<T> finder,boolean create,BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
+		this(factory,finder,create ? Options.CREATE: Options.AUTO_COMPLETE,restrict,autocomplete);
+	}
 	/**
 	 * 
+	 * @param factory
+	 * @param finder
+	 * @param options
+	 * @param restrict
+	 * @param autocomplete
 	 */
-	protected final F factory;
-	protected final NameFinder<T> finder; // in most cases this will aslo be the factory but not always
-	
-	private String match_error = null;
-	/** create input
-	 * 
-	 * @param create   make entry if not found
-	 * @param restrict  restrict with filter
-	 * @param autocomplete  suggestions/restrict filter
-	 * @param factory {@link DataObjectFactory} and {@link NameFinder}
-	 */
-	public NameFinderInput(F factory, NameFinder<T> finder,boolean create, boolean restrict,BaseFilter<T> autocomplete) {
-		this(factory,finder,create,true,restrict,autocomplete);
-	}
-	/** create input
-	 * 
-	 * @param create   make entry if not found
-	 * @param use_autocomplete   use autocomplete input or a simple text input
-	 * @param restrict  restrict with filter
-	 * @param autocomplete  suggestions/restrict filter
-	 * @param factory {@link DataObjectFactory} and {@link NameFinder}
-	 */
-	public NameFinderInput(F factory, NameFinder<T> finder,boolean create, boolean use_autocomplete, boolean restrict,BaseFilter<T> autocomplete) {
+	public NameFinderInput(F factory, ParseFactory<T> finder,Options options, BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
 
-		super();
-		this.factory = factory;
+		super(factory,autocomplete,restrict);
 		this.finder = finder;
-		this.create = create;
-		this.autocomplete = autocomplete;
-		this.restrict=restrict;
-		this.use_autocomplete = use_autocomplete;
-		addValidator(new FieldValidator<Integer>() {
-			
-			@Override
-			public void validate(Integer data) throws FieldException {
-				T item = getItembyValue(data);
-				if( item == null) {
-					throw new ValidateException("Value does not correspond to item");
-				}
-				if( restrict){
-					
-					if( ! factory.matches(autocomplete, item)){
-						if( match_error != null) {
-							throw new ValidateException(match_error);
-						}
-						throw new ValidateException("Input does not match required filter");
-					}
-				}
-			}
-		});
+		this.options=options;
+		
+
+
 	}
-	private boolean create;
-	private final boolean restrict;
-	private boolean use_autocomplete;  // allow autocomplete to be turned off while keeping the filter for restrictions.
-	private final BaseFilter<T> autocomplete;
+	private Options options;
+	
+	public void setOptions(Options opt) {
+		options = opt;
+	}
+	
 	
 	public T parseItem(String v) throws ParseException {
 		if( v == null || v.trim().isEmpty()) {
@@ -99,9 +88,10 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		try{
 			boolean created = false;
 			T target=finder.findFromString(v);
-			if( target == null && create ){
-				finder.validateNameFormat(v);
-				target=finder.makeFromString(v);
+			if( target == null && canCreate() ){
+				NameFinder<T> nf = (NameFinder<T>) finder;
+				nf.validateNameFormat(v);
+				target=nf.makeFromString(v);
 				created=true;
 			}
 			if(target == null) {
@@ -119,16 +109,6 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 					throw new ParseException("["+v+"] Not found");
 				}
 			}
-			// validate against the filter unless we created a new object
-			// a newly created object is unlikely to match the filter but
-			// probably will as a result of the operation.
-			// we assume if creating a new object is requested then
-			// any newly created object is a valid result
-			if( restrict && autocomplete != null && ! created) {
-				if( ! factory.matches(autocomplete, target)) {
-					throw new ParseException("["+v+"] Not valid");
-				}
-			}
 			return target;
 		}catch(ParseException p) {
 			throw p;
@@ -142,48 +122,44 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	}
 	@Override
 	public Integer parseValue(String v) throws ParseException {
-		T item = parseItem(v);
-		if( item == null) {
+		if( v == null || v.trim().isEmpty()) {
 			return null;
 		}
-		return item.getID();
-	}
-	@Override
-	public T getItembyValue(Integer value) {
-		return factory.find(value);
-	}
-	@Override
-	public void setItem(T item) {
-		if( item == null){
-			setNull();
-		}else{
+		T item = parseItem(v);
+		if( item == null) {
 			try {
-				setValue(item.getID());
-			} catch (TypeException e) {
-				throw new TypeError(e);
+				// Fall back to try paring integer.
+				// In case there is a mis-match between the presentation used by the form
+				// and the 
+				return Integer.parseInt(v);
+			}catch(NumberFormatException nf) {
+				return null;
 			}
 		}
-	}
-	@Override
-	public Set<T> getSuggestions() {
-		LinkedHashSet<T> result = new LinkedHashSet<>();
-		if( autocomplete != null){
-			try {
-				this.factory.getResult(autocomplete).toCollection(result);
-			} catch (DataFault e) {
-				getLogger().error("Error getting suggestions",e);
-			}
-		}
-		return result;
-		
+		return getValueByItem(item);
 	}
 	
-	public AppContext getContext(){
-		return factory.getContext();
+	@Override
+	public Integer getValueByTag(String tag) {
+		if( tag == null || tag.isEmpty()) {
+			return null;
+		}
+		try {
+			return Integer.parseInt(tag);
+		}catch(NumberFormatException e) {
+			// Try a fallback name lookup if not an integer
+			if( finder != null) {
+				T item = finder.findFromString(tag);
+				if( item != null) {
+					return item.getID();
+				}
+			}
+			throw e;
+		}
 	}
-	protected Logger getLogger(){
-		return getContext().getService(LoggerService.class).getLogger(getClass());
-	}
+	
+	
+	
 	@Override
 	public String getValue(T item) {
 		return finder.getCanonicalName(item);
@@ -198,81 +174,143 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 */
 	@Override
 	public String getString(Integer val) {
-		T p = this.factory.find(val);
-		if( p != null ){
-			return finder.getCanonicalName(p);
+		if( val == null ) {
+			return null;
 		}
-		return "";
+		T p = getItembyValue(val);
+		if( p != null ){
+			return getValue(p);
+		}
+		return Integer.toString(val);
 	}
 	/**
 	 * @return the create
 	 */
-	public boolean isCreate() {
-		return create;
+	public boolean canCreate() {
+		return options.create && (finder instanceof NameFinder);
 	}
-	/**
-	 * @param create the create to set
-	 */
-	public void setCreate(boolean create) {
-		this.create = create;
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput#convert(java.lang.Object)
-	 */
+	
+	
+	
+	
+	
+	
 	@Override
-	public Integer convert(Object v) throws TypeException {
-		if( v == null) {
+	public boolean canSubmit() {
+		if( canCreate() ) {
+			return true;
+		}
+		try {
+			return getFactory().exists(getRestrictionFilter());
+		} catch (DataException e) {
+			getLogger().error("Error checking submit", e);
+			return false;
+		}
+	}
+	@Override
+	public T forcedItem() {
+		if( canCreate() ) {
 			return null;
 		}
-		if( v instanceof DataObject){
-			if( factory.isMine(v)){
-				return Integer.valueOf(((T)v).getID());
-			}else{
-				throw new TypeException("DataObject "+v.getClass().getCanonicalName()+" passed to "+getClass().getCanonicalName());
+		try {
+			if( getRestrictionCount() == 1L) {
+				return getFactory().find(getRestrictionFilter());
 			}
+		} catch (DataException e) {
+			getLogger().error("Error checking for forced", e);
 		}
-		if( v instanceof IndexedReference ){
-			if( factory.isMyReference((IndexedReference) v)){
-				return Integer.valueOf(((IndexedReference)v).getID());
-			}else{
-				throw new TypeException("IndexedReference "+v.toString()+" passed to "+getClass().getCanonicalName());
-			}
-		}
-		if( v instanceof Number) {
-			int intValue = ((Number)v).intValue();
-			if( intValue <= 0 ) {
-				// This is for legacy references where "null" references are stored
-				// as 0 or -1
-				return null;
-			}
-			return Integer.valueOf(intValue);
-		}
-		if(v instanceof String  ) {
-			String name = (String)v;
-			if( ! name.trim().isEmpty()) {
-				T item = finder.findFromString(name);
-				if( item != null) {
-					return item.getID();
-				}
-			}
-		}
-		return super.convert(v);
+		return null;
 	}
-	public String getMatchError() {
-		return match_error;
-	}
-	public void setMatchError(String match_error) {
-		this.match_error = match_error;
+	
+	
+	private String format_hint=null;
+	public void setFormatHint(String hint) {
+		format_hint=hint;
 	}
 	@Override
+	public String getFormatHint() {
+		return format_hint;
+	}
+	
+	private int boxwid=32;
+	@Override
+	public int getBoxWidth() {
+		return boxwid;
+	}
+	@Override
+	public void setBoxWidth(int l) {
+		boxwid=l;
+	}
+	@Override
+	public boolean getSingle() {
+		return true;
+	}
+	@Override
+	public boolean useListPresentation() {
+		if( options.force_list || finder == null) {
+			return true;
+		}
+		if( ! options.suggestions) {
+			return false;  // suggtions explicitly not requested
+		}
+		if( options.create || options.force_text) {
+			return false; // cannot create from list
+		}
+		try {
+			int threshold = getConfigParam("list_threshold", 50);
+			if( threshold > 0 ) {
+				// If the possible suggestions are low enough and
+				// the suggestions contain all the allowed choices then we can use a list
+				long allowed_count = getRestrictionCount();
+				if( allowed_count < threshold) {
+					if( allowed_count ==  getCount()) {
+						return true;
+					}
+
+				}
+			}
+		} catch (DataException e) {
+			getLogger().error("Error in presentation choice", e);
+		}
+		return false;
+	}
+	
+	
+	/** Get a configuration parameter.
+	 * Check FactoryTag.name first then NameFinderInput.name
+	 * 
+	 * @param name
+	 * @param def
+	 * @return
+	 */
+	private int getConfigParam(String name,int def) {
+		AppContext conn = getContext();
+		return conn.getIntegerParameter(getFactory().getConfigTag()+"."+name,
+				conn.getIntegerParameter("NameFinderInput."+name, def)
+				);
+	}
+
+	@Override
 	public boolean useAutoComplete() {
-		return use_autocomplete;
+		if( ! options.suggestions) {
+			return false;  // explicitly disables
+		}
+		if( options.force_text) {
+			return true;
+		}
+		int max = getConfigParam("max_datalist", 102400);
+		if( max > 0 && getCount() > max) {
+			return false; // too many values to add a datalist
+		}
+		
+		return true;
 	}
-	
-	public void setUseAutoComplete(boolean val) {
-		use_autocomplete = val;
+	public final  <R> R accept(InputVisitor<R> vis) throws Exception{
+		if( useListPresentation()) {
+			return vis.visitListInput(this);
+		}else {
+			return vis.visitAutoCompleteInput(this);
+		}
 	}
-	
-	
 	
 }

@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** Input to select values from a Java Enum 
  * the DB will contain the Enum ordinal and the menu the result of the toString call.
@@ -34,7 +34,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  */
 
 
-public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements  ListInput<Integer,E> {
+public class EnumIntegerInput<E extends Enum<E>> extends AbstractInput<Integer> implements  ListInput<Integer,E> {
     
 	EnumSet<E> set;
     Map<Integer,E> lookup;
@@ -117,16 +117,8 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 
 	
 	@Override
-	public void setItem(E v) {
-		if( v == null ){
-			setNull();
-			return;
-		}
-		try {
-			setValue(getValue(v));
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
+	public final Integer getValueByItem(E v) {
+		return getValue(v);
 	}
 	
 	@Override
@@ -158,6 +150,14 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 	@Override
 	public boolean isValid(E item) {
 		return set.contains(item);
+	}
+	@Override
+	public E getItemByTag(String tag) {
+		return getItembyValue(getValueByTag(tag));
+	}
+	@Override
+	public Integer getValueByTag(String tag) {
+		return Integer.parseInt(tag);
 	}
 
 }

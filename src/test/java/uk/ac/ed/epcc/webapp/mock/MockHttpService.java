@@ -35,7 +35,7 @@ public class MockHttpService extends DefaultHttpService {
 		last_url = url;
 		MockHttpURLConnection c = new MockHttpURLConnection(url);
 		c.setStatus(status);
-		c.setReponse(response.getBytes());
+		c.setResponse(response.getBytes());
 		c.addResponseHeader("content-type", "text/plain");
 		return c;
 	}

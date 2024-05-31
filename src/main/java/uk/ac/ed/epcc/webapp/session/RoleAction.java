@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 public class RoleAction<U extends AppUser> extends FormAction{
@@ -51,7 +52,7 @@ public class RoleAction<U extends AppUser> extends FormAction{
 				}
 			
 			}catch(Exception e){
-				p.getContext().error(e,"Error modifying role");
+				Logger.getLogger(getClass()).error("Error modifying role",e);
 			}
 		}
 		return new MessageResult("roles_updated",p);

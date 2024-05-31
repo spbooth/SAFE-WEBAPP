@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
+import uk.ac.ed.epcc.webapp.validation.*;
 
 public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisitor<Object>{
 	/**
@@ -42,6 +43,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	private static final Feature USE_DATALIST = new Feature("html5.use_datalist",true,"Use html5 datalist syntax, disable to test the fallback mode (as if browser does not userstand datalist)");
 	static final Feature LOCK_FORCED_LIST = new Feature("html.list_input.lock_forced",false,"Supress mandatory pull-down inputs with a single choice");
 	private static final Feature MULTI_INPUT_TABLE = new Feature("html.multi_input.use_table",false,"Use layout tables for multi-input");
+	public static final Preference NO_HISTORY_FEATURE = new Preference("html.datalist.no_history",true,"Supress history auto-complete when the application provides suggested values");
 	private ExtendedXMLBuilder hb;
 	private boolean use_post;
 	private boolean use_html5;
@@ -111,7 +113,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.attr("id",id);
 			}
 		} catch (Exception e) {
-			conn.error(e,"Error getting id");
+			getLogger().error("Error getting id",e);
 		}
 		hb.attr("type","checkbox");
 		hb.attr("name",input.getKey());
@@ -152,7 +154,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.attr("id",id);
 			}
 		} catch (Exception e) {
-			conn.error(e,"Error getting id");
+			getLogger().error("Error getting id",e);
 		}
 		hb.attr("type","file");
 		hb.attr("name",input.getKey());
@@ -192,7 +194,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 					hb.attr("id",id);
 				}
 			} catch (Exception e) {
-				conn.error(e,"Error getting id");
+				getLogger().error("Error getting id",e);
 			}
 			hb.attr("name",input.getKey());
 			hb.addClass("input");
@@ -393,10 +395,11 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		try {
 			id = makeID(input);
 		} catch (Exception e) {
-			conn.error(e,"Error getting id");
+			getLogger().error("Error getting id",e);
 		}
-		emitTextParam(hb, input,input.getKey(),id, input.getBoxWidth(), input
-				.getMaxResultLength(), input.getSingle(), true,def);
+		emitTextParam(hb, input,input.getKey(),id, input.getBoxWidth(), 
+				MaxLengthValidator.getMaxLength(input.getValidators()), 
+				input.getSingle(), true,def);
 	
 	}
 
@@ -412,11 +415,12 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		try {
 			id = makeID(input);
 		} catch (Exception e) {
-			conn.error(e,"Error getting id");
+			getLogger().error("Error getting id",e);
 		}
 		
-		emitTextParam(hb, input,input.getKey(), id,input.getBoxWidth(), input
-				.getMaxResultLength(), input.getSingle(), false,def);
+		emitTextParam(hb, input,input.getKey(), id,input.getBoxWidth(), 
+				MaxLengthValidator.getMaxLength(input.getValidators()),
+				useSingle(input), false,def);
 		if( input instanceof UnitInput){
 			String unit = ((UnitInput) input).getUnit();
 			if (unit  != null) {
@@ -424,6 +428,53 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.clean(unit);
 			}
 		}
+	}
+	
+	private void emitTextHTMLWithAutoComplete(ExtendedXMLBuilder hb,boolean use_post, AutoComplete input,
+			String param) {
+		String def = null;
+		if (use_post) {
+			def = param;
+		} else {
+			def = input.getString();
+		}
+		String id=null;
+		try {
+			id = makeID(input);
+		} catch (Exception e) {
+			getLogger().error("Error getting id",e);
+		}
+		
+		emitTextParam(hb, input,input.getKey(), id,input.getBoxWidth(), 
+				MaxLengthValidator.getMaxLength(input.getValidators()),
+				useSingle(input), false,def,input);
+		if( input instanceof UnitInput){
+			String unit = ((UnitInput) input).getUnit();
+			if (unit  != null) {
+				hb.clean(" ");
+				hb.clean(unit);
+			}
+		}
+	}
+	/** Check if the input should be presented a single line
+	 * 
+	 * @param <X>
+	 * @param input
+	 * @return
+	 */
+	private <X> boolean useSingle(LengthInput<X> input) {
+		if( input.getSingle()) {
+			return true;
+		}
+		FieldValidationSet<X> set = input.getValidators();
+		if( set != null) {
+			for(FieldValidator v : set) {
+				if( v instanceof SingleLineFieldValidator) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private String getParam(Input i){
@@ -464,6 +515,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	public <V,T extends Input> Object visitMultiInput(MultiInput<V,T> input) throws Exception {
 		boolean saved = optional;
 		try {
+			input.setBounds();  // may be reflected in teh html
 			// if we don't require all sub-inputs they must be shown as optional
 			optional = optional || !input.requireAll();
 		
@@ -556,6 +608,13 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		return null;
 	}
 
+	@Override
+	public <V, T> Object visitAutoCompleteInput(AutoComplete<V, T> input) throws Exception {
+		emitTextHTMLWithAutoComplete(hb, use_post, input, getParam(input));
+		return null;
+	}
+
+
 	public Object visitUnmodifyableInput(UnmodifiableInput input)
 			throws Exception {
 		constantHTML(hb,input);
@@ -587,6 +646,57 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		return null;
 	}
+	
+	private <T> String getHtml5Type(Input<T> input) {
+		if( input instanceof HTML5Input) {
+			String t = ((HTML5Input)input).getType();
+			if( t != null ) {
+				return t;
+			}
+		}
+		for(FieldValidator<T> v : input.getValidators()) {
+			if( v instanceof HTML5Input) {
+				String t = ((HTML5Input)v).getType();
+				if( t != null ) {
+					return t;
+				}
+			}
+		}
+		return null;
+	}
+	private <T> boolean useMultiple(Input<T> input) {
+		if( input instanceof MultipleInput) {
+			if( ((MultipleInput)input).isMultiple()) {
+				return true;
+			}
+		}
+		for(FieldValidator<T> v : input.getValidators()) {
+			if( v instanceof MultipleInput) {
+				if( ((MultipleInput)v).isMultiple()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	private <T> String getFormatHint(Input<T> input) {
+		if( input instanceof FormatHintInput) {
+			String t = ((FormatHintInput)input).getFormatHint();
+			if( t != null ) {
+				return t;
+			}
+		}
+		for(FieldValidator<T> v : input.getValidators()) {
+			if( v instanceof FormatHintInput) {
+				String t = ((FormatHintInput)v).getFormatHint();
+				if( t != null ) {
+					return t;
+				}
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * output HTML for a text parameter field
 	 * @param result 
@@ -603,20 +713,29 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	 */
 	private void emitTextParam(ExtendedXMLBuilder result,Input input,String name, String id, int boxwid, int max_result_length,
 			boolean force_single, boolean force_password,String default_value) {
+		emitTextParam(result, input, name, id, boxwid, max_result_length, force_single, force_password, default_value, null);
+	}
+	private void emitTextParam(ExtendedXMLBuilder result,Input input,String name, String id, int boxwid, int max_result_length,
+			boolean force_single, boolean force_password,String default_value,AutoComplete suggestions) {
 	
-		String format_hint=null;
-		if( input instanceof FormatHintInput){
-			format_hint = ((FormatHintInput)input).getFormatHint();
+		String format_hint=getFormatHint(input);
+		
+		if( force_password ) {
+			force_single=true; // passwords always single
+		}
+		if( boxwid <=0 ) {
+			force_single=true; // unspecified width defaults to single
+		}
+		boolean has_suggestions = suggestions != null  && suggestions.useAutoComplete();
+		boolean use_datalist = has_suggestions && use_html5 && USE_DATALIST.isEnabled(conn);
+		if(has_suggestions) {
+			force_single=true; // autocomplete (via list) is single
 		}
 		boolean old_escape = result.setEscapeUnicode(! force_password && ESCAPE_UNICODE_FEATURE.isEnabled(conn));
 		// max_result_length <= 0 is unlimited
-		if (force_single || ( max_result_length > 0 && max_result_length <= 2 * boxwid)) {
-			int size = max_result_length;
-			if (max_result_length > boxwid) {
-				size = boxwid;
-			}
-			boolean autocomplete = input instanceof AutoComplete && ((AutoComplete)input).useAutoComplete();
-			boolean use_datalist = autocomplete && use_html5 && USE_DATALIST.isEnabled(conn);
+		if (force_single || ( max_result_length > 0 && (max_result_length <= 2 * boxwid || max_result_length < 64))) {
+			
+			
 			
 			
 			
@@ -628,8 +747,8 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				result.attr("autofocus",null);
 			}
 			String type="text";
-			if( use_html5 && input instanceof HTML5Input){
-				String tmp = ((HTML5Input)input).getType();
+			if( use_html5 ){
+				String tmp = getHtml5Type(input);
 				if( tmp != null ){
 					type=tmp;
 				}
@@ -638,6 +757,13 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				type="password";
 			}
 			result.attr( "type",type);
+			
+			int size = max_result_length;
+			if( boxwid > 0 ) {
+				if (max_result_length > boxwid || max_result_length <= 0) {
+					size = boxwid;
+				}
+			}
 			if( size > 0 ){
 				result.attr("size",Integer.toString(size));
 			}
@@ -651,10 +777,22 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 
 			
 			result.addClass("input");
-			
+			boolean no_autocomplete=false;
 			if (use_datalist) {
 				// add list attribute
 				result.attr("list", name + "_list");
+				no_autocomplete=NO_HISTORY_FEATURE.isEnabled(getContext()); // don't compete with a datalist
+			}
+			
+			if( input instanceof AutoCompleteHint) {
+				String hint = ((AutoCompleteHint)input).getAutoCompleteHint();
+				if( hint != null && ! hint.isEmpty()) {
+					result.attr("autocomplete",hint);
+					no_autocomplete=false; // unless explicitly asked for
+				}
+			}
+			if( no_autocomplete) {
+				result.attr("autocomplete", "off");
 			}
 			// Now for html verification
 			if( use_html5){
@@ -669,11 +807,11 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 					if( bounded.getType() != null){
 						Object min = bounded.getMin();
 						if( min != null ){
-							result.attr("min",bounded.formatRange(min));
+							result.attr("min",bounded.formatRange((Comparable) min));
 						}
 						Object max = bounded.getMax();
 						if( max != null){
-							result.attr("max", bounded.formatRange(max));
+							result.attr("max", bounded.formatRange((Comparable) max));
 						}
 						if( input instanceof RangedInput){
 							RangedInput ranged = (RangedInput)input;
@@ -681,12 +819,12 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 							if( step == null ){
 								result.attr("step", "any");
 							}else{
-								result.attr("step",ranged.formatRange(step));
+								result.attr("step",ranged.formatRange((Comparable) step));
 							}
 						}
 					}
 				}
-				if( use_html5 && use_required && (use_datalist || ! autocomplete)){
+				if( use_html5 && use_required && (use_datalist || ! has_suggestions)){
 					if( ! optional){
 						//Note we have to set
 						// formnovalidate for non validating submit elements.
@@ -696,17 +834,15 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				if( use_html5 && format_hint != null){
 					result.attr("placeholder",format_hint);
 				}
-				if( use_html5 && input instanceof MultipleInput){
-					if(((MultipleInput)input).isMultiple()){
-						result.attr("multiple", "multiple");
-					}
+				if( use_html5 && useMultiple(input)){
+					result.attr("multiple", "multiple");
 				}
 			}
 			result.close();
 			
-			if (autocomplete) {
+			if (has_suggestions) {
 				if (use_html5) {
-					emitDataList(result, use_datalist,(AutoComplete) input, name,false);
+					emitDataList(result, use_datalist,suggestions, name,false);
 				}
 			}
 		} else {
@@ -757,10 +893,10 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	 * @param input
 	 * @param name
 	 */
-	private <T,V> void emitDataList(SimpleXMLBuilder result, boolean use_datalist, AutoComplete<T,V> input, String name,boolean wrap) {
+	private <T,V> void emitDataList(SimpleXMLBuilder result, boolean use_datalist, AutoComplete<V,T> input, String name,boolean wrap) {
 		// add actual list of completions
 		
-		// can't put in noscritp as some browsers show all noscript contents as text.
+		// can't put in noscript as some browsers show all noscript contents as text.
 		
 		if( use_datalist){
 			result.open("datalist");
@@ -779,9 +915,10 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			result.clean("Not selected");
 			result.close();
 		}
-		Set<T> suggestions = input.getSuggestions();
+		Iterator<T> suggestions = input.getItems();
 		if(suggestions!=null){
-			for(T item : suggestions){
+			while( suggestions.hasNext()) {
+				T item = suggestions.next();
 				String value = input.getValue(item);
 				if( value != null && ! value.isEmpty()) {
 					String text = input.getSuggestionText(item).trim();

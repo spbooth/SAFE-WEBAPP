@@ -19,8 +19,8 @@ public class RealNameComposite<AU extends AppUser> extends AppUserComposite<AU, 
 	public static final String INITIALS = "Initials";
 	public static final String LASTNAME = "Lastname";
 
-	public RealNameComposite(AppUserFactory<AU> fac) {
-		super(fac);
+	public RealNameComposite(AppUserFactory<AU> fac,String tag) {
+		super(fac,tag);
 	}
 
 	@Override

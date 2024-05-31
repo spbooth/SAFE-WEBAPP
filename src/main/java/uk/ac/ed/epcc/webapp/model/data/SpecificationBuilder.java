@@ -48,7 +48,7 @@ public class SpecificationBuilder {
 			}else if( info.isDate()){
 				spec.setField(fields, new DateFieldType(info.getNullable(), null));
 			}else if( info.isReference()){
-				spec.setField(fields, new ReferenceFieldType(info.getNullable(), info.getReferencedTable()));
+				spec.setField(fields, new ReferenceFieldType(info.getNullable(), info.getReferencedTable(),info.isIndexed()));
 			}else if( info.isNumeric()){
 				int type = info.getType();
 				if( type == Types.INTEGER){

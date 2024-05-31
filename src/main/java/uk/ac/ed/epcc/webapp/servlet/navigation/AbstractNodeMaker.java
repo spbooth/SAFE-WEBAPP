@@ -47,7 +47,4 @@ public abstract class AbstractNodeMaker implements NodeMaker{
 		return;
 	}
 	
-	protected Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
-	}
 }

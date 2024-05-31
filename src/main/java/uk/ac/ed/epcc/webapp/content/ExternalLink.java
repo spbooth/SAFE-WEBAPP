@@ -17,7 +17,6 @@ import java.net.URL;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
 /**
  * @author Stephen Booth
@@ -43,14 +42,16 @@ public class ExternalLink extends AbstractContexed implements XMLGenerator{
 	@Override
 	public SimpleXMLBuilder addContent(SimpleXMLBuilder b) {
 		try {
-			SimpleXMLBuilder builder=b.getNested();
-			builder.open("a");
-			builder.attr("href", url.toString());
-			builder.attr("target", "_blank");
-			builder.attr("rel","noopener noreferrer external");
-			builder.clean(text);
-			builder.close();
-			builder.appendParent();
+			String string_url = url.toString(); // do this first to pick up any exception
+			
+			b.open("a");
+			
+			b.attr("href", string_url);
+			b.attr("target", "_blank");
+			b.attr("rel","noopener noreferrer external");
+			b.clean(text);
+			b.close();
+			
 		}catch(Exception e) {
 			getLogger().error("Error making link", e);
 			b.clean(text);

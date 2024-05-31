@@ -14,16 +14,12 @@
 package uk.ac.ed.epcc.webapp.forms.result;
 
 import java.text.MessageFormat;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 
 /** A {@link CustomPageResult} that acts as a drop in replacement for {@link MessageResult}
@@ -66,7 +62,7 @@ public class CustomMessageResult extends CustomPageResult  {
 		return conn.getService(MessageBundleService.class).getBundle();
 	}
     private Logger getLogger() {
-    	return conn.getService(LoggerService.class).getLogger(getClass());
+    	return Logger.getLogger(conn,getClass());
     }
     
     private String message_title=null;

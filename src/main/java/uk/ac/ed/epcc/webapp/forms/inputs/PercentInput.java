@@ -47,7 +47,6 @@ public class PercentInput extends DoubleInput {
 	   setMin(0.0);
 	   setMax(1.0);
 	   setBoxWidth(4);
-	   setMaxResultLength(8);
 	   setUnit("(Percentage)");
    }
    @Override

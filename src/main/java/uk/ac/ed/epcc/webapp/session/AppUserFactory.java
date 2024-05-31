@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Span;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -45,7 +46,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
-import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisistor;
+import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
@@ -60,16 +61,13 @@ import uk.ac.ed.epcc.webapp.jdbc.table.PlaceHolderFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
-import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
-import uk.ac.ed.epcc.webapp.model.IndexTableContributor;
-import uk.ac.ed.epcc.webapp.model.NameFinder;
-import uk.ac.ed.epcc.webapp.model.SummaryContributer;
+import uk.ac.ed.epcc.webapp.model.*;
 import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
 import uk.ac.ed.epcc.webapp.model.data.filter.IdAcceptFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.PrimaryOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
@@ -80,6 +78,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.UpdateAction;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput.Options;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
@@ -136,6 +135,8 @@ Targetted<AU>
 	public static final Feature BOOTSTRAP_ADMIN_FEATURE = new Feature("bootstrap.admin",true,"automatically give first user Admin role");
 	public static final String BOOTSTRAP_ROLE_PROPERTY = "bootstrap-role";
 
+	// Might need to set this if auto-creating users f
+	public static final Feature USER_SUPPLIED_LOOKUP = new Feature("app_user.name_lookup.user_supplied_only",true,"The default NameFinder for AppUsers only considers user supplied ids");
 	public static final Feature REQUIRE_PERSON_UPDATE_FEATURE = new Feature("require-person-update",false,"require person update if needed");
 	 public static final Feature AUTO_COMPLETE_APPUSER_INPUT = new Preference("app_user.autocomplete_input",false,"Use auto-complete input as the default person input");
 	 // optional field to allow users to be marked as never to recieve emails
@@ -276,21 +277,6 @@ Targetted<AU>
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getSelectors()
-	 */
-	@Override
-	protected Map<String,Selector> getSelectors() {
-		// expose to EmailCahngeRequest 
-		// final to see if any overiddes.
-		Map<String,Selector> selectors = super.getSelectors();
-		
-		
-		return selectors;
-	}
-   
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObject.Factory#getSupress()
 	 */
 	@Override
@@ -406,7 +392,7 @@ Targetted<AU>
 					}
 				}
 			}catch(Exception t){
-				ctx.error(t,"Error adding Admin to first user");
+				getLogger().error("Error adding Admin to first user",t);
 			}
 		}
 	}
@@ -447,7 +433,7 @@ Targetted<AU>
 				if( ! service.hasRole(SessionService.ADMIN_ROLE)){
 					f.removeField(ALLOW_EMAIL_FIELD);
 				}
-				if( ! CanSubmitVisistor.canSubmit(f)) {
+				if( ! CanSubmitVisitor.canSubmit(f)) {
 					// As a safety check don't force a form that can't
 					// be submitted
 					getLogger().warn("User details form cannot be submitted for "+user.getIdentifier());
@@ -479,7 +465,7 @@ Targetted<AU>
 						}
 					}
 				}catch(Exception t){
-					getContext().error(t,"Error checking force_time");
+					getLogger().error("Error checking force_time",t);
 				}
 				return last.before(target_time);
 			}
@@ -562,6 +548,16 @@ Targetted<AU>
 	}
 	
 	private Map<String,AppUserNameFinder> realms=null;
+	
+	/** This is a role that allows access to all personal details in the application
+	 * this role can be used to short-circuit an expensive access check using {@link #VIEW_PERSON_RELATIONSHIP}
+	 */
+	public static final String VIEW_PERSON_ROLE = "ViewPersonalDetails";
+	/** This is the relationship that allows personal details to be viewed.
+	 * this should always include the {@link #VIEW_PERSON_ROLE} as well as person specific relationships
+	 * 
+	 */
+	public static final String VIEW_PERSON_RELATIONSHIP = "ViewPerson";
 	/** key for a session attibute holding a newly registered user.
 	 * This is to support users being able to link external identities
 	 * in the same session after registration
@@ -603,6 +599,26 @@ Targetted<AU>
 		name = name.trim();
 		try {
 			return find(getStringFinderFilter(name),true);
+		}catch(MultipleResultException mr) {
+			// In principle we might have duplicate ids in different realms.
+			// e.g. a remote-id that is the same as a users email but the user
+			// has two accounts. We really should not be using the default
+			// NameFinder in these contexts so warn.
+			// however we can use the supplied realms in order to break a tie
+			getLogger().warn("Multiple results from person StringFilterFinder", mr);
+			// Search each realm in turn
+			boolean require_vis = USER_SUPPLIED_LOOKUP.isEnabled(getContext());
+			for( AppUserNameFinder finder : getRealms()) {
+				if( finder.userVisible() || ! require_vis) {
+					AU user = (AU) finder.findFromString(name);
+					if( user != null ) {
+						return user;
+					}
+				}
+			}
+			
+			
+			return null;
 		}catch(DataNotFoundException e){
 			return null;
 		} catch (DataException e) {
@@ -632,28 +648,36 @@ Targetted<AU>
 		}
 		return sb.toString();
 	}
-	public static class  AppUserNameInput<A extends AppUser> extends NameFinderInput<A, AppUserFactory<A>> implements HTML5Input, FormatHintInput{
+	public static class  AppUserNameInput<A extends AppUser> extends NameFinderInput<A, AppUserFactory<A>> implements HTML5Input{
 
-		/**
-		 * @param factory
-		 * @param create
-		 * @param restrict
-		 * @param autocomplete
-		 */
-		public AppUserNameInput(AppUserFactory<A> factory,NameFinder<A>finder, boolean create, boolean use_autocomplete,boolean restrict,
+		
+
+		public AppUserNameInput(AppUserFactory<A> factory, ParseFactory<A> finder, BaseFilter<A> restrict,
 				BaseFilter<A> autocomplete) {
-			super(factory, finder,create,use_autocomplete, restrict, autocomplete);
+			super(factory, finder, restrict, autocomplete);
+			if( useEmail()) {
+				setBoxWidth(EmailInput.defaultBoxWidth(getContext()));
+				setFormatHint("name@example.com");
+			}
+			
 		}
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput#getFormatHint()
-		 */
-		@Override
-		public String getFormatHint() {
-			if( useEmail()){
-				return "name@example.com";
+		public AppUserNameInput(AppUserFactory<A> factory, ParseFactory<A> finder, boolean create,
+				BaseFilter<A> restrict, BaseFilter<A> autocomplete) {
+			super(factory, finder, create, restrict, autocomplete);
+			if( useEmail()) {
+				setBoxWidth(EmailInput.defaultBoxWidth(getContext()));
+				setFormatHint("name@example.com");
 			}
-			return null;
+		}
+
+		public AppUserNameInput(AppUserFactory<A> factory, ParseFactory<A> finder, Options options,
+				BaseFilter<A> restrict, BaseFilter<A> autocomplete) {
+			super(factory, finder, options, restrict, autocomplete);
+			if( useEmail()) {
+				setBoxWidth(EmailInput.defaultBoxWidth(getContext()));
+				setFormatHint("name@example.com");
+			}
 		}
 
 		/**
@@ -691,11 +715,16 @@ Targetted<AU>
 		return getInput(restrictDefaultInput());
 	}
 	public DataObjectItemInput<AU> getInput(boolean restrict) {
+		BaseFilter<AU> fil = getFinalSelectFilter();
 		if( useAutoCompleteForSelect()) {
-			//return getNameInput(getFinalSelectFilter(),false, restrictDefaultInput() );
-			return getNameInput(getFinalSelectFilter(),getRealmFinder(getDefaultRealm()),false,true, restrict );
+			if( restrict ) {
+				return new AppUserNameInput<AU>(this,getRealmFinder(getDefaultRealm()),Options.TEXT_COMPLETE,fil,null );
+			}else {
+				return new AppUserNameInput<AU>(this,getRealmFinder(getDefaultRealm()),Options.TEXT_COMPLETE,null, fil );
+			}
+			
 		}
-		return super.getInput(getFinalSelectFilter(),restrict);
+		return super.getInput(fil,restrict);
 	}
 	/** Are we using an auto-complete input for {@link #getInput()}
 	 * 
@@ -707,9 +736,7 @@ Targetted<AU>
 		return AUTO_COMPLETE_APPUSER_INPUT.isEnabled(getContext());
 	}
 	
-	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,NameFinder<AU> finder,boolean create,boolean use_autocomplete,boolean restrict){
-		return new AppUserNameInput<>(this, finder,create, use_autocomplete,restrict, fil);
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.ParseFactory#getCanonicalName(java.lang.Object)
 	 */
@@ -738,7 +765,7 @@ Targetted<AU>
 	}
 
 	public   SQLFilter<AU> getStringFinderFilter(String name){
-		return getStringFinderFilter(name, false);
+		return getStringFinderFilter(name, USER_SUPPLIED_LOOKUP.isEnabled(getContext()));
 	}
 	public   SQLFilter<AU> getStringFinderFilter(String name,boolean require_user_supplied){
 		SQLOrFilter<AU> fil = getSQLOrFilter();
@@ -1008,8 +1035,8 @@ Targetted<AU>
 		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory#getDefaults()
 		 */
 		@Override
-		public Map<String, Object> getDefaults() {
-			Map<String, Object> defaults = super.getDefaults();
+		public Map<String, Object> getCreationDefaults() {
+			Map<String, Object> defaults = super.getCreationDefaults();
 			defaults.put(ALLOW_EMAIL_FIELD, Boolean.TRUE);
 			
 			// look for defaults set in properties
@@ -1119,8 +1146,20 @@ Targetted<AU>
 	 */
 	@Override
 	public void validateNameFormat(String name) throws ParseException {
-		//TODO consider checking if single realm
-		
+		for( AppUserNameFinder finder : getRealms()) {
+			try {
+				if( finder.userVisible()) {
+					finder.validateNameFormat(name);
+					// valid in one realm
+					return;
+				}
+			}catch(ParseException e) {
+				
+			}
+		}
+		// Throw exception for the default realm
+		NameFinder<AU> def = getRealmFinder(getDefaultRealm());
+		def.validateNameFormat(name);
 	}
 	@Override
 	public BaseFilter<AU> hasRelationFilter(String role, AU user) {
@@ -1159,8 +1198,20 @@ Targetted<AU>
 	}
 	@Override
 	public BaseFilter<AU> getSelectFilter() {
+		/* Because input selectors can leak personal information
+		 * we allways narrow selections using the view person relationship.
+		 * In principal an autocomplete input might still allow a person to be
+		 * selected where their id (usually email) is known.
+		 */
+		SessionService sess = getContext().getService(SessionService.class);
+		if( sess.hasRole(AppUserFactory.VIEW_PERSON_ROLE)) {
+			// shortcut the relationship lookup as
+			// the role is sufficient
+			return super.getSelectFilter();
+		}
+		// degault filter must be true as it narrows the relationship
 		return getAndFilter(super.getSelectFilter(),
-				getContext().getService(SessionService.class).getRelationshipRoleFilter(this, AppUserTransitionProvider.VIEW_PERSON_RELATIONSHIP,new GenericBinaryFilter<>(true)));
+				sess.getRelationshipRoleFilter(this, AppUserFactory.VIEW_PERSON_RELATIONSHIP,new GenericBinaryFilter<>(true)));
 	}
 	@Override
 	public FormUpdate<AU> getFormUpdate(AppContext c) {
@@ -1240,7 +1291,7 @@ Targetted<AU>
 				fac.update(p);
 				fac.terminate(p);
 			} catch (Exception e) {
-				conn.error(e, "Error updating PersonHistory");
+				getLogger().error("Error updating PersonHistory", e);
 				return;
 			}
 		}

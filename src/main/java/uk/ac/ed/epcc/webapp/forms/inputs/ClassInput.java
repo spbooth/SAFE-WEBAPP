@@ -22,10 +22,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** Input to select a target class from the set of definitions from the configuration service.
  * This defaults to the set of <b>classdef</b> definitions {@link AppContext#getPropertyClass(Class,String)}
@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  */
 
 
-public class ClassInput<T> extends AbstractInput<String> implements ListInput<String,Class<? extends T>>{
+public class ClassInput<T> extends SimpleListInput<Class<? extends T>>{
     private final AppContext c;
     private final String prefix;
     
@@ -62,7 +62,7 @@ public class ClassInput<T> extends AbstractInput<String> implements ListInput<St
 				}
 			} catch (Exception e) {
 				// just skip
-				c.getService(LoggerService.class).getLogger(getClass()).error("Class "+params.get(name)+" from parameter "+name+" not found",e);
+				Logger.getLogger(c,getClass()).error("Class "+params.get(name)+" from parameter "+name+" not found",e);
 			}
     	}
     	addValidator(new FieldValidator<String>() {
@@ -79,7 +79,7 @@ public class ClassInput<T> extends AbstractInput<String> implements ListInput<St
     	this(c,target,false,"classdef");
     }
 	@Override
-	public Class<? extends T> getItembyValue(String value) {
+	public Class<? extends T> getItemByTag(String value) {
 		if( value == null ){
 			return null;
 		}
@@ -106,29 +106,13 @@ public class ClassInput<T> extends AbstractInput<String> implements ListInput<St
 		return null;
 	}
 
-	@Override
-	public String getTagByValue(String value) {
-		return value;
-	}
+	
 
 	@Override
 	public String getText(Class<? extends T> item) {
 		String tag = getTagByItem(item);
 		return c.getInitParameter("classinput.text."+prefix+tag, tag);
 	}
-
-	@Override
-	public String convert(Object v)  {
-		if( v instanceof String ){
-			return (String) v;
-		}
-		return null;
-	}
-
-	
-
-	
-
 
 	
 
@@ -137,20 +121,6 @@ public class ClassInput<T> extends AbstractInput<String> implements ListInput<St
 		return reg.get(getValue());
 	}
 
-	@Override
-	public void setItem(Class<? extends T> item) {
-		try {
-			setValue(getTagByItem(item));
-		} catch (TypeException e) {
-			// should never happen
-			throw new TypeError(e);
-		}
-		
-	}
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
 	 */
@@ -158,5 +128,5 @@ public class ClassInput<T> extends AbstractInput<String> implements ListInput<St
 	public boolean isValid(Class<? extends T> item) {
 		return reg.values().contains(item);
 	}
-
+   
 }

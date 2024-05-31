@@ -14,11 +14,10 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.forms.MultiInputTestBase;
-import uk.ac.ed.epcc.webapp.forms.ParseMapInputInterfaceTest;
-import uk.ac.ed.epcc.webapp.forms.ParseMapInputInterfaceTestImpl;
+import uk.ac.ed.epcc.webapp.forms.*;
 
 
 /**
@@ -27,12 +26,13 @@ import uk.ac.ed.epcc.webapp.forms.ParseMapInputInterfaceTestImpl;
  */
 
 public class AlternateInputTestCase extends MultiInputTestBase<Integer,Input<Integer>,AlternateInput<Integer>> implements
-ParseMapInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase>
+TestParseDataProvider<Integer, AlternateInput<Integer>>,
+ParseInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase>
 
 {
 
 	
-	public ParseMapInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase> parse_map_test = new ParseMapInputInterfaceTestImpl<>(this);
+	public ParseInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase> parse_test = new ParseInputInterfaceTestImpl<>(this);
 	
 		/**
 	 * 
@@ -80,12 +80,52 @@ ParseMapInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestC
 
 	
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.ParseMapInputInterfaceTest#testGoodDataParses()
-	 */
+	
+
+	@Override
+	public void parseNull() throws Exception {
+		parse_test.parseNull();
+		
+	}
+
+	@Override
+	public void testGoodParse() throws Exception {
+		parse_test.testGoodParse();
+		
+	}
+
+	@Override
+	public void testBadParse() throws Exception {
+		parse_test.testBadParse();
+		
+	}
+
+	@Override
+	public Set<String> getGoodParseData() {
+		Set<String> data = new LinkedHashSet<>();
+		data.add("3");
+		data.add("4");
+		data.add("5");
+		return data;
+	}
+
+	@Override
+	public Set<String> getBadParseData() {
+		Set<String> data = new LinkedHashSet<>();
+		data.add("-9");
+		data.add("wombat");
+		data.add("a thing");
+		return data;
+	}
+
+	@Override
+	public boolean allowNull() {
+		return  true;
+	}
+
 	@Override
 	public void testGoodDataParses() throws Exception {
-		parse_map_test.testGoodDataParses();
+		parse_test.testGoodDataParses();
 		
 	}
 

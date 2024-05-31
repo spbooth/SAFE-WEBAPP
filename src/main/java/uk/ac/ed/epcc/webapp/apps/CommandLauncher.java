@@ -48,7 +48,7 @@ public class CommandLauncher extends AbstractContexed{
 	  private static final Option OPT_HELP = new Option(options, 'h', "help",
 		"Print usage information and exit");
 	  private static final Option OPT_PROP = new Option(options, 'P', true,
-		"Specifiy a property value.  e.g. -Pprop=val").setMultipleArgs();
+		"Specifiy a property value.  e.g. -Pprop=val").noValueSeparator().setMultipleArgs();  // disable value separator to allow comma in properties
 
 	  private static final Option OPT_PROPS_FILE = new Option(options, 'p',
 		"properties", true, "Specify a properties file to load").setMultipleArgs();
@@ -70,6 +70,7 @@ public class CommandLauncher extends AbstractContexed{
 	  
 	  public static void main(String[] args){
 		  AppContext conn = new AppContext();
+		  AppContext.setContext(conn);
 		  conn.setService( new CommandLineLoggerService());
 		  CommandLauncher laucher=new CommandLauncher(conn);
 		  laucher.run(args);
@@ -135,7 +136,7 @@ public class CommandLauncher extends AbstractContexed{
 		try {
 			c = conn.makeContexedObject(comm);
 		} catch (Exception e) {
-			conn.getService(LoggerService.class).getLogger(getClass()).error("error making object",e);
+			Logger.getLogger(conn,getClass()).error("error making object",e);
 			return;
 		}
 		
@@ -144,10 +145,11 @@ public class CommandLauncher extends AbstractContexed{
 	}
 	public static Options.Instance  setupContext(String[] args,
 			LinkedList<String> data,  AppContext context) {
+		AppContext.setContext(context);
 		if( System.getProperty("testing") == null ){
 			context.setService(new CommandLineLoggerService());
 		}
-		Logger log = context.getService(LoggerService.class).getLogger(CommandLauncher.class);
+		Logger log = Logger.getLogger(context,CommandLauncher.class);
 		Options.Instance opts = options.newInstance();
 		Properties prop = new Properties();
 		

@@ -28,8 +28,8 @@ public abstract class AppUserComposite<AU extends AppUser,X extends AppUserCompo
 	/**
 	 * @param fac
 	 */
-	protected AppUserComposite(AppUserFactory<AU> fac) {
-		super(fac);
+	protected AppUserComposite(AppUserFactory<AU> fac,String tag) {
+		super(fac,tag);
 	}
 
 	public AppUserFactory<AU> getAppUserFactory(){

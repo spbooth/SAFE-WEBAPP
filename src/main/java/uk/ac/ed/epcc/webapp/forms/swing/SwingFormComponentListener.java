@@ -23,10 +23,7 @@ import java.awt.event.ComponentListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.Spring;
-import javax.swing.SpringLayout;
+import javax.swing.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Field;
@@ -34,7 +31,6 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.FormValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 
 /** class to map {@link Field}s to {@link SwingField}s and handle events.
@@ -52,7 +48,7 @@ public class SwingFormComponentListener implements ComponentListener {
 	public SwingFormComponentListener(AppContext c) {
 		conn=c;
 		field_map=new LinkedHashMap<>();
-		log = conn.getService(LoggerService.class).getLogger(getClass());
+		log = Logger.getLogger(conn,getClass());
 	}
 
 	public <I> SwingField<I> getSwingField(Field<I> f){
@@ -121,7 +117,7 @@ public class SwingFormComponentListener implements ComponentListener {
 					f.validate();
 				}
 			}catch(Exception e){
-				conn.error(e, "Error registering field");
+				log.error("Error registering field", e);
 			}
 		}
 		makeCompactGrid(panel, nrow, 2, 5, 5, 5, 5);
@@ -251,7 +247,7 @@ public class SwingFormComponentListener implements ComponentListener {
 			try {
 				field.setComponentValue();
 			} catch (Exception e) {
-				conn.error(e,"Error setting compoment: "+field.toString());
+				log.error("Error setting compoment: "+field.toString(),e);
 			}
 		}
 	}

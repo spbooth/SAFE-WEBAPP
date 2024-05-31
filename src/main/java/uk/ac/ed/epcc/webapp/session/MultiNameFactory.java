@@ -91,6 +91,7 @@ public class MultiNameFactory<N extends MultiNameFactory.Name, AU extends AppUse
 		spec.setField(PERSON, c.getService(SessionService.class).getLoginFactory().getReferenceFieldType());
 		try {
 			spec.new Index("name_index", true, NAME);
+			spec.new Index("person_index",false,PERSON);
 		} catch (InvalidArgument e) {
 			c.getService(LoggerService.class).getLogger(getClass()).error("Error making index",e);
 		}

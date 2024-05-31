@@ -342,8 +342,8 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 
 		public LinkInput() {
 			super();
-			addInput("left",  (left_input =  getLeftInput()));
-			addInput("right",  (right_input = getRightInput()));
+			addInput("left",  (left_input =  getLeftSelector().getInput()));
+			addInput("right",  (right_input = getRightSelector().getInput()));
 		}
 
 		/**
@@ -431,16 +431,8 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		}
 
 		@Override
-		public void setItem(T l) {
-
-		
-			try {
-				setValue(new Integer(l.getID()));
-			} catch (TypeException e) {
-				// should never happen
-				throw new TypeError(e);
-			}
-
+		public Integer getValueByItem(T l) {
+			return l.getID();
 		}
 
 		@Override
@@ -460,14 +452,16 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			Integer old = getValue();
 			try {
 					l =  find(id);
-					left_input.setValue(l.getLeftID().intValue());
-					right_input.setValue(l.getRightID().intValue());
-					// reset the fixed values to maintain consistency
-					if (fix_left != null) {
-						fixLeft(l.getLeft());
-					}
-					if (fix_right != null) {
-						fixRight(l.getRight());
+					if( l != null ) {
+						left_input.setValue(l.getLeftID().intValue());
+						right_input.setValue(l.getRightID().intValue());
+						// reset the fixed values to maintain consistency
+						if (fix_left != null) {
+							fixLeft(l.getLeft());
+						}
+						if (fix_right != null) {
+							fixRight(l.getRight());
+						}
 					}
 			} catch (DataException e) {
 				l = null;
@@ -648,8 +642,8 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			IndexedProducer<L> leftFac, String leftField,
 			IndexedProducer<R> rightFac, String rightField) {
 		TableSpecification s = super.getDefaultTableSpecification(c, table, leftFac, leftField, rightFac, rightField);
-		s.setField(leftField, new ReferenceFieldType(false,((DataObjectFactory<L>)leftFac).getTag()));
-		s.setField(rightField, new ReferenceFieldType(false,((DataObjectFactory<R>)rightFac).getTag()));
+		s.setField(leftField, new ReferenceFieldType(false,((DataObjectFactory<L>)leftFac).getTag(),true));
+		s.setField(rightField, new ReferenceFieldType(false,((DataObjectFactory<R>)rightFac).getTag(),true));
 		try {
 			// Might double as an index on leftField
 			// parent makes link index
@@ -659,7 +653,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			s.new Index("LeftKey",false,leftField);
 			s.new Index("RightKey",false,rightField);
 		} catch (InvalidArgument e) {
-			getContext().error(e,"Error making index");
+			getLogger().error("Error making index",e);
 		}
 		return s;
 	}
@@ -824,37 +818,25 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	}
 
 	
-	/**
+	/** {@link Selector} to use for LEFT object
 	 * @return
 	 */
-	protected DataObjectItemInput<L> getLeftInput() {
-		return getLeftFactory().getInput();
+	protected  DataObjectSelector<L> getLeftSelector() {
+		return getLeftFactory();
 	}
 
-	/**
+	/** {@link Selector} to use for RIGHT object
 	 * @return
 	 */
-	protected DataObjectItemInput<R> getRightInput() {
-		return getRightFactory().getInput();
+	protected DataObjectSelector<R> getRightSelector() {
+		return getRightFactory();
 	}
 
 	@Override
 	protected Map<String, Selector> getSelectors() {
 		Map<String, Selector> result = super.getSelectors();
-		result.put(getLeftField(),new Selector() {
-
-			@Override
-			public Input getInput() {
-				return getLeftInput();
-			}
-		});
-		result.put(getRightField(),new Selector() {
-
-			@Override
-			public Input getInput() {
-				return getRightInput();
-			}
-		});
+		result.put(getLeftField(),getLeftSelector());
+		result.put(getRightField(),getRightSelector());
 		return result;
 	}
 

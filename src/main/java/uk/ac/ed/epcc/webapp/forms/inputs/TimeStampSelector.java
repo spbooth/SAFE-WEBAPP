@@ -1,54 +1,44 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.Date;
-
-import uk.ac.ed.epcc.webapp.model.data.BoundedSelector;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
-public class TimeStampSelector implements Selector<TimeStampInput>, BoundedSelector<Date, TimeStampInput> {
+public class TimeStampSelector implements Selector<TimeStampInput> {
 
-	private final long res;
-	private final Date min;
-	private final Date max;
-	public TimeStampSelector(long res, Date min,Date max) {
-		this.res=res;
-		this.min=min;
-		this.max=max;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (res ^ (res >>> 32));
+		return result;
 	}
 
-	public TimeStampSelector(Date min,Date max) {
-		this(1000L,min,max);
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TimeStampSelector other = (TimeStampSelector) obj;
+		if (res != other.res)
+			return false;
+		return true;
+	}
+	private final long res;
+	
+	public TimeStampSelector(long res) {
+		this.res=res;
+	}
+
+	public TimeStampSelector() {
+		this(1000L);
 	}
 	@Override
 	public TimeStampInput getInput() {
 		TimeStampInput input = new TimeStampInput(res);
-		if( min != null ) {
-			input.setMin(min);
-		}
-		if( max != null ) {
-			input.setMax(max);
-		}
 		return input;
 	}
 
-
-	@Override
-	public BoundedSelector<Date, TimeStampInput> narrowBounds(Date min, Date max) {
-		if( min == null ) {
-			min=this.min;
-		}else {
-			if( this.min != null && this.min.after(min)) {
-				min = this.min;
-			}
-		}
-		if( max == null ) {
-			max = this.max;
-		}else {
-			if( this.max != null && this.max.before(max)) {
-				max = this.max;
-			}
-		}
-		return new TimeStampSelector(res, min, max);
-	}
 
 }

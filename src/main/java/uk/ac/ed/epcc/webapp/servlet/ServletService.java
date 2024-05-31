@@ -228,7 +228,21 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * @throws IOException
 	 * @throws ServletException
 	 */
-	public <A extends AppUser> void requestLogin(SessionService<A> sess, String page)
+	default public <A extends AppUser> void requestLogin(SessionService<A> sess, String page)
+			throws IOException, ServletException{
+		requestLogin(sess, null, page);
+	}
+	
+	/** Go to the login page to request a login.
+	 * 
+	 * @param <A>
+	 * @param sess {@link SessionService}
+	 * @param username  suggested username for login form
+	 * @param page  page to return to
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	public <A extends AppUser> void requestLogin(SessionService<A> sess, String username, String page)
 			throws IOException, ServletException;
 	/** Return the default charset we want to use.
 	 * 

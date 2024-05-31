@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import jakarta.mail.MessagingException;
@@ -39,6 +40,8 @@ import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
 
 /** Mock based tests of {@link Emailer}.
@@ -102,7 +105,7 @@ public class EmailerTest extends WebappTestBase {
 		assertTrue(stream.toString().contains("Penguins"));
 	}
 	@Test
-	public void testTemplateEmail() throws IOException, MessagingException, InvalidArgument{
+	public void testTemplateEmail() throws IOException, MessagingException, InvalidArgument, DataFault{
 		Emailer mailer = Emailer.getFactory(ctx);
 	
 		TemplateFile tf = TemplateFile.getFromString(getResourceAsString("/test_templates/test_email.txt")); // Load the page template
@@ -114,9 +117,84 @@ public class EmailerTest extends WebappTestBase {
 		
 	}
 	
+	@Test
+	@ConfigFixtures("queued.properties")
+	public void testQueuedTemplateEmail() throws Exception{
+		MockTansport.clear();
+		MockTansport.setConnectFail(true);
+		setTime(2023, Calendar.AUGUST, 25, 15, 30);
+		takeBaseline();
+		Emailer mailer = Emailer.getFactory(ctx);
+		assertTrue(Emailer.EMAIL_QUEUE_FAILS_FEATURE.isEnabled(ctx));
+	
+		TemplateFile tf = TemplateFile.getFromString(getResourceAsString("/test_templates/test_email.txt")); // Load the page template
+		mailer.doSend(mailer.templateMessage("user@example.com", null, tf));
+		deferredEmails();
+		assertTrue(MockTansport.nSent()==0);
+		checkDiff(null, "queued.xml");
+		
+		// Attempt a retry with connection still failing
+		setTime(2023, Calendar.AUGUST, 25, 15, 35);
+		QueuedMessages fac = QueuedMessages.getFactory(ctx);
+		fac.retry();
+		assertTrue(MockTansport.nSent()==0);
+		assertEquals(1, fac.getCount(null));
+		checkDiff(null, "retry_fail.xml");
+		
+		// attempt second retry with good conenction
+		setTime(2023, Calendar.AUGUST, 25, 15, 40);
+		MockTansport.setConnectFail(false);
+		fac.retry();
+		assertTrue(MockTansport.nSent()==1);
+		assertEquals("user@example.com", MockTansport.getAddress(0)[0].toString());
+		assertEquals("A test Email",MockTansport.getMessage(0).getSubject());
+		assertEquals(0, fac.getCount(null));
+		checkDiff(null, "retry_send.xml");
+		MockTansport.clear();
+	}
+	
+	
+	@Test
+	@ConfigFixtures("force_queued.properties")
+	public void testForceQueuedTemplateEmail() throws Exception{
+		MockTansport.clear();
+		MockTansport.setConnectFail(false);
+		setTime(2023, Calendar.AUGUST, 25, 15, 30);
+		takeBaseline();
+		Emailer mailer = Emailer.getFactory(ctx);
+		assertTrue(Emailer.EMAIL_FORCE_QUEUE_FEATURE.isEnabled(ctx));
+	
+		TemplateFile tf = TemplateFile.getFromString(getResourceAsString("/test_templates/test_email.txt")); // Load the page template
+		mailer.doSend(mailer.templateMessage("user@example.com", null, tf));
+		
+		mailer.doSend(mailer.templateMessage("user2@example.com", null, tf));
+		deferredEmails();
+		assertTrue(MockTansport.nSent()==0);
+		checkDiff(null, "queued2.xml");
+		takeBaseline();
+		
+		// Attempt a retry with connection still failing
+		setTime(2023, Calendar.AUGUST, 25, 15, 35);
+		QueuedMessages fac = QueuedMessages.getFactory(ctx);
+		fac.retry();
+		assertTrue(MockTansport.nSent()==0);
+		assertEquals(2, fac.getCount(null));
+		checkUnchanged(); // Should be disabled if queue forced
+		
+		StreamData sd = fac.exportMessages();
+		assertEquals(0, fac.getCount(null)); // should be removed
+		checkDiff(null, "exported.xml");
+		System.out.println(sd.toString());
+		
+		takeBaseline();
+		fac.importMessages(sd);
+		assertEquals(2, fac.getCount(null)); // should be restored
+		checkDiff(null, "imported.xml");
+		
+	}
 	@Test(expected=jakarta.mail.SendFailedException.class)
 	@ConfigFixtures("blacklist.properties")
-	public void testBlacklist() throws IOException, MessagingException, InvalidArgument{
+	public void testBlacklist() throws IOException, MessagingException, InvalidArgument, DataFault{
 		Emailer mailer = Emailer.getFactory(ctx);
 	
 		TemplateFile tf = TemplateFile.getFromString(getResourceAsString("/test_templates/test_email.txt")); // Load the page template

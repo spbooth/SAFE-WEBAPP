@@ -61,9 +61,9 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 		Boolean b = (Boolean) conn.getAttribute(this);
 		if (b == null) {
 			
-			b = new Boolean(defaultSetting(conn));
+			b = Boolean.valueOf(defaultSetting(conn));
 			SessionService sess = conn.getService(SessionService.class);
-			if( ! sess.isAuthenticated()) {
+			if( sess == null || ! sess.isAuthenticated()) {
 				// This ensures that preferences don't trigger authentication
 				// within the authentication flow itself
 				// user must already have authenticated for preferences to take effect.
@@ -76,8 +76,8 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 			// once lookup is complete the user preference will be applied.
 			conn.setAttribute(this, b);
 			if( sess !=null && canView(sess)){
-				UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
-				b = new Boolean(fac.getPreference(this));
+				UserSettingFactory<UserSetting> fac = UserSettingFactory.getFactory(conn);
+				b = Boolean.valueOf(fac.getPreference(this));
 				conn.setAttribute(this, b);
 			}
 		}
@@ -94,20 +94,20 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 	
 	@Override
 	public boolean hasPreference(AppContext conn){
-		UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
+		UserSettingFactory<UserSetting> fac = UserSettingFactory.getFactory(conn);
 		return fac.hasPreference(this);
 	}
 	
 	
 	public void clearPreference(AppContext conn) throws DataFault{
-		UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
+		UserSettingFactory<UserSetting> fac = UserSettingFactory.getFactory(conn);
 		fac.clearPreference(this);
 		conn.removeAttribute(this);
 		
 	}
 	@Override
 	public void setPreference(AppContext conn, Boolean value){
-		UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
+		UserSettingFactory<UserSetting> fac = UserSettingFactory.getFactory(conn);
 		fac.setPreference(this, value);
 		conn.removeAttribute(this);
 	}

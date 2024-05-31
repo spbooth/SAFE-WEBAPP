@@ -21,6 +21,8 @@ import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.NumberFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 /** TypeProducer to make {@link Indexed} objects from an Integer field.
@@ -80,6 +82,11 @@ public class IndexedTypeProducer<T extends Indexed,F extends IndexedProducer<T>>
 	 */
 	@Override
 	public FieldType<Integer> getFieldType(T def) {
+		Class c = getInnerClass();
+		String tag = getInnerTag();
+		if( DataObjectFactory.class.isAssignableFrom(c) && tag != null) {
+			return new ReferenceFieldType(tag);
+		}
 		return new NumberFieldType<>(Integer.class, def == null,def == null ? null : def.getID());
 	}
 	/* (non-Javadoc)
@@ -92,6 +99,29 @@ public class IndexedTypeProducer<T extends Indexed,F extends IndexedProducer<T>>
 			return ((Selector)producer).getInput();
 		}
 		return null;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((field == null) ? 0 : field.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IndexedTypeProducer other = (IndexedTypeProducer) obj;
+		if (field == null) {
+			if (other.field != null)
+				return false;
+		} else if (!field.equals(other.field))
+			return false;
+		return true;
 	}
 	
 	

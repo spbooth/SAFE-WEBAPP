@@ -12,26 +12,24 @@
 <Firstname type='String' nullable='true' max='32'/>
 <Initials type='String' nullable='true' max='3'/>
 <Lastname type='String' nullable='true' max='32'/>
-<PublicKey type='String' nullable='true' max='16777215'/>
 <PersonalCertificate type='String' nullable='true' max='200'/>
 <Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
 <WebName_index type='Index' unique='true'><Column name='WebName'/></WebName_index>
 </TableSpecification>
 <Person id='1'>
 <Email>fred@example.com</Email>
-<Updated>1589549330</Updated>
+<Updated>1714732782</Updated>
 <PasswordFails>0</PasswordFails>
 <PasswordStatus>V</PasswordStatus>
-<Salt>dcHTP6yifSXsJfnb</Salt>
+<Salt>8dqiZHFDfWa0dq3L</Salt>
 <Alg>2</Alg>
-<Password>a090ac23407e80e8101b9de6d198e18fd3c9b80b4513550eafa27b8efe90fb9d</Password>
+<Password>83f08290f56c6675d7fc70c03f2b5c4e335e10b4faca7f1aa90f83cc38e34425</Password>
 <Firstname>Albert</Firstname>
 <Lastname>Spangler</Lastname>
-<PublicKey>ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQSfRc3/A1cyD8NV/gxINRNhMIVkIofUexxtLfAfmNRf666SSei/w2kPX9ndOJ32y2OUUKkijJvEdeMEuFido9Kifc79p0q1KcOhAdRNmmE+LriqsbhJJVQz0OeOKw7wPN9KNYfTevZleQAJBRKr99rBgyRrtrXBhnjYu3yb8E/lf4g8MiBuLGcezzi310RwKMFnamr6MTbA3KBvgvFrPmsjVyedn1IyMdgQ0x8OZMQbr6hesvnR8HuKYfFtm4Vjx7bS+Dyqn+PlPrWH/fjs1957fe57gtZ9eM2S0lsv5cagcWghPAZP</PublicKey>
 <PersonalCertificate>/c=UK/o=eScience/ou=Edinburgh/l=NeSC/cn=stephen booth</PersonalCertificate>
 </Person>
 <TableSpecification name='PersonHistory'>
-<PeerID reference='Person'/>
+<PeerID reference='Person' nullable='false'/>
 <StartTime type='Long' nullable='true'/>
 <EndTime type='Long' nullable='true'/>
 <Email type='String' nullable='true' max='254'/>
@@ -40,18 +38,16 @@
 <Firstname type='String' nullable='true' max='32'/>
 <Initials type='String' nullable='true' max='3'/>
 <Lastname type='String' nullable='true' max='32'/>
-<PublicKey type='String' nullable='true' max='16777215'/>
 <PeerIndex type='Index' unique='false'><Column name='PeerID'/><Column name='EndTime'/><Column name='StartTime'/></PeerIndex>
 <SearchIndex type='Index' unique='false'><Column name='EndTime'/><Column name='StartTime'/></SearchIndex>
 </TableSpecification>
 <PersonHistory id='1'>
 <PeerID>1</PeerID>
-<StartTime>1589549330</StartTime>
+<StartTime>1714732782</StartTime>
 <EndTime>9223372036854775</EndTime>
 <Email>fred@example.com</Email>
 <Firstname>Albert</Firstname>
 <Lastname>Spangler</Lastname>
-<PublicKey>ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQSfRc3/A1cyD8NV/gxINRNhMIVkIofUexxtLfAfmNRf666SSei/w2kPX9ndOJ32y2OUUKkijJvEdeMEuFido9Kifc79p0q1KcOhAdRNmmE+LriqsbhJJVQz0OeOKw7wPN9KNYfTevZleQAJBRKr99rBgyRrtrXBhnjYu3yb8E/lf4g8MiBuLGcezzi310RwKMFnamr6MTbA3KBvgvFrPmsjVyedn1IyMdgQ0x8OZMQbr6hesvnR8HuKYfFtm4Vjx7bS+Dyqn+PlPrWH/fjs1957fe57gtZ9eM2S0lsv5cagcWghPAZP</PublicKey>
 </PersonHistory>
 <TableSpecification name='role_table'>
 <PersonID type='Integer' nullable='false'/>

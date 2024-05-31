@@ -60,8 +60,5 @@ public class UrlInputTest extends AbstractInputTestCase<String,URLInput> {
 		return res;
 	}
 
-	@Test 
-	public void testType() throws Exception {
-		assertEquals("url",getInput().getType());
-	}
+	
 }

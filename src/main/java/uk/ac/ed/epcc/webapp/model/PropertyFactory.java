@@ -16,10 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model;
 
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
@@ -35,7 +32,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -71,7 +67,6 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 				name_input.setSingle(true);
 				name_input.setTrim(true);
 				name_input.setBoxWidth(64);
-				name_input.setMaxResultLength(MAX_NAME_LENGTH);
 				name_input.addValidator(new NoSpaceFieldValidator());
 				return name_input;
 			}
@@ -85,7 +80,6 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 			public Input getInput() {
 				TextInput prop_input = new TextInput();
 				prop_input.setBoxWidth(64);
-				prop_input.setMaxResultLength(MAX_PROP_LENGTH);
 				prop_input.setSingle(true);
 				return prop_input;
 			}
@@ -113,7 +107,7 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 		try {
 			s.new Index("name_key", true, Property.NAME);
 		} catch (InvalidArgument e) {
-			c.error(e,"Failed to create name key");
+			getLogger().error("Failed to create name key",e);
 		}
 		return s;
     }
@@ -123,7 +117,7 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 	}
     public void loadProperties(Properties props){
     	try {
-    		Logger log= getContext().getService(LoggerService.class).getLogger(getClass());
+    		Logger log= getLogger();
 			for(Property p: all()){
 				String name=p.getName().trim();
 				String value=p.getValue().trim();

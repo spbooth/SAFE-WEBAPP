@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
 /**	
@@ -56,14 +56,14 @@ protected final UpdateTemplate<BDO> updater;
 
 		try {
 			AppContext conn = dat.getContext();
-			Map<String,Object> orig=dat.getMap(true); // want nulls for diff generation
+			Map<String,Object> orig=dat.getMap(true,false); // want nulls for diff generation
 			
 			dat.formUpdate(f);
 			preCommit(dat,f,orig);
 			boolean changed = dat.commit();
 			if( changed && LOG_FORM_UPDATES.isEnabled(conn)) {
 				String diff = f.diff(orig);
-				conn.getService(LoggerService.class).getLogger(dat.getClass()).info("Form update "+diff);
+				Logger.getLogger(conn,dat.getClass()).info("Form update "+diff);
 			}
 			
 			postUpdate(dat,f,orig, changed);

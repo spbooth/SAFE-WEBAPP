@@ -19,6 +19,9 @@ package uk.ac.ed.epcc.webapp.model;
 import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.UIGenerator;
+import uk.ac.ed.epcc.webapp.content.UIProvider;
+import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionGenerator;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.*;
@@ -40,10 +43,11 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  * @author spb
  *
  */
-public class Dummy1 extends DataObject implements Removable {
-	@ConfigTag("Dummy")
+public class Dummy1 extends DataObject implements Removable, UIProvider {
+	private static final String DUMMY_CONFIG_TAG = "Dummy";
+
 	public static final String NAME = "Name";
-	@ConfigTag("Dummy")
+	
 	public static final String MANDATORY ="Mandatory";
 	public static final String NUMBER = "Number";
 	public static final String UNSIGNED = "UnsignedInt";
@@ -110,10 +114,10 @@ public class Dummy1 extends DataObject implements Removable {
 	}
 	
 	
-    public static class Factory extends DataObjectFactory<Dummy1> implements TestComposable, FieldHandler{
+    public static class Factory extends DataObjectFactory<Dummy1> implements TestComposable{
     	
-    	@ConfigTag("Dummy")
-    	public static final String BASE="Base";
+    	
+    	
     	 /**
 		 * 
 		 */
@@ -268,6 +272,7 @@ public class Dummy1 extends DataObject implements Removable {
 		protected TableSpecification getDefaultTableSpecification(AppContext c,
 				String table) {
 			TableSpecification spec = new TableSpecification();
+			spec.setCurrentTag(DUMMY_CONFIG_TAG);
 			spec.setField(NAME, new StringFieldType(true, "", 32));
 			spec.setField(NUMBER, new DoubleFieldType(true, 0.0));
 			spec.setField(UNSIGNED, new LongFieldType(true, 0L));
@@ -275,6 +280,7 @@ public class Dummy1 extends DataObject implements Removable {
 			spec.setField(TIME,new DateFieldType(true, null));
 			spec.setField(beatles.getField(), beatles.getFieldType(Beatle.Paul));
 			spec.setField(ruttles.getField(), ruttles.getFieldType(Beatle.Ringo));
+			spec.clearCurrentTag();
 			return spec;
 		}
 		public Set<String> getNullFields(){
@@ -303,11 +309,10 @@ public class Dummy1 extends DataObject implements Removable {
 		public FilterUpdate<Dummy1> getUpdate(){
 			return new FilterUpdate<>(res);
 		}
-		@Override
-		public void addConfigTags(Map<String, String> config_tags) throws Exception {
-			FieldHandler.addConfigTags(getClass(),config_tags);
-			FieldHandler.addConfigTags(Dummy1.class,config_tags);
+		public Map<String,String> getConfigTags(){
+			return getFinalTableSpecification(getContext(), getTag()).getConfigTags();
 		}
+		
     }
 
 
@@ -318,5 +323,10 @@ public class Dummy1 extends DataObject implements Removable {
 	public void remove() throws DataException {
 		delete();
 		
+	}
+
+	@Override
+	public UIGenerator getUIGenerator() {
+		return new ViewTransitionGenerator<Dummy1>(getContext(), ViewDummyTransitionProvider.DUMMY_TRANISTION_TAG, this,getName());
 	}
 }

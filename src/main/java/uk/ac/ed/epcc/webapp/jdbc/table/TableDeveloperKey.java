@@ -39,7 +39,9 @@ public class TableDeveloperKey extends TableTransitionKey {
 	public TableDeveloperKey(String name) {
 		this(DataObjectFactory.class,name);
 	}
-
+	public TableDeveloperKey(String name,String help) {
+		this(DataObjectFactory.class,name,help);
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.AccessControlTransitionKey#allow(uk.ac.ed.epcc.webapp.session.SessionService)
 	 */

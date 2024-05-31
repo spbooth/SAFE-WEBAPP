@@ -19,8 +19,10 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.InternalErrorResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
 
@@ -40,9 +42,9 @@ public class DropTableTransition<T extends DataObjectFactory> extends
 			return new TableListResult();
 		}
 		}catch(Exception e){
-			conn.error(e,"Error dropping table");
+			Logger.getLogger(getClass()).error("Error dropping table",e);
 		}
-		return new MessageResult("internal_error");
+		return new InternalErrorResult();
 	}
 
 }

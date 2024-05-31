@@ -15,6 +15,7 @@
 // A text input with auto-complete suggestions
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import java.util.Iterator;
 import java.util.Set;
 
 /** A {@link TextInput} with an auto-complete list.
@@ -25,7 +26,7 @@ import java.util.Set;
  * @author James
  *
  */
-public abstract class AutocompleteTextInput<T> extends TextInput implements ItemInput<String,T>, AutoComplete<T,String> {
+public abstract class AutocompleteTextInput<T> extends TextInput implements ItemInput<String,T>, AutoComplete<String,T> {
 	public AutocompleteTextInput() {
 		super();
 	}
@@ -34,7 +35,6 @@ public abstract class AutocompleteTextInput<T> extends TextInput implements Item
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete#getSuggestions()
 	 */
 	// subclasses should override to return a list of possible completions
-	@Override
 	abstract public Set<T> getSuggestions();
 	
 	/* (non-Javadoc)
@@ -57,12 +57,25 @@ public abstract class AutocompleteTextInput<T> extends TextInput implements Item
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
 	 */
 	@Override
-	public void setItem(T item) {
-		try {
-			setValue(getValue(item));
-		} catch (TypeException e) {
-			throw new TypeError(e);
+	public final String getValueByItem(T item) {
+		return getValue(item);	
+	}
+	@Override
+	public <R> R accept(InputVisitor<R> vis) throws Exception{
+		if( useAutoComplete()) {
+			return vis.visitAutoCompleteInput(this);
+		}else {
+			return vis.visitLengthInput(this);
 		}
-		
+	}
+
+	@Override
+	public Iterator<T> getItems() {
+		return getSuggestions().iterator();
+	}
+
+	@Override
+	public int getCount() {
+		return getSuggestions().size();
 	}
 }

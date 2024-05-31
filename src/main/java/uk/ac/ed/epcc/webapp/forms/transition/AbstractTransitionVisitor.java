@@ -43,4 +43,15 @@ public abstract class AbstractTransitionVisitor<K,T> extends AbstractContexed im
 	public FormResult getSelf() {
 		return new ChainedTransitionResult<T, K>(provider, target, tag);
 	}
+	@Override
+	public FormResult doModalTransition(ModalTransition<T> t) throws TransitionException {
+		if( target == null ){
+			throw new TransitionException("No target specified");
+		}
+		if( t.useDirect(target)) {
+			return doDirectTransition(t);
+		}else {
+			return doFormTransition(t);
+		}
+	}
 }

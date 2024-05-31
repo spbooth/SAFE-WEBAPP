@@ -20,6 +20,7 @@ import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.XMLGenerator;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 
 public class InputGenerator implements XMLGenerator{
 	private final boolean use_post;
@@ -42,8 +43,12 @@ public class InputGenerator implements XMLGenerator{
 		try {
 			i.accept(vis);
 		} catch (Exception e) {
-			conn.error(e,"Error formatting input");
+			getLogger().error("Error formatting input",e);
 		}
 		return builder;
+	}
+	
+	public Logger getLogger() {
+		return Logger.getLogger(conn,getClass());
 	}
 }

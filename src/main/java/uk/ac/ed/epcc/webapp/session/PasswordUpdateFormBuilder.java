@@ -21,7 +21,6 @@ import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.email.Emailer;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.FormValidator;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
@@ -38,6 +37,8 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.SingleLineFieldValidator;
 
 /** A class that build password update forms
  * @author spb
@@ -107,7 +108,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
      * @author spb
      *
      */
-    private class MatchValidator implements FieldValidator<String>{
+    private class MatchValidator implements SingleLineFieldValidator{
 
     	/**
 		 * @param user
@@ -201,7 +202,9 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
     	SessionService<U> sess = conn.getService(SessionService.class);
     	boolean logged_in = sess != null && sess.haveCurrentUser();
     	if( check_old ){
-    		f.addInput(PASSWORD_FIELD, "Current Password:", new PasswordInput());
+    		PasswordInput s = new PasswordInput();
+    		s.setAutoCompleteHint("current-password");
+			f.addInput(PASSWORD_FIELD, "Current Password:", s);
     		f.getField(PASSWORD_FIELD).addValidator(new MatchValidator(user));
     		f.addValidator(new ChangeValidator());
     	}
@@ -325,7 +328,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 					listener.setPassword(user, new_password);
 				}
 			}catch(Exception t){
-				getLogger().error("Error calling PasswordChangeListener", t);
+				getLogger().error( "Error calling PasswordChangeListener",t);
 			}
 			SessionService<U> service = getContext().getService(SessionService.class);
 			FormResult next_result = null;
@@ -354,7 +357,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 						Emailer emailer = Emailer.getFactory(getContext());
 						emailer.passwordChanged(user);
 					}catch(Exception t) {
-						getLogger().error("Error in email notification", t);
+						getLogger().error("Error in email notification",t);
 					}
 				}
 			}

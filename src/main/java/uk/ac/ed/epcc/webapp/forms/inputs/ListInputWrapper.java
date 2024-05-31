@@ -15,7 +15,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.Iterator;
 
-/**
+/** Abstract superclass for wrappers around {@link ListInput}s
  * @author Stephen Booth
  *
   * @param <V> type of value object
@@ -23,10 +23,12 @@ import java.util.Iterator;
  */
 public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements ListInput<V,T>{
 
+	
+
 	/**
 	 * @param nested
 	 */
-	public ListInputWrapper(Input nested) {
+	public ListInputWrapper(ListInput<V, T> nested) {
 		super(nested);
 	}
 
@@ -37,6 +39,10 @@ public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements
 	@Override
 	public T getItembyValue(V value) {
 		return getInner().getItembyValue(value);
+	}
+	@Override
+	public V getValueByItem(T item) throws TypeException {
+		return getInner().getValueByItem(item);
 	}
 
 	@Override
@@ -50,7 +56,7 @@ public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements
 	}
 
 	@Override
-	public String getTagByItem(T item) {
+	public String getTagByItem(T item){
 		return getInner().getTagByItem(item);
 	}
 
@@ -58,7 +64,18 @@ public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements
 	public String getTagByValue(V value) {
 		return getInner().getTagByValue(value);
 	}
-
+	@Override
+	public T getItemByTag(String tag) {
+		return getInner().getItemByTag(tag);
+	}
+	@Override
+	public String getText(T item) {
+		return getInner().getText(item);
+	}
+	@Override
+	public V getValueByTag(String tag) {
+		return getInner().getValueByTag(tag);
+	}
 	@Override
 	public V convert(Object v) throws TypeException {
 		if( v == null){
@@ -72,10 +89,6 @@ public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements
 		return getInner().convert(v);
 	}
 
-	@Override
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
 
 	@Override
 	public T getItem() {

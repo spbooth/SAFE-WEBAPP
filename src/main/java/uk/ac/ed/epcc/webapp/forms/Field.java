@@ -16,19 +16,11 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.IsForcedVisitor;
-import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
-import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /**
  * Field represents a single field in the form consisting of a label and and Input.
@@ -52,8 +44,8 @@ public final class Field<I> {
 	 * 
 	 */
 	private String label;
-	
 	private String tooltip;
+	private String hint;
 	private boolean optional=false;
 	
 
@@ -72,6 +64,7 @@ public final class Field<I> {
 		}
 		this.sel = sel;
 		this.sel.setKey(key);
+		setInput(sel);
 	}
 	/** Convert the Input to an UnmodifiedInput
 	 * by wrapping it in a LockedInput
@@ -105,7 +98,7 @@ public final class Field<I> {
     		try {
 				return sel.accept(new IsForcedVisitor());
 			} catch (Exception e) {
-				f.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error checking for fixed input",e);
+				Logger.getLogger(f.getContext(),getClass()).error("Error checking for fixed input",e);
 				return false;
 			}
     	}
@@ -144,10 +137,16 @@ public final class Field<I> {
     	sel=i;
     	if( key != null ){
     	  sel.setKey(key);
+		  if(sel instanceof ModifiableFormatHintInput) {
+			  String hint = getInputHint();
+			  if(hint != null) {
+				  ((ModifiableFormatHintInput) sel).setFormatHint(hint);
+    		  }
+    	  }
     	}
     }
     
-	/**
+    /**
 	 * get the key associated with this field
 	 * 
 	 * @return Object
@@ -255,6 +254,19 @@ public final class Field<I> {
 	public void setTooltip(String tooltip) {
 		this.tooltip = tooltip;
 	}
+	public String getInputHint() {
+		if( hint != null) {
+			return hint;
+		}
+		FormTextGenerator gen = f.getFormTextGenerator();
+		if( gen != null) {
+			return gen.getFieldHint(getKey());
+		}
+		return null;
+	}
+	public void setHint(String hint) {
+		this.hint = hint;
+	}
 	public Form getForm() {
 		return f;
 	}
@@ -264,5 +276,4 @@ public final class Field<I> {
 	public void setOptional(boolean optional) {
 		this.optional = optional;
 	}
-
 }

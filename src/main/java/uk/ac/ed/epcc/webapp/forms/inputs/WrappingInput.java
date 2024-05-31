@@ -13,11 +13,13 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** An Input that wraps another input
  * @author Stephen Booth
+ * @param <V> type of input
  *
  */
 public abstract class WrappingInput<V> implements Input<V> {
@@ -114,6 +116,11 @@ public abstract class WrappingInput<V> implements Input<V> {
 		nested.addValidator(val);
 		
 	}
+	
+	@Override
+	public void addValidatorSet(FieldValidationSet<V> set) {
+		nested.addValidatorSet(set);
+	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#removeValidator(uk.ac.ed.epcc.webapp.forms.FieldValidator)
@@ -122,6 +129,11 @@ public abstract class WrappingInput<V> implements Input<V> {
 	public void removeValidator(FieldValidator<V> val) {
 		nested.removeValidator(val);
 		
+	}
+
+	@Override
+	public FieldValidationSet<V> getValidators() {
+		return nested.getValidators();
 	}
 
 	@Override

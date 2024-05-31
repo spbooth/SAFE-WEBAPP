@@ -17,6 +17,7 @@ import java.security.Principal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import uk.ac.ed.epcc.webapp.forms.Identified;
 
@@ -213,7 +214,10 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 				hb.clean("\n");
 			}
 		}
-		addBody(nrow,t);
+		nrow = addBody(nrow,t);
+		if( table_sections) {
+			nrow = addFooter(nrow, t);
+		}
 		hb.close();
 		hb.clean("\n");
 		
@@ -258,74 +262,106 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 	public final String getTableTag() {
 		return style;
 	}
-    public  void addBody(int nrow,Table<C,R> t){
+    public  int addBody(int nrow,Table<C,R> t){
 		if( table_sections){
 			hb.open("tbody");
 			hb.clean("\n");
 		}
-		
-		for (R row_key: t.getRows()) {
-			hb.open("tr", new String[][]{
-					{"count",Integer.toString(nrow)}
-					});
-			if (t.getWarning(row_key)) {
-				hb.attr("class","notice");
-			}else if (t.getHighlight(row_key)) {
-				hb.attr("class","highlight");	
-			}
-			int col=0;
-			if (t.printKeys()) {
-				hb.open(t.isPrintHeadings()?"td":"th", new String[][]{
-						{ "class","key"},
-						{"count",Integer.toString(col++)}
-						});
-				addContent(t.getKeyText(row_key));
-				hb.close();
-			}
-			ArrayList<R> row_keys=null;
-			int skip_col=0;
-			for (C key: t.getColumNames()) {
-				Table<C,R>.Col column = t.getCol(key);
-				if( skip_col > 0) {
-					skip_col--;
-					col++;
-				}else {
-					Object n = t.get(key, row_key);
-					String dc=null;
-					int cols=0;
-					
-					if( n instanceof MultiColumn && hb instanceof HtmlPrinter && allow_span) {
-						cols = ((MultiColumn) n).getColumns();
-						if( cols > 1 ) {
-							
-							skip_col = cols-1;
-						}
-						dc = ((MultiColumn) n).getDisplayClass();
-						
-					}
-					if( column.isDedup() && allow_span) {
-						if( row_keys == null ) {
-							row_keys = new ArrayList<R>();
-							for(R row : t.getRows()) {
-								row_keys.add(row);
-							}
-						}
-						addTdWithDeDup(row_keys, t, row_key, nrow-1, col, key, n, dc, cols);
-					}else {
-						addTd(t, row_key, nrow-1,col, key, n, dc, cols,1);
-					}
-					col++;
-				}
-			}
-			hb.close();
-			hb.clean("\n");
-			nrow++;
-		}
+		int n = emitRows(nrow, t, table_sections ? (r)-> ! t.isFooter(r) : null);
 		if( table_sections){
 			hb.close();
 			hb.clean("\n");
 		}
+		return n;
 	}
+    public  int addFooter(int nrow,Table<C,R> t){
+    	if( ! t.hasFooter()) {
+    		return nrow;
+    	}
+		if( table_sections){
+			hb.open("tfoot");
+			hb.clean("\n");
+		}
+		int n = emitRows(nrow, t, table_sections ? (r)-> t.isFooter(r) : null);
+		if( table_sections){
+			hb.close();
+			hb.clean("\n");
+		}
+		return n;
+	}
+    /** Emit a series of table rows.
+     * 
+     * @param nrow    - starting row position
+     * @param t		  - table
+     * @param filter   - {@link Predicate} to select rows to emait
+     * @return
+     */
+    private int emitRows(int nrow, Table<C, R> t, Predicate<R> filter) {
+    	int pos=0;
+    	for (R row_key: t.getRows()) {
+    		if( filter == null || filter.test(row_key)) {
+    			hb.open("tr", new String[][]{
+    				{"count",Integer.toString(nrow)}
+    			});
+    			if (t.getWarning(row_key)) {
+    				hb.attr("class","notice");
+    			}else if (t.getHighlight(row_key)) {
+    				hb.attr("class","highlight");	
+    			}
+    			int col=0;
+    			if (t.printKeys()) {
+    				hb.open(t.isPrintHeadings()?"td":"th", new String[][]{
+    					{ "class","key"},
+    					{"count",Integer.toString(col++)}
+    				});
+    				addContent(t.getKeyText(row_key));
+    				hb.close();
+    			}
+    			ArrayList<R> row_keys=null;
+    			int skip_col=0;
+    			for (C key: t.getColumNames()) {
+    				Table<C,R>.Col column = t.getCol(key);
+    				if( skip_col > 0) {
+    					skip_col--;
+    					col++;
+    				}else {
+    					Object n = t.get(key, row_key);
+    					String dc=null;
+    					int cols=0;
+
+    					if( n instanceof MultiColumn && hb instanceof HtmlPrinter && allow_span) {
+    						cols = ((MultiColumn) n).getColumns();
+    						if( cols > 1 ) {
+
+    							skip_col = cols-1;
+    						}
+    						dc = ((MultiColumn) n).getDisplayClass();
+
+    					}
+    					if( column.isDedup() && allow_span) {
+    						if( row_keys == null ) {
+    							row_keys = new ArrayList<R>();
+    							for(R row : t.getRows()) {
+    								if( filter == null || filter.test(row)) {
+    									row_keys.add(row);
+    								}
+    							}
+    						}
+    						addTdWithDeDup(row_keys, t, row_key, pos, col, key, n, dc, cols);
+    					}else {
+    						addTd(t, row_key,col, key, n, dc, cols,1);
+    					}
+    					col++;
+    				}
+    			}
+    			hb.close();
+    			hb.clean("\n");
+    			nrow++;
+    			pos++;
+    		}
+    	}
+    	return nrow;
+    }
 	/**
 	 * @param t  Table
 	 * @param row_key  
@@ -335,7 +371,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 	 * @param dc
 	 * @param cols
 	 */
-	protected void addTd(Table<C, R> t, R row_key, int row,int col, C key, Object n, String dc, int cols,int rows) {
+	protected void addTd(Table<C, R> t, R row_key, int col, C key, Object n, String dc, int cols,int rows) {
 		hb.open("td",new String[][]{
 			{"class",col==0?"first":"main"},
 			{"count",Integer.toString(col)}
@@ -352,16 +388,16 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 		addCell(t,key,row_key, n);
 		hb.close();
 	}
-    protected void addTdWithDeDup(ArrayList<R> row_keys,Table<C, R> t, R row_key, int row,int col, C key, Object n, String dc, int cols) {
+    protected void addTdWithDeDup(ArrayList<R> row_keys,Table<C, R> t, R row_key, int pos,int col, C key, Object n, String dc, int cols) {
     	int rows=1;
-    	if( row > 0 ) {
-			Object prev = t.get(key, row_keys.get(row-1));
+    	if( pos > 0 ) {
+			Object prev = t.get(key, row_keys.get(pos-1));
 			if( n != null && prev != null && n.equals(prev)) {
 				hb.clean("\t\t");
 				return;  //supress duplicate
 			}
 		}
-		for( int i=row+1; i< t.nRows();i++) {
+		for( int i=pos+1; i< row_keys.size();i++) {
 			Object next= t.get(key, row_keys.get(i));
 			if( n != null && next != null && n.equals(next)) {
 				rows++;
@@ -369,7 +405,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 				break;
 			}
 		}
-		addTd(t, row_key, row, col, key, n, dc, cols, rows);
+		addTd(t, row_key, col, key, n, dc, cols, rows);
     }
     /* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.TableFormatPolicy#addColumn(uk.ac.ed.epcc.webapp.content.Table, C)

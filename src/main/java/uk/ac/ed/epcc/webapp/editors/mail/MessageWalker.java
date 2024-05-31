@@ -19,22 +19,17 @@ package uk.ac.ed.epcc.webapp.editors.mail;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import jakarta.mail.Address;
+import jakarta.mail.Message.RecipientType;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Part;
-import jakarta.mail.Message.RecipientType;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.internet.MimePart;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** Class that traverses the tree structure of a Mail message (or a MultiPart) applying a visitor class.
  * As the tree is walked it builds a path object that represents the position in the tree.
@@ -148,7 +143,7 @@ public class MessageWalker {
 		return conn;
 	}
 	protected Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
+		return Logger.getLogger(conn,getClass());
 	}
 	public MimeMessage getCurrentMessage(){
 		return current_message;
@@ -492,7 +487,7 @@ protected  boolean showAsLink(MimePart parent, String string) {
  * @param extra
  * @return combined path
  */
-public static LinkedList<String> addPath(LinkedList<String> path, String ...extra){
+public static LinkedList<String> addPath(List<String> path, String ...extra){
 	LinkedList<String> result = new LinkedList<>();
 	if( path != null){
 		result.addAll(path);

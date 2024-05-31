@@ -20,7 +20,7 @@ import java.util.Iterator;
 
 
 
-/**
+/** An {@link AlternateInput} for composing {@link ItemInput}s
  * 
  * @author spb
  *
@@ -70,6 +70,18 @@ public class AlternateItemInput<T,I> extends AlternateInput<T> implements ItemIn
 		for(Iterator<Input<T>> it = getInputs();it.hasNext();){
 			ItemInput<T,I> i =  (ItemInput<T,I>) it.next();
 			return i.getItembyValue(value);
+		}
+		return null;
+	}
+
+	@Override
+	public T getValueByItem(I item) throws TypeException {
+		if( item == null) {
+			return null;
+		}
+		for(Iterator<Input<T>> it = getInputs();it.hasNext();){
+			ItemInput<T,I> i =  (ItemInput<T,I>) it.next();
+			return i.getValueByItem(item);
 		}
 		return null;
 	}

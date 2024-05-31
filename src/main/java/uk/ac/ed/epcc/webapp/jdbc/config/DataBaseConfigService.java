@@ -16,11 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.config;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -147,7 +143,7 @@ public class DataBaseConfigService implements ConfigService {
     			// setup has failed
     			// try to report and carry on. 
     			// However this will leave incomplete data in any upper caches.
-    			ctx.error(e, "Error setting up property table");
+    			getLogger().error("Error setting up property table", e);
     			// If something went wrong don't cache anything.
     			sql=null;
     		}finally{
@@ -214,7 +210,7 @@ public class DataBaseConfigService implements ConfigService {
 						sql.getService().handleError("Error getting properties", se);
 					}
 				} catch (Exception e) {
-					conn.error(e,"Error reading property table");
+					getLogger().error("Error reading property table",e);
 					db_props= null; // DB props are required, this may be a transient error so try again later.
 					ctx.getService(ConfigService.class).clearServiceProperties();
 					return nested.getServiceProperties();
@@ -304,7 +300,7 @@ public class DataBaseConfigService implements ConfigService {
 					}
 				}
 			}catch(Exception e){
-				getContext().error(e,"Error setting database parameter");
+				getLogger().error("Error setting database parameter",e);
 			}
 			notifyListeners();
 		}

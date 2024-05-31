@@ -17,19 +17,15 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.SetInput;
-import uk.ac.ed.epcc.webapp.forms.result.CustomPageResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A transition to show all people with a specific Relationship
  * @author spb
@@ -59,45 +55,6 @@ public class ViewRelationTransition<X extends DataObject> extends AbstractFormTr
 		}
 		return rels;
 	}
-	public class RelationshipList extends CustomPageResult{
-		public RelationshipList(AppContext conn,String relationship, X target) {
-			super();
-			this.conn=conn;
-			this.relationship = relationship;
-			this.target = target;
-		}
-
-		private final AppContext conn;
-		private final String relationship;
-		private final X target;
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.result.CustomPage#getTitle()
-		 */
-		@Override
-		public String getTitle() {
-			return "People with relationship "+relationship+" on "+target.getIdentifier();
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.result.CustomPage#addContent(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.ContentBuilder)
-		 */
-		@Override
-		public ContentBuilder addContent(AppContext conn, ContentBuilder cb) {
-			cb.addHeading(1, getTitle());
-			SessionService sess = conn.getService(SessionService.class);
-			ContentBuilder defn = cb.getDetails("Implementation");
-			defn.addObject(sess.explainRelationship(fac, relationship));
-			defn.closeDetails();
-			try {
-				cb.addList(sess.getPeopleInRelationship(fac, relationship, target));
-			} catch (Exception e) {
-				cb.addText("Internal error occured");
-				conn.getService(LoggerService.class).getLogger(getClass()).error("Error making list",e);
-			}
-			return cb;
-		}
-	}
 	public class ShowAction extends FormAction{
 		public ShowAction(X target) {
 			super();
@@ -109,7 +66,7 @@ public class ViewRelationTransition<X extends DataObject> extends AbstractFormTr
 		 */
 		@Override
 		public FormResult action(Form f) throws ActionException {
-			return new RelationshipList(target.getContext(), (String)f.get(RELATIONSHIP_FIELD), target);
+			return new RelationshipList<>(target.getContext(), (String)f.get(RELATIONSHIP_FIELD),fac, target);
 		}
 		
 	}

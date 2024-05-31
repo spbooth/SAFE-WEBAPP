@@ -143,8 +143,10 @@ public abstract class MultiInput<V,I extends Input> extends BaseInput<V> impleme
 		return true;
 	}
 	
+	
 	@Override
 	public void validateInner() throws FieldException {
+		setBounds();
 		// default behaviour is to validate each sub input
 		// sub-classes can override.
 		for(I i : m.values()){
@@ -190,5 +192,13 @@ public abstract class MultiInput<V,I extends Input> extends BaseInput<V> impleme
 		for( I i : m.values()) {
 			i.setNull();
 		}
+	}
+	
+	/** An extension point that can reflect validation rules
+	 * onto component inputs, if appropriate
+	 * 
+	 */
+	public void setBounds() {
+		
 	}
 }

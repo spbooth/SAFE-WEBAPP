@@ -248,4 +248,8 @@ public class WrappedDatabaseService implements DatabaseService {
 		result.put("wrapped",getClass().getCanonicalName());
 		return result;
 	}
+	@Override
+	public void addCleanup(Runnable r) {
+		inner.addCleanup(r);
+	}
 }

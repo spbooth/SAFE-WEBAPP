@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.forms;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,12 +34,10 @@ import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
  */
 public class FileUploadDecoratorTestCase extends MultiInputTestBase<String, Input, FileUploadDecorator> implements
 TestParseDataProvider<String, FileUploadDecorator>,
-ParseInputInterfaceTest<String, FileUploadDecorator, FileUploadDecoratorTestCase>,
-ParseMapInputInterfaceTest<String, FileUploadDecorator, FileUploadDecoratorTestCase>{
+ParseInputInterfaceTest<String, FileUploadDecorator, FileUploadDecoratorTestCase>{
 
 	ParseInputInterfaceTestImpl<String, FileUploadDecorator, FileUploadDecoratorTestCase> parse_impl = new ParseInputInterfaceTestImpl<>(this);
-	ParseMapInputInterfaceTestImpl<String, FileUploadDecorator, FileUploadDecoratorTestCase> map_imp = new ParseMapInputInterfaceTestImpl<>(this);
-	/**
+		/**
 	 * 
 	 */
 	public FileUploadDecoratorTestCase() {
@@ -131,7 +130,6 @@ ParseMapInputInterfaceTest<String, FileUploadDecorator, FileUploadDecoratorTestC
 	@Test
 	public void testGoodDataParses() throws Exception {
 		parse_impl.testGoodDataParses();
-		map_imp.testGoodDataParses();
 	}
 
 	/* (non-Javadoc)
@@ -160,37 +158,42 @@ ParseMapInputInterfaceTest<String, FileUploadDecorator, FileUploadDecoratorTestC
 		Map<String,Object> data = new HashMap<>();
 		ByteArrayStreamData sd = new ByteArrayStreamData("ringo".getBytes());
 		data.put("decorator.File", sd);
-		
+		MapForm form = new MapForm(getContext());
 		FileUploadDecorator input = getInput();
+		form.addInput("decorator", input);
+		Map errors = new HashMap<>();
+		assertTrue(form.parsePost(errors, data, false));
 		
-		input.parse(data);
-		
-		assertEquals("ringo",input.getValue());
+		assertEquals("ringo",form.get("decorator"));
 	}
 	@Test
 	public void testFileLoadReplace() throws Exception {
 		Map<String,Object> data = new HashMap<>();
 		ByteArrayStreamData sd = new ByteArrayStreamData("ringo".getBytes());
 		data.put("decorator.File", sd);
-		
+		MapForm form = new MapForm(getContext());
 		FileUploadDecorator input = getInput();
 		input.setValue("john");
 		assertEquals("john",input.getValue());
-		input.parse(data);
+		form.addInput("decorator", input);
+		Map errors = new HashMap<>();
+		assertTrue(form.parsePost(errors, data, false));
 		
-		assertEquals("ringo",input.getValue());
+		assertEquals("ringo",form.get("decorator"));
 	}
 	@Test
 	public void testTextReplace() throws Exception {
 		Map<String,Object> data = new HashMap<>();
 		
-		data.put("decorator.Text", "Ringo");
-		
+		data.put("decorator.Text", "ringo"); // a list input would generate lower-case
+		MapForm form = new MapForm(getContext());
 		FileUploadDecorator input = getInput();
 		input.setValue("john");
 		assertEquals("john",input.getValue());
-		input.parse(data);
+		form.addInput("decorator", input);
+		Map errors = new HashMap<>();
+		assertTrue(form.parsePost(errors, data, false));
 		
-		assertEquals("ringo",input.getValue());
+		assertEquals("ringo",form.get("decorator"));
 	}
 }

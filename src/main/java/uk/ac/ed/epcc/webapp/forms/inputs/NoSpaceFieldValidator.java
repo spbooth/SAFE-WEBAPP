@@ -15,9 +15,9 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.regex.Pattern;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /**
  * @author Stephen Booth

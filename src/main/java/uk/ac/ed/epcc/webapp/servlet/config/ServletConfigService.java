@@ -58,7 +58,7 @@ public class ServletConfigService implements ConfigService {
 					}
 				}
 			}catch(Exception e) {
-				c.error(e,"Error getting servlet properties");
+				getLogger().error("Error getting servlet properties",e);
 			}
 		return props;
 	}
@@ -89,7 +89,5 @@ public class ServletConfigService implements ConfigService {
 	public ConfigService getNested() {
 		return nested_service;
 	}
-
-	
 	
 }

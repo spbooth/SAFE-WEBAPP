@@ -20,39 +20,19 @@
  */
 package uk.ac.ed.epcc.webapp.email;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import jakarta.mail.Address;
-import jakarta.mail.Authenticator;
-import jakarta.mail.Message;
+import jakarta.mail.*;
 import jakarta.mail.Message.RecipientType;
-import jakarta.mail.MessagingException;
-import jakarta.mail.Multipart;
-import jakarta.mail.Part;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.AddressException;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeBodyPart;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.*;
 import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
-import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
-import uk.ac.ed.epcc.webapp.content.TemplateFile;
-import uk.ac.ed.epcc.webapp.content.XMLPrintWriterPolicy;
-import uk.ac.ed.epcc.webapp.content.XMLPrinterWriter;
+import uk.ac.ed.epcc.webapp.content.*;
+import uk.ac.ed.epcc.webapp.email.QueuedMessages.QueuedMessage;
 import uk.ac.ed.epcc.webapp.email.logging.EmailLogger;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
@@ -61,19 +41,14 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 //import uk.ac.ed.epcc.webapp.logging.email.EmailLogger;
 import uk.ac.ed.epcc.webapp.model.TemplateFinder;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
-import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
-import uk.ac.ed.epcc.webapp.session.AppUser;
-import uk.ac.ed.epcc.webapp.session.AppUserFactory;
+import uk.ac.ed.epcc.webapp.session.*;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest;
-import uk.ac.ed.epcc.webapp.session.EmailParamContributor;
-import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
-import uk.ac.ed.epcc.webapp.session.PasswordChangeListener;
-import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory.PasswordChangeRequest;
-import uk.ac.ed.epcc.webapp.session.SessionService;
-import uk.ac.ed.epcc.webapp.session.VerificationProvider;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
 /**
  * Emailer Class that sends emails.
@@ -131,9 +106,12 @@ public class Emailer implements Contexed{
 	public static final String EMAIL_FORCE_ADDRESS = "email.force.address";
 	public static final String EMAIL_BYPASS_FORCE_ADDRESS = "email.bypass_force.address";
 	public static final Feature EMAILS_FEATURE = new Feature("emails",true,"emails enabled");
+	public static final Feature EMAIL_FORCE_QUEUE_FEATURE = new Preference("emails.force_queue",false,"All emails are queued to the database first",SessionService.ADMIN_ROLE);
+	public static final Feature EMAIL_QUEUE_FAILS_FEATURE = new Feature("emails.queue_fails",true,"Failed sends are queued to the database first");
+
 	public static final Feature PASSWORD_RESET_SERVLET = new Feature("password_reset.servlet",false,"Send reset url in reset email");
 	public static final Feature EMAIL_DEFERRED_SEND = new Feature("email.deferred_send",true,"Use cleanup service to defer send till end of transaction");
-    public static final Feature HTML_ALTERNATIVE = new Feature("email.html_alternative",true,"Look for a tempalte region conatining html alternative content");
+    public static final Feature HTML_ALTERNATIVE = new Feature("email.html_alternative",true,"Look for a template region containing html alternative content");
 	private static final String MAIL_SMTP_HOST = "mail.smtp.host";
 
 	private static final String ERROR_EMAIL_FROM_ADDRESS = "error.email_from_address";
@@ -150,7 +128,7 @@ public class Emailer implements Contexed{
 
 	private static final int MAX_REPORTS = 10;
 
-	public static final Feature DEBUG_SEND = new Feature("email.send.debug", false, "Log send internal operations");
+	public static final Feature DEBUG_SEND = new Preference("email.send.debug", false, "Log send internal operations",SessionService.ADMIN_ROLE);
 	AppContext ctx;
 	private final Pattern dont_send_pattern;
 	private TemplateFinder finder=null;
@@ -550,7 +528,7 @@ public class Emailer implements Contexed{
 		@Override
 		public void run() {
 			try {
-				postSend(es.send(m));
+				postSend(es.send(m,false));
 			} catch (Exception e) {
 				es.getLogger().error("Error sending message", e);
 			}
@@ -569,12 +547,19 @@ public class Emailer implements Contexed{
 	 *  a transaction
 	 * @param m
 	 * @throws MessagingException
+	 * @throws DataFault 
 	 */
-	public void doSend(MimeMessage m) throws MessagingException{
-		if( EMAIL_DEFERRED_SEND.isEnabled(getContext()) && getContext().getService(DatabaseService.class).inTransaction()) {
+	public void doSend(MimeMessage m) throws MessagingException, DataFault{
+		if( EMAIL_DEFERRED_SEND.isEnabled(getContext())) {
 		   CleanupService cleanup = getContext().getService(CleanupService.class);
 		   if( cleanup != null) {
-			   cleanup.add(new SendAction(this,m));
+			   SendAction a = new SendAction(this,m);
+			   cleanup.add(a);
+			   DatabaseService db = getContext().getService(DatabaseService.class);
+			   if( db != null && db.inTransaction()) {
+				   // If we are in a transaction cancel this if transaction is rolled back
+				   db.addCleanup(a);
+			   }
 			   return;
 		   }
 		}
@@ -587,25 +572,66 @@ public class Emailer implements Contexed{
 	 * @param m
 	 * @return
 	 * @throws MessagingException
+	 * @throws DataFault 
 	 */
-	public MimeMessage doSendNow(MimeMessage m) throws MessagingException{
+	public MimeMessage doSendNow(MimeMessage m) throws MessagingException, DataFault{
+		try {
+			return doSendNow(m, false);
+		} catch (QueuedMessageException e) {
+			getLogger().error("Impossible exception !!",e);
+			return m;
+		}
+	}	
+	public MimeMessage doSendNow(MimeMessage m,boolean exception_on_queue) throws MessagingException, DataFault, QueuedMessageException{	
 		if( m == null ){
 			return null;
 		}
 		
 		
-		m = send(m);
+		m = send(m,exception_on_queue);
 		return m;
 	}
 
-	/**
-	 * @param m
+	/** Re-try a queued message. 
+	 * If it is sent successfully then the queued message will be deleted
+	 * 
+	 * @param qm
+	 * @throws DataFault 
+	 */
+	public boolean retry(QueuedMessage qm) throws DataFault {
+		if( ! EMAILS_FEATURE.isEnabled(getContext())) {
+			return false;
+		}
+		String force = getContext().getInitParameter(EMAIL_FORCE_ADDRESS);
+		if( force != null ) {
+			return false;
+		}
+		try {
+			MimeMessage m = qm.getMessage();
+			Transport.send(m);
+			qm.delete();
+			return true;
+		}catch(SendFailedException me) {
+			getLogger().error("Send fail of queued message",me);
+			qm.delete();
+		}catch(MessagingException me) {
+			getLogger().warn("Email retry failed", me);
+		}
+		qm.recordRetry();
+		return false;
+	}
+	/** Actually send the {@link MimeMessage}
+	 * @param m {@link MimeMessage}
+	 * @param exception_on_queue
+	 * Note this will return null if message sending is disabled.
 
-	 * @return
+	 * @return sent {@link MimeMessage}
 	 * @throws MessagingException
 	 * @throws AddressException
+	 * @throws DataFault 
+	 * @throws QueuedMessageException 
 	 */
-	private MimeMessage send(MimeMessage m) throws MessagingException, AddressException {
+	private MimeMessage send(MimeMessage m, boolean exception_on_queue) throws MessagingException, AddressException, DataFault, QueuedMessageException {
 		if( m == null ){
 			return null;
 		}
@@ -619,7 +645,7 @@ public class Emailer implements Contexed{
 			// in an email so never roll back to before a point an email is sent
 			db.commitTransaction();
 		}
-		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+		Logger log = Logger.getLogger(conn,getClass());
 		if( EMAILS_FEATURE.isEnabled(conn)  && (conn.getAttribute(SUPRESS_EMAIL_ATTR) == null)){
 			String force_email = conn.getInitParameter(EMAIL_FORCE_ADDRESS);
 			Address[] recipients = m.getRecipients(RecipientType.TO);
@@ -672,24 +698,47 @@ public class Emailer implements Contexed{
 			if( vis != null ){
 				m = vis.update(m);
 			}
-			if( DEBUG_SEND.isEnabled(getContext())){
-				ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				Session s = getSession();
-				PrintStream print = new PrintStream(stream);
-				s.setDebugOut(print);;
-				s.setDebug(true);
-				try{
-					Transport.send(m);
-				}finally{
-					s.setDebug(false);
-					s.setDebugOut(null);
-					print.flush();
-					log.debug( stream.toString());
+			if( EMAIL_FORCE_QUEUE_FEATURE.isEnabled(getContext())) {
+				try {
+					QueuedMessages.getFactory(getContext()).queueMessage(m);
+					log.info("mail queued ok "+m.getSubject()+" "+formatAddresses(m.getAllRecipients()));
+				} catch (DataFault e) {
+					log.error("Error queueing message",e);
 				}
-			}else{
-				Transport.send(m);
+				
+			}else {
+				try(TimeClosable tc = new TimeClosable(getContext(), "Emailer.send")) {
+					if( DEBUG_SEND.isEnabled(getContext())){
+						ByteArrayOutputStream stream = new ByteArrayOutputStream();
+						Session s = getSession();
+						PrintStream print = new PrintStream(stream);
+						s.setDebugOut(print);;
+						s.setDebug(true);
+						try{
+							Transport.send(m);
+						}finally{
+							s.setDebug(false);
+							s.setDebugOut(null);
+							print.flush();
+							log.debug( stream.toString());
+						}
+					}else{
+						Transport.send(m);
+					}
+					log.info("mail sent ok "+m.getSubject()+" "+formatAddresses(m.getAllRecipients()));
+				}catch(SendFailedException sf) {
+					throw sf; // Can't be sent at all
+				}catch(MessagingException me) {
+					if( EMAIL_QUEUE_FAILS_FEATURE.isEnabled(conn)) {
+						QueuedMessages.getFactory(conn).queueMessage(m);
+						if( exception_on_queue) {
+							throw new QueuedMessageException("Send failed, message queued for later resend", me);
+						}
+					}else {
+						throw me;
+					}
+				}
 			}
-			log.info("mail sent ok "+m.getSubject()+" "+formatAddresses(m.getAllRecipients()));
 		}else{
 			log.info("email send supressed "+m.getSubject());
 			try{
@@ -699,6 +748,7 @@ public class Emailer implements Contexed{
 			}catch(Exception e){
 				log.error("Error logging contents",e);
 			}
+			return null; // indicate send supressed
 		}
 		return m;
 	}
@@ -1000,9 +1050,6 @@ public class Emailer implements Contexed{
 		return m;
 	}
 
-	public Logger getLogger() {
-		return getContext().getService(LoggerService.class).getLogger(getClass());
-	}
 
 	/** should we specify an encoding for the string
 	 * @param subject
@@ -1074,15 +1121,16 @@ public class Emailer implements Contexed{
 	 * @throws UnsupportedEncodingException
 	 * @throws MessagingException
 	 * @throws InvalidArgument 
+	 * @throws DataFault 
 	 */
 	public void templateEmail(String[] notify_emails,
 			TemplateFile email_template) throws UnsupportedEncodingException,
-			MessagingException, InvalidArgument {
+			MessagingException, InvalidArgument, DataFault {
 		doSend(templateMessage(notify_emails,email_template));
 	}
 	public void templateEmail(String[] notify_emails,InternetAddress from,
 			TemplateFile email_template) throws UnsupportedEncodingException,
-			MessagingException, InvalidArgument {
+			MessagingException, InvalidArgument, DataFault {
 		doSend(templateMessageWithFrom(notify_emails,from,email_template));
 	}
 	/**
@@ -1191,7 +1239,10 @@ public class Emailer implements Contexed{
 	 
 	 */
 	public void errorEmail(Logger log,String subject,String text) {
-		
+		if( EMAIL_FORCE_QUEUE_FEATURE.isEnabled(getContext())) {
+			// Error emails are never queued. so suppress them if queueing is forced
+			return;
+		}
 		try {
 			AppContext conn = getContext();
 			if (!doReport(log,conn)) {
@@ -1271,6 +1322,12 @@ public class Emailer implements Contexed{
 			// abort early if no notify address set.
 			return;
 		}
+		if( EMAIL_FORCE_QUEUE_FEATURE.isEnabled(conn)) {
+			// Error emails are never queued. so suppress them if queueing is forced
+			return;
+		}
+	
+		
 		String subject="An Error occurred";
 		String body="";
 		// Show stack trace
@@ -1363,7 +1420,11 @@ public class Emailer implements Contexed{
 	 * @param text
 	 */
 	public static void infoEmail(AppContext conn, String text) {
-		Logger log = conn.getService(LoggerService.class).getLogger(conn.getClass());
+		if( EMAIL_FORCE_QUEUE_FEATURE.isEnabled(conn)) {
+			// Error emails are never queued. so suppress them if queueing is forced
+			return;
+		}
+		Logger log = Logger.getLogger(conn,Emailer.class);
 		try {
 
 			if (!doReport(log,conn)) {

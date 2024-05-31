@@ -30,17 +30,20 @@ import uk.ac.ed.epcc.webapp.http.HttpService;
  *
  */
 public class MockMultiConnectionHttpService extends DefaultHttpService {
-	public Map<URL,MockHttpURLConnection> connections = new HashMap<URL, MockHttpURLConnection>();
+	public Map<URL,LinkedList<MockHttpURLConnection>> connections = new HashMap<URL,LinkedList< MockHttpURLConnection>>();
 	public LinkedList<MockHttpURLConnection> used = new LinkedList<MockHttpURLConnection>();
 
 	@Override
 	protected HttpURLConnection connect(URL url) throws IOException {
 		getLogger().debug("Requesting connection to "+url);
-		MockHttpURLConnection c = connections.get(url);
+		MockHttpURLConnection c = null;
+		LinkedList<MockHttpURLConnection> list = connections.get(url);
+		if( list != null && ! list.isEmpty() ) {
+			c = list.removeFirst();
+		}
 		if( c == null ) {
 			throw new IOException("No connection for "+url);
 		}
-		connections.remove(url);
 		used.add(c);
 		return c;
 	}
@@ -52,7 +55,20 @@ public class MockMultiConnectionHttpService extends DefaultHttpService {
 		super(conn);
 	}
 
+	/** Add a {@link MockHttpURLConnection} tot he connection list.
+	 * If multiple connections are added for the same URL they will be returned in the order added.
+	 * 
+	 * 
+	 * @param c
+	 */
 	public void addConnection(MockHttpURLConnection c) {
-		connections.put(c.getURL(), c);
+		
+		URL url = c.getURL();
+		LinkedList<MockHttpURLConnection> list = connections.get(url);
+		if( list == null ) {
+			list = new LinkedList<>();
+			connections.put(url, list);
+		}
+		list.add(c);
 	}
 }

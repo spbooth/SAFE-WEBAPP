@@ -107,8 +107,13 @@ public class DefaultServletService implements ServletService{
 
 	public static final Feature EXTERNAL_AUTH_VIA_LOGIN_FEATURE = new Feature("external_auth.use_login",false,"Mandatory external auth with only login.jsp protected externally");
 
-	public static final Feature ALLOW_INSECURE = new Feature("session.allow_insecure",false,"Allow insecure connections to use tokes");
-	public static final Feature REDIRECT_TO_LOGIN_FEATURE = new Feature("login_page.always_redirect",false,"Always use redirect to go to login page");
+	public static final Feature ALLOW_INSECURE = new Feature("session.allow_insecure",false,"Allow insecure connections to use tokens");
+
+	public static final Feature REPORT_URL_MODIFY = new Feature("session.report_url_modify",true,"Report urls with extra spaces to make them un-clickable but readable");
+	
+	// This should be true. If we have just created a session and forward to the login page it will
+	// show the session-id in urls. If we redirect it will be set as a cookie (if cookies enabled(
+	public static final Feature REDIRECT_TO_LOGIN_FEATURE = new Feature("login_page.always_redirect",true,"Always use redirect to go to login page");
 	public DefaultServletService(AppContext conn,ServletContext ctx, ServletRequest req,
 			ServletResponse res) {
 		super();
@@ -590,7 +595,7 @@ public class DefaultServletService implements ServletService{
 	}
 
 
-	public <A extends AppUser> void requestLogin(SessionService<A> sess, String page)
+	public <A extends AppUser> void requestLogin(SessionService<A> sess, String username, String page)
 			throws IOException, ServletException {
 		// Need to remember page and redirect to login
 		if( page !=null&& ! page.isEmpty()) {
@@ -615,9 +620,26 @@ public class DefaultServletService implements ServletService{
 		// standard login page supports both custom password login and self-register for external-auth
 		// If built_in login is off we might change the login page to an external auth servlet url.
 		String login_page=LoginServlet.getLoginPage(getContext());
+		if( username != null && ! username.isEmpty()) {
+			try {
+				sess.getLoginFactory().validateNameFormat(username);
+				login_page = login_page+"?username="+username;
+			}catch(Exception e) {
+				
+			}
+		}
+				
 		if( EXTERNAL_AUTH_VIA_LOGIN_FEATURE.isEnabled(getContext()) || REDIRECT_TO_LOGIN_FEATURE.isEnabled(getContext()) || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
-			
-			redirect(login_page);
+			// A non encoding redirect to make sure there is no session in the url
+			// We may well be creating a session cookie at this point (we need to remember the requested page)
+			// but might still get re-write if no cookie seen in request.
+			// risk is a non cookie browser will lose the destination location but
+			// that is an edge case and tolerable where session leakage is a risk for everyone.
+			if( req instanceof HttpServletRequest && res instanceof HttpServletResponse){
+	    		((HttpServletResponse)res).sendRedirect(((HttpServletRequest)req).getContextPath()+login_page);
+	    	}else {
+	    		error("Unexpected request/response type "+req.getClass().getCanonicalName()+" "+res.getClass().getCanonicalName());
+	    	}
 		}else {
 			forward(login_page);
 		}
@@ -874,7 +896,7 @@ public class DefaultServletService implements ServletService{
 		if (req != null ) {
 			
 			String url = null;
-			StringBuffer buf =  req.getRequestURL();
+			StringBuffer buf =  getRequestURI(req);
 			if( buf != null ){
 				url = buf.toString();
 			}
@@ -900,6 +922,7 @@ public class DefaultServletService implements ServletService{
 				}
 			}
 			props.put("headers", headers);
+			props.put("request_method", req.getMethod());
 
 			StringBuilder service_list = new StringBuilder();
 			for(AppContextService s : getContext().getServices()){
@@ -945,6 +968,32 @@ public class DefaultServletService implements ServletService{
 			}
 		}
 		
+	}
+
+
+	/** Intercept method to get the requestURI as a StringBuffer
+	 * 
+	 * Though {@link HttpServletRequest} has a method to do this
+	 * this allows us to override this to avoid email URL re-write
+	 * (e.g. MS "safe-links") we want this value to be readable but
+	 * not necessarily clickable
+	 * 
+	 * @param req
+	 * @return
+	 */
+	private StringBuffer getRequestURI(HttpServletRequest req) {
+		if( REPORT_URL_MODIFY.isEnabled(getContext())) {
+			StringBuffer sb = new StringBuffer();
+			sb.append(req.getScheme());
+			sb.append(":/ /"); // extra space
+			sb.append(req.getServerName());
+			sb.append(req.getContextPath());
+			sb.append("/");
+			sb.append(encodePage());
+			
+			return sb;
+		}
+		return req.getRequestURL();
 	}
 
 

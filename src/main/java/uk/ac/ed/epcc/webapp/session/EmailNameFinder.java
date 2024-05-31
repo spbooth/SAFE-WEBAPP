@@ -32,7 +32,6 @@ import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
 import uk.ac.ed.epcc.webapp.email.inputs.ServiceAllowedEmailFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Field;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
@@ -64,6 +63,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 import uk.ac.ed.epcc.webapp.model.lifecycle.ActionList;
 import uk.ac.ed.epcc.webapp.servlet.session.token.Scopes;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /**
  * A {@link AppUserNameFinder} to handle users canonical Email
@@ -103,11 +103,6 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 	public static final EmailStatus.Value VALID = e_status.new Value("V", "Valid");
 	public static final EmailStatus.Value UNKNOWN = e_status.new Value("U", "Unknown");
 	public static final EmailStatus.Value INVALID = e_status.new Value("I", "InValid");
-	/**
-	 * property to set the email input box width
-	 * 
-	 */
-	public static final String EMAIL_MAXWIDTH_PROP = "email.maxwidth";
 	public static final String EMAIL = "Email";
 	public static final String EMAIL_VERIFIED_FIELD = "EmailVerified";
 	public static final Feature CHANGE_EMAIL_FEATURE = new Feature("email.change_transition", true,
@@ -136,14 +131,12 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 
 	@Override
 	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
-		EmailInput email = new EmailInput();
-		email.setBoxWidth(getContext().getIntegerParameter(EMAIL_MAXWIDTH_PROP, 32));
 		selectors.put(EMAIL, new Selector() {
 
 			@Override
 			public Input getInput() {
 				EmailInput email = new EmailInput();
-				email.setBoxWidth(getContext().getIntegerParameter(EMAIL_MAXWIDTH_PROP, 32));
+				email.setBoxWidth(EmailInput.defaultBoxWidth(getContext()));
 				return email;
 			}
 
@@ -274,24 +267,29 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 	 */
 	@Override
 	public void addAttributes(Map<String, Object> attributes, AU target) {
-		String email = getCanonicalName(target);
-		if (email != null) {
-			attributes.put(EMAIL, email);
-		}
-		Date d = getVerificationDate(target);
-		if (d != null) {
-			attributes.put("Email last verified", d);
-			Date need_by = needVerifyBy(target);
-			if (need_by != null) {
-				attributes.put("Next Email verification required", need_by);
+		// Attributes may be exposed as IdP attributes or used
+		// by operators. don't advertise an email we don't trust.
+		// (unless we don't do email verification at all)
+		if( isEmailVerified(target)) {
+			String email = getCanonicalName(target);
+			if (email != null) {
+				attributes.put(EMAIL, email);
 			}
-		} else {
-			if (useEmailVerificationDate()) {
-				attributes.put("Email verification", "Email address has not been verified");
+			Date d = getVerificationDate(target);
+			if (d != null) {
+				attributes.put("Email last verified", d);
+				Date need_by = needVerifyBy(target);
+				if (need_by != null) {
+					attributes.put("Next Email verification required", need_by);
+				}
+			} else {
+				if (useEmailVerificationDate()) {
+					attributes.put("Email verification", "Email address has not been verified");
+				}
 			}
-		}
-		if (useEmailStatus()) {
-			attributes.put("Email status", getStatus(target).getName());
+			if (useEmailStatus()) {
+				attributes.put("Email status", getStatus(target).getName());
+			}
 		}
 	}
 	@Override
@@ -866,5 +864,4 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 			}
 		}
 	}
-	
 }

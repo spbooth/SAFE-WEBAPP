@@ -16,8 +16,11 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-/**
- * an input that has some Domain Object associated with its values
+/** An input that has some Domain Object associated with its values
+ * 
+ * Our normal convention for automatic forms is to have the input value correspond to the database field value. 
+ * Reference fields and type-producer fields can use ItemInputs to work with the referenced object
+ * 
  * 
  * @author spb
  * @param <V> type of input
@@ -34,13 +37,24 @@ public interface ItemInput<V,T> extends Input<V>{
 	 * @return Object the domain object or null
 	 */
 	public abstract T getItembyValue(V value);
+	
+	/** get the value associated with the domain object
+	 * 
+	 * @param item
+	 * @return
+	 */
+	public abstract V getValueByItem(T item) throws TypeException;
 	/**
 	 * get the domain Object associated with the current value
 	 * 
 	 * @return Object
 	 */
 	default public  T getItem() {
-		return getItembyValue(getValue());
+		V value = getValue();
+		if( value == null) {
+			return null;
+		}
+		return getItembyValue(value);
 	}
 	
 	
@@ -48,7 +62,17 @@ public interface ItemInput<V,T> extends Input<V>{
 	/**
 	 * Set the value of the input using an item
 	 * 
-	 * @param item
+	 * @param item 
 	 */
-	public abstract void setItem(T item);
+	public default void setItem(T item){
+		if(item == null) {
+			setNull();
+		}else {
+			try {
+				setValue(getValueByItem(item));
+			} catch (TypeException e) {
+				setNull();
+			}
+		}
+	}
 }

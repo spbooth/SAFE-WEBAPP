@@ -19,12 +19,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
+import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 
@@ -35,6 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
  * be constructed via field <i>field_name</i> and the same algorithm applied on the remote factory.
  * If the name starts with <b>name:</b> and the factory is a {@link NameFinder} then the remainder of
  * the name is passed to {@link NameFinder#getStringFinderFilter(String)}. 
+ * If the name starts with <b>null:</b> the remainder of the name is taken to be a field name and a {@link NullFieldFilter} generated for that field.
  * Only references registered in the {@link Repository} can be de-referenced.
  * 
  * Dynamic filters can be defined using configuration properties of the form <b>use_filter.<i>name</i></b>
@@ -53,10 +53,12 @@ public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed i
 	 * 
 	 */
 	private static final String FILTER_DEREF = "->";
-	/**
+	/** prefix indicating the filter is the name of a target object
 	 * 
 	 */
 	private static final String NAME_PREFIX = "name:";
+	
+	private static final String NULL_FIELD_PREFIX = "null:";
 	private final DataObjectFactory<T> fac;
 	private final Set<String> missing=new HashSet<>();
 	/**
@@ -71,6 +73,9 @@ public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed i
 	 */
 	@Override
 	public BaseFilter<T> getNamedFilter(String name) {
+		if( name.equals("false")) {
+			return new FalseFilter<>();
+		}
 		// We need to handle AND/OR combinations here for code that uses explicitly name-filter
 		// when called from the SessionService relationship code the AND/OR combinations should
 		// be parsed at that level
@@ -115,7 +120,11 @@ public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed i
 			String provider_name = name.substring(pos+1);
 			NamedFilterProvider<T> prov = fac.getContext().makeObject(NamedFilterProvider.class, provider);
 			if( prov != null) {
-				return prov.getNamedFilter(provider_name);
+				BaseFilter<T> namedFilter = prov.getNamedFilter(provider_name);
+				if( namedFilter == null ) {
+					getLogger().error("Unrecognised named filter "+name+" for "+fac.getConfigTag());
+				}
+				return namedFilter;
 			}else {
 				getLogger().error("Bad explicit NamedFilterProvider "+provider);
 			}
@@ -123,6 +132,25 @@ public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed i
 		}
 		if( fac instanceof NameFinder && name.startsWith(NAME_PREFIX)) {
 			return ((NameFinder)fac).getStringFinderFilter(name.substring(NAME_PREFIX.length()));
+		}
+		if( name.startsWith(NULL_FIELD_PREFIX)) {
+			String field = name.substring(NULL_FIELD_PREFIX.length());
+			Repository res = fac.res;
+			boolean optional = false;
+			if( field.endsWith("?")) {
+				optional=true;
+				field = field.substring(0,field.length()-1);
+			}
+			if( res.hasField(field)) {
+				return new NullFieldFilter<>(res, field, true);
+			}else {
+				if( optional) {
+					// optional field
+					return new GenericBinaryFilter<>(true);
+				}
+				getLogger().error("Bad null field filter "+field);
+				return null;
+			}
 		}
 		
 		BaseFilter<T> result=null;

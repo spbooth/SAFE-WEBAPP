@@ -26,12 +26,8 @@ import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
-import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableContentProvider;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.table.*;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
@@ -39,7 +35,6 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
-import uk.ac.ed.epcc.webapp.model.relationship.Relationship.Link;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.PermissionSummary;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
@@ -202,7 +197,7 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		try {
 			s.new Index("Link", true, PERSON_ID, TARGET_ID);
 		} catch (InvalidArgument e) {
-			conn.error(e,"Error making index");
+			Logger.getLogger(Relationship.class).error("Error making index",e);
 			return;
 		}
 		// best we can do
@@ -281,5 +276,13 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		}
 		FilterDelete del = new FilterDelete(res);
 		del.delete(new SQLValueFilter(res, getLeftField(), user));
+	}
+
+	public void clearRelationships(B target) throws DataFault {
+		if( target == null) {
+			return;
+		}
+		FilterDelete del = new FilterDelete(res);
+		del.delete(new SQLValueFilter(res, getRightField(), target));
 	}
 }

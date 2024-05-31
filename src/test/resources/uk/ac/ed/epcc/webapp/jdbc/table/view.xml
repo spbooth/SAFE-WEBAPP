@@ -1,45 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?><view_page>
-<Title>View Table</Title>
-<top/>
-<log>
-<h2>Table TableTest</h2>
-<h3>Table Type:TableStructureTestFactory</h3>
-<details class="details">
-<summary>Database table TableTest</summary>
-<table class="auto" rows="1" cols="5">
-<tr count="0">
-<th class="key" count="0">Field</th>
-<th class="main" count="1">Type</th>
-<th class="main" count="2">Unique</th>
-<th class="main" count="3">Nullable</th>
-<th class="main" count="4">Size</th>
-</tr>
-<tr count="1">
-<td class="key" count="0">Name</td>
-<td class="main" count="1">Varchar</td>
-<td class="main" count="2">false</td>
-<td class="main" count="3">true</td>
-<td class="main" count="4" numeric="true">48</td>
-</tr>
+<view_page><Title>View Table</Title><top/><log><h2>Table TableTest</h2><h3>Table Type:TableStructureTestFactory</h3><details class='details'>
+<summary>Database table TableTest</summary><table class='auto' rows='1' cols='5'>
+<tr count='0'><th class='key' count='0'>Field</th><th class='main' count='1'>Type</th><th class='main' count='2'>Unique</th><th class='main' count='3'>Nullable</th><th class='main' count='4'>Size</th></tr>
+<tr count='1'><td class='key' count='0'>Name</td><td class='main' count='1'>Varchar</td><td class='main' count='2'>false</td><td class='main' count='3'>true</td><td class='main' count='4' numeric='true'>48</td></tr>
 </table>
+
 </details>
-</log>
-<buttons>
-<active value="DropTable"/>
-<active value="AddForeignKeys"/>
-<active value="DropField"/>
-<active value="DropIndex"/>
-<active value="DropForeignKey"/>
-<active value="AddReferenceField"/>
-<active value="AddDateField"/>
-<active value="AddTextField"/>
-<active value="AddIntegerField"/>
-<active value="AddLongField"/>
-<active value="AddFloatField"/>
-<active value="AddDoubleField"/>
-<active value="AddBooleanField"/>
-<active value="Add Std field" help="Add missing fields from the default table specification for this class"/>
-<active value="Add Std index" help="Add missing index from the default table specification for this class"/>
-<active value="Drop optional field" help="Drop optional existing field"/>
-</buttons>
-</view_page>
+</log><buttons><active value='DropTable'></active><active value='AddForeignKeys' help='Add foreign keys for ALL reference fields'></active><active value='DropField'></active><active value='DropIndex'></active><active value='DropForeignKey'></active><active value='AddReferenceField'></active><active value='AddDateField'></active><active value='AddTextField'></active><active value='AddIntegerField'></active><active value='AddLongField'></active><active value='AddFloatField'></active><active value='AddDoubleField'></active><active value='AddBooleanField'></active><active value='Add Std field' help='Add missing fields from the default table specification for this class'></active><active value='Add Std foreign key' help='Add missing foreign key from the default table specification for this class'></active><active value='Add Std index' help='Add missing index from the default table specification for this class'></active><active value='Drop optional field' help='Drop optional existing field'></active></buttons></view_page>

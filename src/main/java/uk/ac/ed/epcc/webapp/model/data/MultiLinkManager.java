@@ -216,7 +216,7 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
   			String homeTable) {
 		 TableSpecification spec = new TableSpecification();
 		 for(Map.Entry<String,String> e : table_to_key.entrySet()) {
-			 spec.setField(e.getValue(), new ReferenceFieldType(e.getKey()));
+			 spec.setField(e.getValue(), new ReferenceFieldType(false,e.getKey(),true));
 		 }
 		 try {
 			Index m = spec.new Index("match_key", true, table_to_key.values().toArray(new String[table_to_key.size()]));
@@ -310,6 +310,21 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		return convertToDestinationFilter(fac, table_to_key.get(fac.getTag()), fil);
 		
 	}
+	/** Get a {@link BaseFilter} on one of the linked {@link DataObjectFactory}s
+	 * 
+	 * @param <R>
+	 * @param fac
+	 * @param fil
+	 * @return
+	 * @throws InvalidArgument
+	 */
+	public <R extends DataObject> SQLFilter<R> getSQLDestFilter(DataObjectFactory<R> fac,SQLFilter<M> fil) throws InvalidArgument{
+		if( ! table_to_key.containsKey(fac.getTag())) {
+			throw new InvalidArgument("BadFactory passed to MultiLink "+fac.getTag());
+		}
+		return getDestFilter(fil, table_to_key.get(fac.getTag()), fac);
+		
+	}
 	/** get a {@link BaseFilter} on the {@link MultiLink} from a filter on a remote {@link DataObjectFactory}
 	 * 
 	 * @param <R>
@@ -325,5 +340,19 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		return getRemoteFilter(fac, table_to_key.get(fac.getTag()), fil);
 		
 	}
-
+	/** get a {@link SQLFilter} on the {@link MultiLink} from a filter on a remote {@link DataObjectFactory}
+	 * 
+	 * @param <R>
+	 * @param fac
+	 * @param fil
+	 * @return
+	 * @throws InvalidArgument
+	 */
+	public <R extends DataObject> SQLFilter<M> getRemoteSQLFilter(DataObjectFactory<R> fac,SQLFilter<R> fil) throws InvalidArgument{
+		if( ! table_to_key.containsKey(fac.getTag())) {
+			throw new InvalidArgument("BadFactory passed to MultiLink "+fac.getTag());
+		}
+		return getRemoteSQLFilter(fac, table_to_key.get(fac.getTag()), fil);
+		
+	}
 }

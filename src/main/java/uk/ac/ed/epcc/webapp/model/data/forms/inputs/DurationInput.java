@@ -18,7 +18,6 @@ package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
 import java.util.StringTokenizer;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -27,6 +26,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.model.data.Duration;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 /** Input for a {@link Duration} in  HH:mm::ss format.
  *  @see ElapsedSecondInput
  * 
@@ -35,7 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.Duration;
  */
 
 
-public class DurationInput extends ParseAbstractInput<Duration> implements FormatHintInput{
+public class DurationInput extends ParseAbstractInput<Duration> {
 
 	private final long resolution;
 	public DurationInput(){
@@ -48,8 +48,8 @@ public class DurationInput extends ParseAbstractInput<Duration> implements Forma
 	public DurationInput(long resolution) {
 		super();
 		setBoxWidth(10);
-		setMaxResultLength(16);
 		setSingle(true);
+		setFormatHint("HH:MM:SS");
 		this.resolution=resolution;
 		addValidator(new FieldValidator<Duration>() {
 			
@@ -103,9 +103,6 @@ public class DurationInput extends ParseAbstractInput<Duration> implements Forma
 		return total+":"+min+":"+seconds;
 	}
 
-	public String getFormatHint() {
-		return "HH:MM:SS";
-	}
 	@Override
 	public Duration convert(Object v) throws TypeException {
 		if( v == null ){

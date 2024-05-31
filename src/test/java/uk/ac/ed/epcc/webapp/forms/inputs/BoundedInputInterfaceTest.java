@@ -19,7 +19,7 @@ import org.junit.Test;
  * @author Stephen Booth
  *
  */
-public interface BoundedInputInterfaceTest<T, I extends BoundedInput<T>,X extends BoundedInputDataProvider<T, I>> {
+public interface BoundedInputInterfaceTest<T extends Comparable<T>, I extends BoundedInput<T>,X extends BoundedInputDataProvider<T, I>> {
 	@Test
     public void testMin()throws Exception;
 	@Test

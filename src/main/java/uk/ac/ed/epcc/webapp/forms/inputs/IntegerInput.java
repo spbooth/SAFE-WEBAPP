@@ -80,10 +80,10 @@ public class IntegerInput extends NumberInput<Integer> {
 			return (Integer) v;
 		}
 		if( v instanceof Number ){
-			return new Integer(((Number)v).intValue());
+			return Integer.valueOf(((Number)v).intValue());
 		}
 		if( v instanceof String){
-			return new Integer((String)v);
+			return Integer.valueOf((String)v);
 		}
 		throw new TypeException("Invalid type "+v.getClass().getCanonicalName()+" passed to IntegerInput");
 	}

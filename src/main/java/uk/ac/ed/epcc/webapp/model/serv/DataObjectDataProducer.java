@@ -95,7 +95,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 				CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 				del.delete(new SQLValueFilter<>(res, EXPIRES_FIELD,MatchCondition.LT, time.getCurrentTime()));
 			} catch (DataFault e) {
-				getContext().error(e,"Error deleting old data");
+				getLogger().error("Error deleting old data",e);
 			}
 		}
 	}
@@ -228,7 +228,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 			result.addFirst(Integer.toString(obj.getID()));
 			return result;
 		} catch (DataFault e) {
-			getContext().error(e,"Error making MimeData");
+			getLogger().error("Error making MimeData",e);
 			return null;
 		}
 	}

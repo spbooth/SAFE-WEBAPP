@@ -517,6 +517,13 @@ public class Option implements Serializable {
 		return this;
 	}
 
+	/** clear the value separator for this option
+	 * 
+	 * @return
+	 */
+	public Option noValueSeparator() {
+		return setValueSeparator(UNSET);
+	}
 	/**
 	 * Two options are considered equal if they have the same long name and short
 	 * name

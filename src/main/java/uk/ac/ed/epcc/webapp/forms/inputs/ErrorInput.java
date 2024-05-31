@@ -16,9 +16,10 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** An ErrorInput is an unmodifiable input that never validates.
  * It can used to indicate that no valid selections are possible for the user
@@ -99,6 +100,16 @@ public class ErrorInput<T> implements UnmodifiableInput, Input<T> {
 	 */
 	@Override
 	public void removeValidator(FieldValidator<T> val) {
+		
+	}
+	@Override
+	public FieldValidationSet<T> getValidators() {
+		return null;
+	}
+	
+	@Override
+	public void addValidatorSet(FieldValidationSet<T> set) {
+		
 		
 	}
 	@Override

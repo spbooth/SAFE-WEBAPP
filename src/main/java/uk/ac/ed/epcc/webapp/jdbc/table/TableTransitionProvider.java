@@ -53,6 +53,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
 /** Class implementing transitions on factory classes identified by table.
  * The target factory must have its
@@ -91,7 +92,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
     /**
 	 * 
 	 */
-	static final TableTransitionKey ADD_FOREIGN_KEYS_KEY = new TableDeveloperKey("AddForeignKeys");
+	static final TableTransitionKey ADD_FOREIGN_KEYS_KEY = new TableDeveloperKey("AddForeignKeys","Add foreign keys for ALL reference fields");
 	/**
 	 * 
 	 */
@@ -147,6 +148,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 	 * 
 	 */
 	static final TableTransitionKey ADD_STD_FIELD = new TableStructureAdminOperationKey("Add Std field","Add missing fields from the default table specification for this class");
+	static final TableTransitionKey ADD_STD_FK = new TableStructureAdminOperationKey("Add Std foreign key","Add missing foreign key from the default table specification for this class");
 	static final TableTransitionKey DROP_OPTIONAL_FIELD =new TableStructureAdminOperationKey("Drop optional field","Drop optional existing field");
 
     public TableTransitionProvider(AppContext conn){
@@ -186,6 +188,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 		}
 		if( target.getTableSpecification() != null ) {
 			map.put(ADD_STD_FIELD, new AddStdFieldTransition<>());
+			map.put(ADD_STD_FK, new AddStdFkTransition<>());
 			map.put(ADD_STD_INDEX, new AddStdIndexTransition<>());
 			map.put(DROP_OPTIONAL_FIELD, new DropOptionalFieldTransition<>());
 		}
@@ -245,7 +248,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 		@Override
 		public void buildForm(Form f, AppContext c) throws TransitionException {
 			TextInput update_input = new TextInput();
-			update_input.setMaxResultLength(23*1024*2024);
+			update_input.addValidator(new MaxLengthValidator(23*1024*2024));
 			FileUploadDecorator decorator = new FileUploadDecorator(update_input);
 			f.addInput("data", "Update text", decorator);
 			f.addAction("Update", new FormAction() {

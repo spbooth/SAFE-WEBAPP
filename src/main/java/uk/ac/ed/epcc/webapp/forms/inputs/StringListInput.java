@@ -13,13 +13,13 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-/** A {@link ListInput} where the items tags and values are the same String
+/** A {@link ListInput} where the items, tags and values are all the same String
  * 
  * 
  * @author Stephen Booth
  *
  */
-public abstract class StringListInput extends AbstractInput<String> implements ListInput<String, String> {
+public abstract class StringListInput extends SimpleListInput<String> {
 
 	
 	/**
@@ -29,42 +29,7 @@ public abstract class StringListInput extends AbstractInput<String> implements L
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#accept(uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor)
-	 */
-	@Override
-	public final <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
-
 	
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
-	 */
-	@Override
-	public final void setItem(String item) {
-		try {
-			setValue(item);
-		} catch (TypeException e) {
-			throw new TypeError(e);
-		}
-	}
-
-	public final String getItem() {
-		return getValue();
-	}
-	
-
-	
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#getTagByValue(java.lang.Object)
-	 */
-	@Override
-	public final String getTagByValue(String value) {
-		return value;
-	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#getText(java.lang.Object)
@@ -73,20 +38,13 @@ public abstract class StringListInput extends AbstractInput<String> implements L
 	public String getText(String item) {
 		return item;
 	}
-
-
-
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#getItembyValue(java.lang.Object)
 	 */
 	@Override
-	public final String getItembyValue(String value) {
+	public final String getItemByTag(String value) {
 		return value;
 	}
-
-	
-   
-	
 	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#getTagByItem(java.lang.Object)

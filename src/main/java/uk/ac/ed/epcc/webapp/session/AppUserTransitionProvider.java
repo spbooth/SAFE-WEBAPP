@@ -13,10 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.Map.Entry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -34,14 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPageResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ScriptCustomPage;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
-import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionProvider;
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.forms.transition.*;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
@@ -84,7 +74,6 @@ DataObjectTransitionProvider<AU, AppUserFactory<AU>, AppUserKey<AU>>{
 	 * 
 	 */
 	public static final String PERSON_TRANSITION_TAG = "Person";
-	public static final String VIEW_PERSON_RELATIONSHIP = "ViewPerson";
 	public static final AppUserKey SU_KEY = new AppUserKey("SU","Become User","Switch to this user identity") {
 
 		@Override
@@ -411,7 +400,7 @@ DataObjectTransitionProvider<AU, AppUserFactory<AU>, AppUserKey<AU>>{
 	@Override
 	public boolean canView(AU target, SessionService<?> sess) {
 		try(TimeClosable time = new TimeClosable(getContext(), "AppUserTransitionProvider.canView")){
-		return ((SessionService)sess).isCurrentPerson(target) || ((SessionService)sess).hasRelationship((AppUserFactory)sess.getLoginFactory(), target, VIEW_PERSON_RELATIONSHIP,false);
+		return ((SessionService)sess).isCurrentPerson(target) || sess.hasRole(AppUserFactory.VIEW_PERSON_ROLE)|| ((SessionService)sess).hasRelationship((AppUserFactory)sess.getLoginFactory(), target, AppUserFactory.VIEW_PERSON_RELATIONSHIP,false);
 		}
 	}
 
@@ -462,13 +451,12 @@ DataObjectTransitionProvider<AU, AppUserFactory<AU>, AppUserKey<AU>>{
 	    if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 
 	    	ExtendedXMLBuilder text = cb.getText();
 	    	text.open("small");
-	    	text.clean(c.expandText("All information supplied is held and processed in accordance with the ${service.name} Personal Data and Privacy Policy.\n" + 
-	    			"You can find full details "));
+	    	text.clean(c.expandText("All information supplied is held and processed in accordance with the ${service.name} "));
 	    	text.open("a");
 	    		text.attr("href",privacy_policy);
 	    		text.attr("target", "_blank");
 	    		text.attr("rel","noopener noreferrer external");
-	    		text.clean("here");
+	    		text.clean("Personal Data and Privacy Policy");
 	    	text.close();
 	    	text.clean(".");
 	    	text.close();

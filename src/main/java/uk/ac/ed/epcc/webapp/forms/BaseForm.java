@@ -16,30 +16,16 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.forms.action.ConfirmMessage;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ConfirmException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
-import uk.ac.ed.epcc.webapp.forms.inputs.WrappingInput;
+import uk.ac.ed.epcc.webapp.forms.exceptions.*;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /**
  * superclass for all Forms. A Form is functionally an ordered set of {@link Field}s. Once
@@ -78,7 +64,7 @@ public class BaseForm implements Form {
 		actions = new LinkedHashMap<>();
 		
 		conn = c;
-		log = c.getService(LoggerService.class).getLogger(getClass());
+		log = Logger.getLogger(c,getClass());
 	}
 
 	/**
@@ -326,7 +312,7 @@ public class BaseForm implements Form {
 		return f.getInput();
 	}
     public Logger getLogger(){
-    	return conn.getService(LoggerService.class).getLogger(getClass());
+    	return log;
     }
     /** get the form contents as a Table
      * 

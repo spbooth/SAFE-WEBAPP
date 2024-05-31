@@ -14,9 +14,7 @@
 package uk.ac.ed.epcc.webapp.forms.transition;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.content.ContentBuilder;
-import uk.ac.ed.epcc.webapp.content.UIGenerator;
-import uk.ac.ed.epcc.webapp.content.UIProvider;
+import uk.ac.ed.epcc.webapp.content.*;
 import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -30,6 +28,7 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  * @author spb
  *
  */
+@HasObjectMapper(tag=ViewTransitionMapper.CONSTRUCTION_TAG)
 public class ViewTransitionGenerator<X> implements UIGenerator, Comparable<ViewTransitionGenerator<X>>{
 
 	@Override
@@ -100,15 +99,31 @@ public class ViewTransitionGenerator<X> implements UIGenerator, Comparable<ViewT
 	public ContentBuilder addContent(ContentBuilder builder) {
 		try(TimeClosable time=new TimeClosable(conn, ()->"ViewTranditionGenerator."+transition_tag)){
 			SessionService sess = conn.getService(SessionService.class);
-			TransitionFactory<?, X> fac =new TransitionFactoryFinder(conn).getProviderFromName(transition_tag);
+			ViewTransitionFactory<?, X> fac =getFactory();
 			// Check for current user so as not to add links in emails for public viewable objects
-			if( fac != null && sess != null && sess.haveCurrentUser() && fac instanceof ViewTransitionFactory && ((ViewTransitionFactory)fac).canView(target, sess)){
-				builder.addLink(conn, toString(), title,new ViewTransitionResult((ViewTransitionFactory)fac, target));
+			if( fac != null && sess != null && sess.haveCurrentUser()  && fac.canView(target, sess)){
+				builder.addLink(conn, toString(), title,new ViewTransitionResult(fac, target));
 			}else{
 				builder.getSpan().clean(toString()).appendParent();
 			}
 			return builder;
 		}
+	}
+	public ViewTransitionFactory getFactory() {
+		TransitionFactory fac = new TransitionFactoryFinder(conn).getProviderFromName(transition_tag);
+		if( fac instanceof ViewTransitionFactory) {
+			return (ViewTransitionFactory) fac;
+		}
+		return null;
+	}
+	public String getText() {
+		return text;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public X getTarget() {
+		return target;
 	}
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)

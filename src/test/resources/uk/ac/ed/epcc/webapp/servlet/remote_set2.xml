@@ -2,6 +2,7 @@
 <Name type='String' nullable='false' max='128'/>
 <Person reference='Person'/>
 <name_index type='Index' unique='true'><Column name='Name'/></name_index>
+<person_index type='Index' unique='false'><Column name='Person'/></person_index>
 </TableSpecification>
 <TableSpecification name='Person'>
 <Email type='String' nullable='true' max='254'/>
@@ -18,9 +19,9 @@
 <Email>fred@example.com</Email>
 <PasswordFails>0</PasswordFails>
 <PasswordStatus>V</PasswordStatus>
-<Salt>UGjHKekNOf8wwd9F</Salt>
+<Salt>sfirXNnysG3VjF7A</Salt>
 <Alg>2</Alg>
-<Password>ba59c942921bd18c0ad8b49c79aeb31f7e7745ffbd40f008a2bc80e6d2e6eecc</Password>
+<Password>7ee142087c478949ecf44b05dc220bd5ac3e681b142eeb8adf9a76b76d0915fc</Password>
 </Person>
 <OIDC id='1'>
 <Name>fred</Name>

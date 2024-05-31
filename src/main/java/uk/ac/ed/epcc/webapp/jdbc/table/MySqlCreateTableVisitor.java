@@ -24,11 +24,8 @@ import java.util.function.UnaryOperator;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.MysqlSQLContext;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.FullTextIndex;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexField;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.*;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
@@ -36,20 +33,33 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	public static final Feature FOREIGN_KEY_FEATURE=new Feature("foreign-key",false,"Generate foreign keys");
+	public static final Feature FOREIGN_CREATE_TABLE_KEY_FEATURE=new Feature("foreign-key.create_table",true,"Automatically create parent table of foreign key if missing");
+
 	public static final Feature FOREIGN_KEY_DELETE_CASCASE_FEATURE = new Feature("foreign-key.delete_cascase",true,"Default to DELETE CASCASE on foreign keys for references that do not allow null");
     public static final Feature FORCE_MYISAM_ON_FULLTEXT_FEATURE=new Feature("mysql.force_myisam_on_fulltext",false,"Always use MyISAM if table contains fulltext index");
     public static final Feature USE_TIMESTAMP=new Feature("mysql.use_timestamp",false,"use timestamp fields by default");
-	private final MysqlSQLContext ctx;
+    public static final Feature USE_DATE=new Feature("mysql.use_date",true,"use date fields by default");
+
+    private final MysqlSQLContext ctx;
 	private final StringBuilder sb;
 	// Keep table in memory if we can only use for unit tests
 	private boolean use_memory=false;
 	private boolean use_myisam=false; // older versions of mysql need this for fulltext
 	private final List<Object> args;
-	public MySqlCreateTableVisitor(MysqlSQLContext ctx,StringBuilder sb, List<Object> args){
+	boolean use_date;
+	boolean use_timestamp;
+	private final String config_tag;
+	public MySqlCreateTableVisitor(MysqlSQLContext ctx,String config_tag,StringBuilder sb, List<Object> args){
 		this.ctx=ctx;
 		this.sb=sb;
 		this.args=args;
-		this.use_memory = ctx.getContext().getBooleanParameter("create_table.use_memory", use_memory);
+		AppContext conn = ctx.getContext();
+		// Note don't have these start create_table.table-name as this will
+		// conflict with dynamic table fields
+		this.use_memory = conn.getBooleanParameter("create_table.use_memory", use_memory);
+		use_date =  conn.getBooleanParameter("create_table.use_date."+config_tag, USE_DATE.isEnabled(ctx.getContext()));
+		use_timestamp = conn.getBooleanParameter("create_table.use_timestamp."+config_tag, USE_TIMESTAMP.isEnabled(ctx.getContext()));
+		this.config_tag=config_tag;
 	}
 	 
 	public void visitDateFieldType(DateFieldType dateFieldType) {
@@ -61,20 +71,26 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 		
 		//sb.append("TIMESTAMP");
 		if( dateFieldType.isTruncate()) {
-			sb.append("DATE");
-			doNull(dateFieldType);
-			Date d = dateFieldType.getDefault();
-			if( d != null ){
-				sb.append(" DEFAULT ?");
-				args.add(new java.sql.Date(dateFieldType.getDefault().getTime()));
-			}else {
-				if( dateFieldType.canBeNull()) {
-					// mysql null-date
-					sb.append(" DEFAULT 0");
+		
+			if( use_date) {
+				sb.append("DATE");
+				doNull(dateFieldType);
+				Date d = dateFieldType.getDefault();
+				if( d != null ){
+					sb.append(" DEFAULT ?");
+					args.add(new java.sql.Date(dateFieldType.getDefault().getTime()));
+				}else {
+					if( dateFieldType.canBeNull()) {
+						// mysql null-date
+						sb.append(" DEFAULT 0");
+					}
 				}
+			}else {
+				doNumericDate(dateFieldType);
 			}
 		}else {
-			if( USE_TIMESTAMP.isEnabled(ctx.getContext())) {
+			
+			if( use_timestamp) {
 				sb.append("TIMESTAMP");
 				doNull(dateFieldType);
 				Date d = dateFieldType.getDefault();
@@ -88,16 +104,20 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 					}
 				}
 			}else {
-				sb.append("BIGINT(20)");
-				doNull(dateFieldType);
-				Date d = dateFieldType.getDefault();
-				if( d != null ){
-					sb.append(" DEFAULT ?");
-					args.add(dateFieldType.getDefault().getTime()/1000);
-				}
+				doNumericDate(dateFieldType);
 			}
 		}
 		
+	}
+
+	private void doNumericDate(DateFieldType dateFieldType) {
+		sb.append("BIGINT(20)");
+		doNull(dateFieldType);
+		Date d = dateFieldType.getDefault();
+		if( d != null ){
+			sb.append(" DEFAULT ?");
+			args.add(dateFieldType.getDefault().getTime()/Repository.DEFAULT_RESOLUTION);
+		}
 	}
 	
 	private void doNull(FieldType field) {
@@ -128,6 +148,8 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 			sb.append(" DEFAULT NULL");
 		}
 	}
+	
+
 	public void visitStringFieldType(StringFieldType stringFieldType) {
 		int len = stringFieldType.getMaxLEngth();
 		if( len < 256 ){
@@ -210,24 +232,35 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#visitForeignKey(uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType)
 	 */
-	public void visitForeignKey(String name,ReferenceFieldType referenceField) {
+	public void visitForeignKey(String name,String prefix,ReferenceFieldType referenceField) {
 		AppContext conn = ctx.getContext();
-		if( FOREIGN_KEY_FEATURE.isEnabled(conn)){
+		// Allow per reg supression (e.g. for circular references)
+		if(  FOREIGN_KEY_FEATURE.isEnabled(conn) && referenceField.wantForeighKey() ){
 			String tag = referenceField.getRemoteTable();
-			try{
-				// Try to make referenced factory.
-				// This is to ensure the referenced table is auto-created before the
-				// current one (in case we have a foreign key)
-				conn.makeObject(DataObjectFactory.class, tag);
-			}catch(Exception t){
-				conn.getService(LoggerService.class).getLogger(getClass()).error("Problem making referenced facory for "+tag);
+			if(FOREIGN_CREATE_TABLE_KEY_FEATURE.isEnabled(conn)) {
+				try{
+					// Try to make referenced factory.
+					// This is to ensure the referenced table is auto-created before the
+					// current one (in case we have a foreign key)
+					conn.makeObject(DataObjectFactory.class, tag);
+				}catch(Exception t){
+					Logger.getLogger(conn,getClass()).error("Problem making referenced facory for "+tag);
+				}
+			}
+			DataBaseHandlerService hand = conn.getService(DataBaseHandlerService.class);
+			if( ! hand.tableExists(Repository.tagToTable(conn, tag))) {
+				return;
 			}
 			// Note this will only work if the table has already been created.
 			String desc = Repository.getForeignKeyDescriptor(conn,tag,true);
 			if( desc != null ){
-				sb.append(",\n");
-				sb.append("FOREIGN KEY ");
-				ctx.quote(sb, tag+"_"+name+"_ref_key");
+				sb.append(prefix);
+				sb.append("CONSTRAINT ");
+				// This needs to be a globally unique name (also not conflict with table names)
+				// So name after the referencing field
+				ctx.quote(sb, config_tag+"_"+name+"_fk");
+				sb.append(" FOREIGN KEY ");
+				
 				sb.append(" ( ");
 				ctx.quote(sb, name);
 				sb.append(" ) REFERENCES ");
@@ -284,12 +317,12 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#useIndex(uk.ac.ed.epcc.webapp.jdbc.table.IndexType)
 	 */
 	public boolean useIndex(IndexType i) {
-		if( FOREIGN_KEY_FEATURE.isEnabled(ctx.getContext())) {
-			if( i.isRef()) {
-				// This will duplicate the automatic foreign key
-				return false;
-			}
-		}
+//		if( FOREIGN_KEY_FEATURE.isEnabled(ctx.getContext())) {
+//			if( i.isRef()) {
+//				// This will duplicate the automatic foreign key
+//				return false;
+//			}
+//		}
 		return true;
 	}
 

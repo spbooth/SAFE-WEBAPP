@@ -20,4 +20,10 @@ public interface FormTextGenerator {
 	 * @return
 	 */
 	public String getFieldHelp(String field);
+	/** Get the placeholder/hint to use for a field
+	 * 
+	 * @param field
+	 * @return
+	 */
+	public String getFieldHint(String field);
 }

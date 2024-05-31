@@ -20,6 +20,7 @@ the form could just submit to self.
 <%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag"%>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.forms.*, uk.ac.ed.epcc.webapp.forms.transition.*" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.TransitionServlet" %>
+<%@page import = "uk.ac.ed.epcc.webapp.logging.Logger" %>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:ServiceInit/>
 <wb:session/>
@@ -124,7 +125,7 @@ for(Object key : provider.getTransitions(target)){
 	}
 }
 }catch(Exception e){
-	conn.error(e,"Error building view target form");
+	Logger.getLogger(getClass()).error("Error building view target form",e);
 	//throw e;
 }
 %>

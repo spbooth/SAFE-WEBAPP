@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.forms.action;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.InvalidInputResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 
 /** A {@link FormAction} used to denote a disabled (but present) action.
@@ -38,7 +39,7 @@ public final class DisabledAction extends FormAction {
 	 */
 	@Override
 	public FormResult action(Form f) throws ActionException {
-		return new MessageResult("invalid_input");
+		return new InvalidInputResult();
 	}
 
 	public void setHelp(String help){

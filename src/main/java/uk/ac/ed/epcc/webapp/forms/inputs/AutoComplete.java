@@ -13,30 +13,42 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.Iterator;
-import java.util.Set;
-
 /** Interface for inputs that provide auto-complete text.
  * @author spb
- *
- * @param <T> item type
+ * 
  * @param <V> input type
+ * @param <T> item type
+ * 
  */
-public interface AutoComplete<T,V> extends SuggestedItemInput<V,T>, ParseInput<V> {
+public interface AutoComplete<V,T> extends SuggestedItemInput<V,T>, LengthInput<V> {
 
-	/** Get the set of Items corresponding to a suggested values
+	/** Are there any legal values for this input.
+	 * 
+	 * @return 
+	 */
+	default boolean canSubmit() {
+		return true;
+	}
+	/** If there is only one legal item for this input return
 	 * 
 	 * @return
 	 */
-	// subclasses should override to return a list of possible completions
-	Set<T> getSuggestions();
+	default T forcedItem() {
+		return null;
+	}
 
 	/** Map an item to the corresponding value (compatible with the parse method).
 	 * 
 	 * @param item
 	 * @return String value
 	 */
-	String getValue(T item);
+	default String getValue(T item){
+		try {
+			return getString(getValueByItem(item));
+		} catch (TypeException e) {
+			return null;
+		}
+	}
 
 	/** get the suggestion text. This can be an expanded form of the value
 	 * 
@@ -45,25 +57,24 @@ public interface AutoComplete<T,V> extends SuggestedItemInput<V,T>, ParseInput<V
 	 */
 	String getSuggestionText(T item);
 
-	@Override
-	default Iterator<T> getItems() {
-		return getSuggestions().iterator();
-	}
-
-	@Override
-	default int getCount() {
-		return getSuggestions().size();
-	}
 	
 	/** should the auto-complete option be used?
 	 * If this method returns false the input should fall back to a text
 	 * input without generating the suggestion list. This is for cases where
 	 * the enumerating the suggestions may be very costly.
 	 * 
+	 * 
+	 * 
 	 * @return
 	 */
 	default boolean useAutoComplete() {
 		return true;
 	}
-
+	public default  <R> R accept(InputVisitor<R> vis) throws Exception{
+		if( useAutoComplete()) {
+			return vis.visitAutoCompleteInput(this);
+		}else {
+			return vis.visitLengthInput(this);
+		}
+	}
 }

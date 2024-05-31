@@ -22,13 +22,13 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory;
  * @author Stephen Booth
  *
  */
-public class FixedCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<A,String> {
+public class FixedCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<A,FormAuthComposite,String> {
 
 	/**
 	 * @param fac
 	 */
-	public FixedCodeAuthComposite(AppUserFactory<A> fac) {
-		super(fac);
+	public FixedCodeAuthComposite(AppUserFactory<A> fac,String tag) {
+		super(fac,tag);
 	}
 
 	private String getAuthCode() {
@@ -57,7 +57,7 @@ public class FixedCodeAuthComposite<A extends AppUser> extends CodeAuthComposite
 	 * @see uk.ac.ed.epcc.webapp.session.twofactor.CodeAuthComposite#verify(java.lang.Object)
 	 */
 	@Override
-	public boolean verify(A target,String value) {
+	public boolean verify(A target,String value,StringBuilder notes) {
 		if( value == null) {
 			return false;
 		}

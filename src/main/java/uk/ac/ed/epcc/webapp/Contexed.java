@@ -15,6 +15,9 @@
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp;
+
+import uk.ac.ed.epcc.webapp.logging.Logger;
+
 /** Interface for objects that can provide an AppContext.
  * 
  * When creating objects that implement this interface
@@ -28,6 +31,11 @@ package uk.ac.ed.epcc.webapp;
  * @author spb
  *
  */
-public interface Contexed {
-   public AppContext getContext();
+public interface Contexed extends ContextProvider {
+   default public AppContext getContext() {
+	   return AppContext.getContext();
+   }
+   default public Logger getLogger() {
+	   return Logger.getLogger(getContext(),getClass());
+   }
 }

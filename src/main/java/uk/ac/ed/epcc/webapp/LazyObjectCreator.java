@@ -43,8 +43,7 @@ public LazyObjectCreator(AppContext c,A result){
 	  clazz=(Class<A>) result.getClass();
 	  inner=result;
   }
-  
-  @SuppressWarnings("unchecked")
+@SuppressWarnings("unchecked")
 public A getInner(){
 	  if( inner == null ){
 		  inner = (A) conn.makeObject(clazz, tag);
@@ -59,16 +58,30 @@ public A getInner(){
   }
 @Override
 public int hashCode() {
-	
+	if( tag == null ) {
+		return clazz.hashCode();
+	}
 	return tag.hashCode()+clazz.hashCode();
 }
 @Override
 public boolean equals(Object obj) {
 	if( obj.getClass().equals(getClass())){
 		LazyObjectCreator o = (LazyObjectCreator)obj;
-		return o.clazz.equals(clazz) && o.tag.equals(tag);
+		if(! o.clazz.equals(clazz)) {
+			return false;
+		}
+		if( tag == null && o.tag == null ) {
+			return true; // both null ok
+		}
+		// both non-null and equals ok
+		return o.tag != null && tag != null && o.tag.equals(tag);
 	}
 	return false;
 }
-  
+  public static <X> X unwrap(X o) {
+	  if( o instanceof LazyObjectCreator) {
+		  return ((LazyObjectCreator<X>) o).getInner();
+	  }
+	  return o;
+  }
 }

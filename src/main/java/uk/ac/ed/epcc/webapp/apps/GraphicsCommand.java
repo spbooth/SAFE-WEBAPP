@@ -22,12 +22,12 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.swing.SwingTransitionHandler;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 public abstract class GraphicsCommand implements Command{
 	
@@ -36,7 +36,7 @@ public abstract class GraphicsCommand implements Command{
 	    protected Logger log;
 	    public GraphicsCommand(AppContext conn){
 	    	this.conn=conn;
-	    	log = conn.getService(LoggerService.class).getLogger(getClass());
+	    	log = Logger.getLogger(conn,getClass());
 	    }
 
 
@@ -70,7 +70,7 @@ public abstract class GraphicsCommand implements Command{
 		public void run(LinkedList<String> args) {
 			
 			SessionService session_service=conn.getService(SessionService.class);
-			
+			Feature.setTempFeature(conn, TransitionServlet.TRANSITION_TRANSACTIONS, false); //calls recursively in graphics context
 			if( session_service == null){
 				CommandLauncher.die("No user or roles set");
 			}
