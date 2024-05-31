@@ -267,24 +267,29 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 	 */
 	@Override
 	public void addAttributes(Map<String, Object> attributes, AU target) {
-		String email = getCanonicalName(target);
-		if (email != null) {
-			attributes.put(EMAIL, email);
-		}
-		Date d = getVerificationDate(target);
-		if (d != null) {
-			attributes.put("Email last verified", d);
-			Date need_by = needVerifyBy(target);
-			if (need_by != null) {
-				attributes.put("Next Email verification required", need_by);
+		// Attributes may be exposed as IdP attributes or used
+		// by operators. don't advertise an email we don't trust.
+		// (unless we don't do email verification at all)
+		if( isEmailVerified(target)) {
+			String email = getCanonicalName(target);
+			if (email != null) {
+				attributes.put(EMAIL, email);
 			}
-		} else {
-			if (useEmailVerificationDate()) {
-				attributes.put("Email verification", "Email address has not been verified");
+			Date d = getVerificationDate(target);
+			if (d != null) {
+				attributes.put("Email last verified", d);
+				Date need_by = needVerifyBy(target);
+				if (need_by != null) {
+					attributes.put("Next Email verification required", need_by);
+				}
+			} else {
+				if (useEmailVerificationDate()) {
+					attributes.put("Email verification", "Email address has not been verified");
+				}
 			}
-		}
-		if (useEmailStatus()) {
-			attributes.put("Email status", getStatus(target).getName());
+			if (useEmailStatus()) {
+				attributes.put("Email status", getStatus(target).getName());
+			}
 		}
 	}
 	@Override
